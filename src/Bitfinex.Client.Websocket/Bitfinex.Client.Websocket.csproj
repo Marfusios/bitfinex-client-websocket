@@ -2,6 +2,21 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <PackageId>Bitfinex.Client.Websocket</PackageId>
+    <PackageVersion>0.0.1</PackageVersion>
+    <Version>0.0.1</Version>
+    <Authors>Mariusz Kotas</Authors>
+    <Description>Client for Bitfinex websocket API version 2.0</Description>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageReleaseNotes>Initial release, WIP (work in progress)</PackageReleaseNotes>
+    <Copyright>Copyright 2018 Mariusz Kotas. All rights reserved.</Copyright>
+    <PackageTags>Bitfinex websockets websocket client cryptocurrency exchange bitcoin</PackageTags>
+    <PackageLicenseUrl>https://github.com/Marfusios/bitfinex-client-websocket/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/Marfusios/bitfinex-client-websocket</PackageProjectUrl>
+    <PackageIconUrl>http://blog.bitfinex.com/wp-content/uploads/2016/05/bfx-stacked.png</PackageIconUrl>
+    <RepositoryUrl>https://github.com/Marfusios/bitfinex-client-websocket</RepositoryUrl>
+    <RepositoryType>Git</RepositoryType>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>
