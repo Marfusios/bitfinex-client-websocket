@@ -38,6 +38,6 @@ using (var communicator = new BitfinexWebsocketCommunicator(url))
 ```
  
 Donations gratefully accepted.
-Bitcoin: 1HfxKZhvm68qK3gE8bJAdDBWkcZ2AFs9pw
-Litecoin: LftdENE8DTbLpV6RZLKLdzYzVU82E6dz4W
-Ethereum: 0xb9637c56b307f24372cdcebd208c0679d4e48a47
+* Bitcoin: 1HfxKZhvm68qK3gE8bJAdDBWkcZ2AFs9pw
+* Litecoin: LftdENE8DTbLpV6RZLKLdzYzVU82E6dz4W
+* Ethereum: 0xb9637c56b307f24372cdcebd208c0679d4e48a47
