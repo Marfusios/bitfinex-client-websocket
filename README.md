@@ -9,7 +9,7 @@ https://bitfinex.readme.io/v2/docs
 
 ### Features
 
-* instalation via NuGet ([Bitfinex.Client.Websocket](https://www.nuget.org/packages/Bitfinex.Client.Websocket/0.0.1))
+* instalation via NuGet ([Bitfinex.Client.Websocket](https://www.nuget.org/packages/Bitfinex.Client.Websocket))
 * public and authenticated API
 * reactive extensions ([Rx.NET](https://github.com/Reactive-Extensions/Rx.NET))
 * integrated logging ([Serilog](https://serilog.net/))
