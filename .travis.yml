@@ -12,7 +12,6 @@ deploy:
   provider: script
   skip_cleanup: true
   script:
-    - cd ./src/Bitfinex.Client.Websocket && dotnet pack -c Release
-    - cd ./src/Bitfinex.Client.Websocket/bin/Release && nuget push *.nupkg $NUGET_API_KEY
+    - cd src/Bitfinex.Client.Websocket && dotnet pack -c Release && cd bin/Release && dotnet nuget push *.nupkg -k $NUGET_API_KEY
   on:
     branch: master
