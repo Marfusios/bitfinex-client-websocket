@@ -8,3 +8,11 @@ before_script:
 script:
 - dotnet build -c Release
 - dotnet test test/Bitfinex.Client.Websocket.Tests -c Release
+deploy:
+  provider: script
+  skip_cleanup: true
+  script:
+    - cd ./src/Bitfinex.Client.Websocket && dotnet pack -c Release
+    - cd ./src/Bitfinex.Client.Websocket/bin/Release && nuget push *.nupkg $NUGET_API_KEY
+  on:
+    branch: master
