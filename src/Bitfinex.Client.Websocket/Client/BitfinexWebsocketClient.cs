@@ -27,10 +27,12 @@ namespace Bitfinex.Client.Websocket.Client
         private readonly Subject<ErrorResponse> _errorSubject = new Subject<ErrorResponse>();
         private readonly Subject<InfoResponse> _infoSubject = new Subject<InfoResponse>();
         private readonly Subject<PongResponse> _pongSubject = new Subject<PongResponse>();
+        private readonly Subject<Ticker> _tickerSubject = new Subject<Ticker>();
 
-        public IObservable<ErrorResponse> ErrorReceived => _errorSubject.AsObservable();
-        public IObservable<InfoResponse> InfoReceived => _infoSubject.AsObservable();
-        public IObservable<PongResponse> PongReceived => _pongSubject.AsObservable();
+        public IObservable<ErrorResponse> ErrorStream => _errorSubject.AsObservable();
+        public IObservable<InfoResponse> InfoStream => _infoSubject.AsObservable();
+        public IObservable<PongResponse> PongStream => _pongSubject.AsObservable();
+        public IObservable<Ticker> TickerStream => _tickerSubject.AsObservable();
 
         public BitfinexWebsocketClient(BitfinexWebsocketCommunicator communicator)
         {
@@ -145,12 +147,12 @@ namespace Bitfinex.Client.Websocket.Client
             switch (response.Channel)
             {
                 case "ticker":
-                    _channelIdToHandler[channelId] = OnTicker;
+                    _channelIdToHandler[channelId] = data => OnTicker(data, response);
                     break;
             }
         }
 
-        private void OnTicker(JToken token)
+        private void OnTicker(JToken token, SubscribedResponse subscription)
         {
             var data = token[1];
 
@@ -161,7 +163,8 @@ namespace Bitfinex.Client.Websocket.Client
             }
 
             var ticker = data.ToObject<Ticker>();
-            //_brain.State.OnTickerUpdated(ticker);
+            ticker.Pair = subscription.Pair;
+            _tickerSubject.OnNext(ticker);
         }
 
         private T Deserialize<T>(string msg)

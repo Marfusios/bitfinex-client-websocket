@@ -23,7 +23,7 @@ namespace Bitfinex.Client.Websocket.Tests.Integration
                 using (var client = new BitfinexWebsocketClient(communicator))
                 {
 
-                    client.PongReceived.Subscribe(pong =>
+                    client.PongStream.Subscribe(pong =>
                     {
                         received = pong;
                         receivedEvent.Set();

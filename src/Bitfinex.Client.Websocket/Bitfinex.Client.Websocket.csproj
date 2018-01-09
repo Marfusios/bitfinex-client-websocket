@@ -3,8 +3,8 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <PackageId>Bitfinex.Client.Websocket</PackageId>
-    <PackageVersion>0.0.1</PackageVersion>
-    <Version>0.0.1</Version>
+    <PackageVersion>0.0.2</PackageVersion>
+    <Version>0.0.2</Version>
     <Authors>Mariusz Kotas</Authors>
     <Description>Client for Bitfinex websocket API version 2.0</Description>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>

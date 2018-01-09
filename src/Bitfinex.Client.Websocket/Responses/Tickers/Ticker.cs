@@ -54,5 +54,11 @@ namespace Bitfinex.Client.Websocket.Responses.Tickers
         /// Daily low
         /// </summary>
         public double Low { get; set; }
+
+        /// <summary>
+        /// Target pair
+        /// </summary>
+        [JsonIgnore]
+        public string Pair { get; set; }
     }
 }

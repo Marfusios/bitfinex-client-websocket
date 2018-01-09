@@ -23,7 +23,7 @@ using (var communicator = new BitfinexWebsocketCommunicator(url))
 {
     using (var client = new BitfinexWebsocketClient(communicator))
     {
-        client.PongReceived.Subscribe(pong =>
+        client.PongStream.Subscribe(pong =>
         {
             Console.WriteLine($"Pong received! Id: {pong.Cid}") // Pong received! Id: 123456
             exitEvent.Set();
