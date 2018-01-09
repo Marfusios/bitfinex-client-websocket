@@ -11,6 +11,7 @@ https://bitfinex.readme.io/v2/docs
 
 * instalation via NuGet ([Bitfinex.Client.Websocket](https://www.nuget.org/packages/Bitfinex.Client.Websocket))
 * public and authenticated API
+* targeting .NET Standard 2.0 (.NET Core, Linux/MacOS compatible)
 * reactive extensions ([Rx.NET](https://github.com/Reactive-Extensions/Rx.NET))
 * integrated logging ([Serilog](https://serilog.net/))
 
