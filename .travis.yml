@@ -6,5 +6,6 @@ dotnet: 2.0.0
 install:
 before_script:
 script:
-- dotnet build
-- dotnet test
+- dotnet build -c Release
+- dotnet test test/Bitfinex.Client.Websocket.Tests -c Release
+- dotnet test test_integration/Bitfinex.Client.Websocket.Tests.Integration -c Release
