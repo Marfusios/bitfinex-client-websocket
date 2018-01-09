@@ -12,6 +12,7 @@ https://bitfinex.readme.io/v2/docs
 * instalation via NuGet ([Bitfinex.Client.Websocket](https://www.nuget.org/packages/Bitfinex.Client.Websocket/0.0.1))
 * public and authenticated API
 * reactive extensions ([Rx.NET](https://github.com/Reactive-Extensions/Rx.NET))
+* integrated logging ([Serilog](https://serilog.net/))
 
 ### Usage
 
@@ -36,6 +37,46 @@ using (var communicator = new BitfinexWebsocketCommunicator(url))
     }
 }
 ```
+
+More usage examples:
+* integration tests ([link](test_integration/Bitfinex.Client.Websocket.Tests.Integration))
+* console sample ([link](test_integration/Bitfinex.Client.Websocket.Sample/Program.cs))
+
+### API coverage
+
+| API - PUBLIC           |      Covered   |  
+|------------------------|:--------------:|
+| Info                   |  ✔            |
+| Ping-Pong              |  ✔            |
+| Errors                 |  ✔            |
+| Channel subscribing    |  ✔            |
+| Channel unsubscribing  |  ✔            |
+| Ticker                 |  ✔            |
+| Trades                 |               |
+| Books                  |               |
+| Raw books              |               |
+| Candles                |               |
+| Books                  |               |
+| Books                  |               |
+| Books                  |               |
+
+| API - AUTHENTICATED    |      Covered   |  
+|------------------------|:--------------:|
+| Account info           |  ✔            |
+| Orders                 |  ✔            |
+| Positions              |               |
+| Trades                 |               |
+| Funding                |               |
+| Wallets                |               |
+| Balance                |               |
+| Notifications          |               |
+
+| API - AUTH - INPUT     |      Covered   |  
+|------------------------|:--------------:|
+| New order              |  ✔            |
+| Cancel order           |  ✔            |
+| Cancel order multi     |                |
+| Calc                   |                |
  
 Donations gratefully accepted.
 * Bitcoin: 1HfxKZhvm68qK3gE8bJAdDBWkcZ2AFs9pw
