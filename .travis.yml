@@ -8,4 +8,3 @@ before_script:
 script:
 - dotnet build -c Release
 - dotnet test test/Bitfinex.Client.Websocket.Tests -c Release
-- dotnet test test_integration/Bitfinex.Client.Websocket.Tests.Integration -c Release
