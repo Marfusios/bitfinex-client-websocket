@@ -44,7 +44,7 @@ More usage examples:
 
 ### API coverage
 
-| API - PUBLIC           |      Covered   |  
+| PUBLIC                 |    Covered     |  
 |------------------------|:--------------:|
 | Info                   |  ✔            |
 | Ping-Pong              |  ✔            |
@@ -52,26 +52,26 @@ More usage examples:
 | Channel subscribing    |  ✔            |
 | Channel unsubscribing  |  ✔            |
 | Ticker                 |  ✔            |
-| Trades                 |               |
-| Books                  |               |
-| Raw books              |               |
-| Candles                |               |
-| Books                  |               |
-| Books                  |               |
-| Books                  |               |
+| Trades                 |                |
+| Books                  |                |
+| Raw books              |                |
+| Candles                |                |
+| Books                  |                |
+| Books                  |                |
+| Books                  |                |
 
-| API - AUTHENTICATED    |      Covered   |  
+| AUTHENTICATED          |    Covered     |  
 |------------------------|:--------------:|
 | Account info           |  ✔            |
 | Orders                 |  ✔            |
-| Positions              |               |
-| Trades                 |               |
-| Funding                |               |
-| Wallets                |               |
-| Balance                |               |
-| Notifications          |               |
+| Positions              |                |
+| Trades                 |                |
+| Funding                |                |
+| Wallets                |                |
+| Balance                |                |
+| Notifications          |                |
 
-| API - AUTH - INPUT     |      Covered   |  
+| AUTHENTICATED - INPUT  |    Covered     |  
 |------------------------|:--------------:|
 | New order              |  ✔            |
 | Cancel order           |  ✔            |
