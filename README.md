@@ -24,7 +24,7 @@ using (var communicator = new BitfinexWebsocketCommunicator(url))
 {
     using (var client = new BitfinexWebsocketClient(communicator))
     {
-        client.PongStream.Subscribe(pong =>
+        client.Streams.PongStream.Subscribe(pong =>
         {
             Console.WriteLine($"Pong received! Id: {pong.Cid}") // Pong received! Id: 123456
             exitEvent.Set();
@@ -56,9 +56,6 @@ More usage examples:
 | Books                  |                |
 | Raw books              |                |
 | Candles                |                |
-| Books                  |                |
-| Books                  |                |
-| Books                  |                |
 
 | AUTHENTICATED          |    Covered     |  
 |------------------------|:--------------:|
@@ -67,7 +64,7 @@ More usage examples:
 | Positions              |                |
 | Trades                 |                |
 | Funding                |                |
-| Wallets                |                |
+| Wallets                |  ✔            |
 | Balance                |                |
 | Notifications          |                |
 

@@ -11,6 +11,9 @@ namespace Bitfinex.Client.Websocket.Tests.Integration
 {
     public class BitfinexWebsocketClientTests
     {
+        private static readonly string API_KEY = "your_api_key";
+        private static readonly string API_SECRET = "";
+
         [Fact]
         public async Task PingPong()
         {
@@ -23,7 +26,7 @@ namespace Bitfinex.Client.Websocket.Tests.Integration
                 using (var client = new BitfinexWebsocketClient(communicator))
                 {
 
-                    client.PongStream.Subscribe(pong =>
+                    client.Streams.PongStream.Subscribe(pong =>
                     {
                         received = pong;
                         receivedEvent.Set();
@@ -37,6 +40,39 @@ namespace Bitfinex.Client.Websocket.Tests.Integration
 
                     Assert.NotNull(received);
                     Assert.Equal(123456, received.Cid);
+                    Assert.True(DateTime.UtcNow.Subtract(received.Ts).TotalSeconds < 15);
+                }
+            }
+        }
+
+        [SkippableFact]
+        public async Task Authentication()
+        {
+            Skip.If(string.IsNullOrWhiteSpace(API_SECRET));
+
+            var url = BitfinexValues.ApiWebsocketUrl;
+            using (var communicator = new BitfinexWebsocketCommunicator(url))
+            {
+                AuthenticationResponse received = null;
+                var receivedEvent = new ManualResetEvent(false);
+
+                using (var client = new BitfinexWebsocketClient(communicator))
+                {
+
+                    client.Streams.AuthenticationStream.Subscribe(auth =>
+                    {
+                        received = auth;
+                        receivedEvent.Set();
+                    });
+
+                    await communicator.Start();
+
+                    await client.Authenticate(API_KEY, API_SECRET);
+
+                    receivedEvent.WaitOne(TimeSpan.FromSeconds(30));
+
+                    Assert.NotNull(received);
+                    Assert.True(received.IsAuthenticated);
                 }
             }
         }

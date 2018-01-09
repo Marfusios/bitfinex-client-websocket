@@ -1,4 +1,5 @@
 ﻿using Bitfinex.Client.Websocket.Messages;
+using Newtonsoft.Json;
 
 namespace Bitfinex.Client.Websocket.Responses
 {
@@ -9,5 +10,8 @@ namespace Bitfinex.Client.Websocket.Responses
         public int UserId { get; set; }
         public string Code { get; set; }
         public object Caps { get; set; }
+
+        [JsonIgnore] 
+        public bool IsAuthenticated => Status == "OK";
     }
 }

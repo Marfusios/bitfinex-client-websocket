@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reactive.Linq;
-using System.Reactive.Subjects;
 using System.Threading.Tasks;
-using Bitfinex.Client.Websocket.Exceptions;
 using Bitfinex.Client.Websocket.Json;
 using Bitfinex.Client.Websocket.Messages;
+using Bitfinex.Client.Websocket.Requests;
 using Bitfinex.Client.Websocket.Responses;
 using Bitfinex.Client.Websocket.Responses.Tickers;
 using Bitfinex.Client.Websocket.Validations;
@@ -24,23 +22,16 @@ namespace Bitfinex.Client.Websocket.Client
 
         private readonly Dictionary<int, Action<JToken>> _channelIdToHandler = new Dictionary<int, Action<JToken>>();
 
-        private readonly Subject<ErrorResponse> _errorSubject = new Subject<ErrorResponse>();
-        private readonly Subject<InfoResponse> _infoSubject = new Subject<InfoResponse>();
-        private readonly Subject<PongResponse> _pongSubject = new Subject<PongResponse>();
-        private readonly Subject<Ticker> _tickerSubject = new Subject<Ticker>();
-
-        public IObservable<ErrorResponse> ErrorStream => _errorSubject.AsObservable();
-        public IObservable<InfoResponse> InfoStream => _infoSubject.AsObservable();
-        public IObservable<PongResponse> PongStream => _pongSubject.AsObservable();
-        public IObservable<Ticker> TickerStream => _tickerSubject.AsObservable();
-
         public BitfinexWebsocketClient(BitfinexWebsocketCommunicator communicator)
         {
             BfxValidations.ValidateInput(communicator, nameof(communicator));
 
             _communicator = communicator;
-            _messageReceivedSubsciption = _communicator.MessageReceived.Subscribe(async msg => await HandleMessage(msg));
+            _channelIdToHandler[0] = Streams.HandleAccountInfo;
+            _messageReceivedSubsciption = _communicator.MessageReceived.Subscribe(HandleMessage);
         }
+
+        public BitfinexClientStreams Streams { get; } = new BitfinexClientStreams();
 
         public void Dispose()
         {
@@ -55,7 +46,14 @@ namespace Bitfinex.Client.Websocket.Client
             return _communicator.Send(serialized);
         }
 
-        private async Task HandleMessage(string message)
+        public Task Authenticate(string apiKey, string apiSecret)
+        {
+            return Send(new AuthenticationRequest(apiKey, apiSecret));
+        }
+
+
+
+        private void HandleMessage(string message)
         {
             try
             {
@@ -63,7 +61,7 @@ namespace Bitfinex.Client.Websocket.Client
 
                 if (formatted.StartsWith("{"))
                 {
-                    await OnObjectMessage(formatted);
+                    OnObjectMessage(formatted);
                     return;
                 }
 
@@ -79,7 +77,7 @@ namespace Bitfinex.Client.Websocket.Client
             }
         }
 
-        private async Task OnObjectMessage(string msg)
+        private void OnObjectMessage(string msg)
         {
             var parsed = Deserialize<MessageBase>(msg);
 
@@ -89,13 +87,13 @@ namespace Bitfinex.Client.Websocket.Client
                     OnError(Deserialize<ErrorResponse>(msg));
                     break;
                 case MessageType.Info:
-                    OnInfo(Deserialize<InfoResponse>(msg));
+                    Streams.Raise(Deserialize<InfoResponse>(msg));
                     break;
                 case MessageType.Auth:
-                    await OnAuthentication(Deserialize<AuthenticationResponse>(msg));
+                    OnAuthentication(Deserialize<AuthenticationResponse>(msg));
                     break;
                 case MessageType.Pong:
-                    _pongSubject.OnNext(Deserialize<PongResponse>(msg));
+                    Streams.Raise(Deserialize<PongResponse>(msg));
                     break;
                 case MessageType.Subscribed:
                     OnSubscription(Deserialize<SubscribedResponse>(msg));
@@ -108,12 +106,14 @@ namespace Bitfinex.Client.Websocket.Client
         private void OnError(ErrorResponse error)
         {
             Log.Error(L($"Error received - message: {error.Msg}, code: {error.Code}"));
-            _errorSubject.OnNext(error);
+            Streams.Raise(error);
         }
 
-        private void OnInfo(InfoResponse info)
+        private void OnAuthentication(AuthenticationResponse response)
         {
-            _infoSubject.OnNext(info);
+            if(!response.IsAuthenticated)
+                Log.Warning(L("Authentication failed. Code: " + response.Code));
+            Streams.Raise(response);
         }
 
         private void OnArrayMessage(string msg)
@@ -131,13 +131,6 @@ namespace Bitfinex.Client.Websocket.Client
                 return;
 
             _channelIdToHandler[channelId](parsed);
-        }
-
-        private Task OnAuthentication(AuthenticationResponse response)
-        {
-            if(response.Status != "OK")
-                throw new BitfinexException("Authentication failed. Code: " + response.Code);
-            return Task.CompletedTask;
         }
 
         private void OnSubscription(SubscribedResponse response)
@@ -164,7 +157,7 @@ namespace Bitfinex.Client.Websocket.Client
 
             var ticker = data.ToObject<Ticker>();
             ticker.Pair = subscription.Pair;
-            _tickerSubject.OnNext(ticker);
+            Streams.Raise(ticker);
         }
 
         private T Deserialize<T>(string msg)
