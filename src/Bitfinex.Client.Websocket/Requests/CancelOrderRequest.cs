@@ -14,6 +14,9 @@ namespace Bitfinex.Client.Websocket.Requests
             Id = id;
         }
 
+        /// <summary>
+        /// Unique id (not cid)
+        /// </summary>
         public long Id { get; }
     }
 }

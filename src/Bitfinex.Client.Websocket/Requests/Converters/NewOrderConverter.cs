@@ -21,8 +21,11 @@ namespace Bitfinex.Client.Websocket.Requests.Converters
 
             writer.WriteStartObject();
 
-            writer.WritePropertyName("gid");
-            writer.WriteValue(order.Gid);
+            if (order.Gid.HasValue)
+            {
+                writer.WritePropertyName("gid");
+                writer.WriteValue(order.Gid.Value);
+            }
 
             writer.WritePropertyName("cid");
             writer.WriteValue(order.Cid);
@@ -36,8 +39,33 @@ namespace Bitfinex.Client.Websocket.Requests.Converters
             writer.WritePropertyName("amount");
             writer.WriteValue(order.Amount.ToString(CultureInfo.InvariantCulture));
 
-            writer.WritePropertyName("price");
-            writer.WriteValue(order.Price.ToString(CultureInfo.InvariantCulture));
+            if (order.Price.HasValue)
+            {
+                writer.WritePropertyName("price");
+                writer.WriteValue(order.Price.Value.ToString(CultureInfo.InvariantCulture));
+            }
+
+            if (order.PriceTrailing.HasValue)
+            {
+                writer.WritePropertyName("price_trailing");
+                writer.WriteValue(order.PriceTrailing.Value.ToString(CultureInfo.InvariantCulture));
+            }
+
+            if (order.PriceAuxLimit.HasValue)
+            {
+                writer.WritePropertyName("price_aux_limit");
+                writer.WriteValue(order.PriceAuxLimit.Value.ToString(CultureInfo.InvariantCulture));
+            }
+
+            writer.WritePropertyName("hidden");
+            writer.WriteValue(order.Hidden);
+
+            if (order.Postonly.HasValue)
+            {
+                writer.WritePropertyName("postonly");
+                writer.WriteValue(order.Postonly.Value.ToString(CultureInfo.InvariantCulture));
+            }
+
 
             writer.WriteEndObject();
             writer.WriteEndArray();

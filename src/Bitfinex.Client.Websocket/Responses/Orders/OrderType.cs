@@ -12,6 +12,8 @@
         ExchangeStop,
         ExchangeTrailingStop,
         Fok,
-        ExchangeFok
+        ExchangeFok,
+        StopLimit,
+        ExchangeStopLimit
     }
 }

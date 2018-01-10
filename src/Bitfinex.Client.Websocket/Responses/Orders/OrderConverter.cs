@@ -91,18 +91,42 @@ namespace Bitfinex.Client.Websocket.Responses.Orders
             var safe = type.ToLower().Trim();
             switch (safe)
             {
+                case "market":
+                case var s when s.StartsWith("market"):
+                    return OrderType.Market;
+                case "exchange market":
+                case var s when s.StartsWith("exchange market"):
+                    return OrderType.ExchangeMarket;
                 case "limit":
                 case var s when s.StartsWith("limit"):
                     return OrderType.Limit;
+                case "exchange limit":
+                case var s when s.StartsWith("exchange limit"):
+                    return OrderType.ExchangeLimit;
                 case "trailing stop":
                 case var s when s.StartsWith("trailing stop"):
                     return OrderType.TrailingStop;
                 case "exchange trailing stop":
                 case var s when s.StartsWith("exchange trailing stop"):
                     return OrderType.ExchangeTrailingStop;
-                case "exchange limit":
-                case var s when s.StartsWith("exchange limit"):
-                    return OrderType.ExchangeLimit;
+                case "stop":
+                case var s when s.StartsWith("stop"):
+                    return OrderType.Stop;
+                case "exchange stop":
+                case var s when s.StartsWith("exchange stop"):
+                    return OrderType.ExchangeStop;
+                case "stop limit":
+                case var s when s.StartsWith("stop limit"):
+                    return OrderType.StopLimit;
+                case "exchange stop limit":
+                case var s when s.StartsWith("exchange stop limit"):
+                    return OrderType.ExchangeStopLimit;
+                case "fok":
+                case var s when s.StartsWith("fok"):
+                    return OrderType.Fok;
+                case "exchange fok":
+                case var s when s.StartsWith("exchange fok"):
+                    return OrderType.ExchangeFok;
             }
             Log.Warning("Can't parse OrderStatus, input: " + safe);
             return OrderType.Undefined;
@@ -112,12 +136,30 @@ namespace Bitfinex.Client.Websocket.Responses.Orders
         {
             switch (type)
             {
+                case OrderType.Market:
+                    return "MARKET";
+                case OrderType.ExchangeMarket:
+                    return "EXCHANGE MARKET";
                 case OrderType.Limit:
                     return "LIMIT";
+                case OrderType.ExchangeLimit:
+                    return "EXCHANGE LIMIT";
                 case OrderType.TrailingStop:
                     return "TRAILING STOP";
                 case OrderType.ExchangeTrailingStop:
                     return "EXCHANGE TRAILING STOP";
+                case OrderType.Stop:
+                    return "STOP";
+                case OrderType.ExchangeStop:
+                    return "EXCHANGE STOP";
+                case OrderType.StopLimit:
+                    return "STOP LIMIT";
+                case OrderType.ExchangeStopLimit:
+                    return "EXCHANGE STOP LIMIT";
+                case OrderType.Fok:
+                    return "FOK";
+                case OrderType.ExchangeFok:
+                    return "EXCHANGE FOK";
             }
             throw new BitfinexException("Not supported order type");
         }

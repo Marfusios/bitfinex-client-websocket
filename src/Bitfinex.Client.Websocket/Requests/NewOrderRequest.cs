@@ -8,6 +8,13 @@ namespace Bitfinex.Client.Websocket.Requests
     [JsonConverter(typeof(NewOrderConverter))]
     public class NewOrderRequest
     {
+        private string _symbol;
+
+        public NewOrderRequest()
+        {
+            
+        }
+
         public NewOrderRequest(long gid, long cid, string symbol, OrderType type, double amount, double price)
         {
             BfxValidations.ValidateInput(cid, nameof(cid), 0);
@@ -17,18 +24,67 @@ namespace Bitfinex.Client.Websocket.Requests
 
             Gid = gid;
             Cid = cid;
-            Symbol = (symbol.StartsWith("t") ? symbol : "t" + symbol).Replace("/", string.Empty);
+            Symbol = symbol;
             Type = type;
             Amount = amount;
             Price = price;
         }
 
-        public long Gid { get; }
-        public long Cid { get; }
-        public string Symbol { get; }
-        public OrderType Type { get;}
-        public double Amount { get; }
-        public double Price { get; }
+        /// <summary>
+        /// (optional) Group id for the order
+        /// </summary>
+        public long? Gid { get; set; }
+
+        /// <summary>
+        /// Must be unique in the day (UTC)
+        /// </summary>
+        public long Cid { get; set; }
+
+        /// <summary>
+        /// symbol (tBTCUSD, tETHUSD, ...)
+        /// </summary>
+        public string Symbol
+        {
+            get => _symbol;
+            set
+            {
+                var s = value ?? string.Empty;
+                _symbol = (s.StartsWith("t") ? s : "t" + s).Replace("/", string.Empty);
+            }
+        }
+
+
+        public OrderType Type { get; set; }
+
+        /// <summary>
+        /// Positive for buy, Negative for sell
+        /// </summary>
+        public double Amount { get; set; }
+
+        /// <summary>
+        /// Price (Not required for market orders)
+        /// </summary>
+        public double? Price { get; set; }
+
+        /// <summary>
+        /// The trailing price
+        /// </summary>
+        public double? PriceTrailing { get; set; }
+
+        /// <summary>
+        /// Auxiliary Limit price (for STOP LIMIT)
+        /// </summary>
+        public double? PriceAuxLimit { get; set; }
+
+        /// <summary>
+        /// Whether the order is hidden (1) or not (0)
+        /// </summary>
+        public int Hidden { get; set; }
+
+        /// <summary>
+        /// (optional) Whether the order is postonly (1) or not (0)
+        /// </summary>
+        public int? Postonly { get; set; }
     }
 
     /*
