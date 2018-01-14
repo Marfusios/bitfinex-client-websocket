@@ -6,6 +6,7 @@ using Bitfinex.Client.Websocket.Json;
 using Bitfinex.Client.Websocket.Messages;
 using Bitfinex.Client.Websocket.Requests;
 using Bitfinex.Client.Websocket.Responses;
+using Bitfinex.Client.Websocket.Responses.Candles;
 using Bitfinex.Client.Websocket.Responses.Tickers;
 using Bitfinex.Client.Websocket.Validations;
 using Bitfinex.Client.Websocket.Websockets;
@@ -111,7 +112,7 @@ namespace Bitfinex.Client.Websocket.Client
 
         private void OnAuthentication(AuthenticationResponse response)
         {
-            if(!response.IsAuthenticated)
+            if (!response.IsAuthenticated)
                 Log.Warning(L("Authentication failed. Code: " + response.Code));
             Streams.Raise(response);
         }
@@ -142,6 +143,9 @@ namespace Bitfinex.Client.Websocket.Client
                 case "ticker":
                     _channelIdToHandler[channelId] = data => OnTicker(data, response);
                     break;
+                case "candles":
+                    _channelIdToHandler[channelId] = data => OnCandles(data, response);
+                    break;
             }
         }
 
@@ -152,12 +156,26 @@ namespace Bitfinex.Client.Websocket.Client
             if (data.Type != JTokenType.Array)
             {
                 // probably heartbeat, ignore
-                return; 
+                return;
             }
 
             var ticker = data.ToObject<Ticker>();
             ticker.Pair = subscription.Pair;
             Streams.Raise(ticker);
+        }
+
+        private void OnCandles(JToken token, SubscribedResponse subscription)
+        {
+            var data = token[1];
+
+            if (data.Type != JTokenType.Array)
+            {
+                // probably heartbeat, ignore
+                return;
+            }
+
+            var candles = data.ToObject<Candles>();
+            Streams.Raise(candles);
         }
 
         private T Deserialize<T>(string msg)
