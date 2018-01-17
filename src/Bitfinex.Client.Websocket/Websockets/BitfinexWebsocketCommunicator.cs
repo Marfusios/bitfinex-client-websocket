@@ -138,11 +138,13 @@ namespace Bitfinex.Client.Websocket.Websockets
             var diffMin = Math.Abs(DateTime.UtcNow.Subtract(_lastReceivedMsg).TotalMinutes);
             if(diffMin > 1)
                 Log.Information(L($"Last message received {diffMin} min ago"));
-            if (diffMin > 10)
+            if (diffMin > 2)
             {
-                Log.Information(L("Last message received more than 10 min ago. Hard restart.."));
+                Log.Information(L("Last message received more than 2 min ago. Hard restart.."));
 
                 _client?.Abort();
+                _client?.Dispose();
+                _client = null;
                 await Reconnect();
             }
         }
