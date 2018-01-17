@@ -143,6 +143,8 @@ namespace Bitfinex.Client.Websocket.Websockets
                 Log.Information(L("Last message received more than 10 min ago. Hard restart.."));
 
                 _client?.Abort();
+                _client?.Dispose();
+                _client = null;
                 await Reconnect();
             }
         }
