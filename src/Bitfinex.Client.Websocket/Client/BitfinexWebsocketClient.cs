@@ -8,6 +8,7 @@ using Bitfinex.Client.Websocket.Requests;
 using Bitfinex.Client.Websocket.Responses;
 using Bitfinex.Client.Websocket.Responses.Candles;
 using Bitfinex.Client.Websocket.Responses.Tickers;
+using Bitfinex.Client.Websocket.Utils;
 using Bitfinex.Client.Websocket.Validations;
 using Bitfinex.Client.Websocket.Websockets;
 using Newtonsoft.Json;
@@ -175,6 +176,9 @@ namespace Bitfinex.Client.Websocket.Client
             }
 
             var candles = data.ToObject<Candles>();
+
+            candles.TimeFrame = new BitfinexTimeFrame().GetFieldByStringValue(subscription.Key.Split(':')[1]);
+            candles.Pair = subscription.Key.Split(':')[2].Remove(0, 1);
             Streams.Raise(candles);
         }
 

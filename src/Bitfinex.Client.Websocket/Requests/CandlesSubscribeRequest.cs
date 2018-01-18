@@ -1,4 +1,5 @@
 ﻿using System;
+using Bitfinex.Client.Websocket.Utils;
 
 namespace Bitfinex.Client.Websocket.Requests
 {
@@ -8,23 +9,14 @@ namespace Bitfinex.Client.Websocket.Requests
         public string Key { get; set; }
 
 
-        public CandlesSubscribeRequest(string pair,TimeFrame timeFrame)
+        public CandlesSubscribeRequest(string pair, BitfinexTimeFrame bitfinexTimeFrame)
         {
-            Key = $"trade:{TimeFrameToKeyCommand(timeFrame)}:{FormatPairToSymbol(pair)}";
+            Key = $"trade:{TimeFrameToKeyCommand(bitfinexTimeFrame)}:{FormatPairToSymbol(pair)}";
         }
 
-        private string TimeFrameToKeyCommand(TimeFrame timeFrame)
+        private string TimeFrameToKeyCommand(BitfinexTimeFrame bitfinexTimeFrame)
         {
-            switch (timeFrame)
-            {
-                case TimeFrame.OneMinute:
-                    return "1m";
-                case TimeFrame.FiveMinute:
-                    return "5m";
-                case TimeFrame.OneDay:
-                    return "1D";
-                    default:throw new NotImplementedException();
-            }
+            return bitfinexTimeFrame.GetStringValue();
         }
 
         private string FormatPairToSymbol(string pair)
@@ -36,12 +28,5 @@ namespace Bitfinex.Client.Websocket.Requests
                 .ToUpper();
             return $"t{formatted}";
         }
-    }
-
-    public enum TimeFrame
-    {
-        OneMinute = 10,
-        FiveMinute = 20,
-        OneDay = 30,
     }
 }
