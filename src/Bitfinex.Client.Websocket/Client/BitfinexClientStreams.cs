@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Bitfinex.Client.Websocket.Responses;
+using Bitfinex.Client.Websocket.Responses.Candles;
 using Bitfinex.Client.Websocket.Responses.Orders;
 using Bitfinex.Client.Websocket.Responses.Tickers;
 using Bitfinex.Client.Websocket.Responses.Trades;
@@ -20,6 +22,7 @@ namespace Bitfinex.Client.Websocket.Client
         private readonly Subject<AuthenticationResponse> _authenticationSubject = new Subject<AuthenticationResponse>();
         private readonly Subject<Ticker> _tickerSubject = new Subject<Ticker>();
         private readonly Subject<Trade> _tradesSubject = new Subject<Trade>();
+        private readonly Subject<Candles> _candlesSubject = new Subject<Candles>();
 
         private readonly Subject<Wallet[]> _walletsSubject = new Subject<Wallet[]>();
         private readonly Subject<Order[]> _ordersSubject = new Subject<Order[]>();
@@ -33,6 +36,7 @@ namespace Bitfinex.Client.Websocket.Client
         public IObservable<AuthenticationResponse> AuthenticationStream => _authenticationSubject.AsObservable();
         public IObservable<Ticker> TickerStream => _tickerSubject.AsObservable();
         public IObservable<Trade> TradesStream => _tradesSubject.AsObservable();
+        public IObservable<Candles> CandlesStream => _candlesSubject.AsObservable();
 
         public IObservable<Wallet[]> WalletsStream => _walletsSubject.AsObservable();
         public IObservable<Order[]> OrdersStream => _ordersSubject.AsObservable();
@@ -43,7 +47,7 @@ namespace Bitfinex.Client.Websocket.Client
 
         internal BitfinexClientStreams()
         {
-            
+
         }
 
         internal void HandleAccountInfo(JToken token)
@@ -117,6 +121,11 @@ namespace Bitfinex.Client.Websocket.Client
         internal void Raise(Trade response)
         {
             _tradesSubject.OnNext(response);
+        }
+
+        internal void Raise(Candles candles)
+        {
+            _candlesSubject.OnNext(candles);
         }
 
         internal void Raise(AuthenticationResponse response)

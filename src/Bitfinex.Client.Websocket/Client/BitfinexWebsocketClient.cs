@@ -6,8 +6,10 @@ using Bitfinex.Client.Websocket.Json;
 using Bitfinex.Client.Websocket.Messages;
 using Bitfinex.Client.Websocket.Requests;
 using Bitfinex.Client.Websocket.Responses;
+using Bitfinex.Client.Websocket.Responses.Candles;
 using Bitfinex.Client.Websocket.Responses.Tickers;
 using Bitfinex.Client.Websocket.Responses.Trades;
+using Bitfinex.Client.Websocket.Utils;
 using Bitfinex.Client.Websocket.Validations;
 using Bitfinex.Client.Websocket.Websockets;
 using Newtonsoft.Json;
@@ -112,7 +114,7 @@ namespace Bitfinex.Client.Websocket.Client
 
         private void OnAuthentication(AuthenticationResponse response)
         {
-            if(!response.IsAuthenticated)
+            if (!response.IsAuthenticated)
                 Log.Warning(L("Authentication failed. Code: " + response.Code));
             Streams.Raise(response);
         }
@@ -146,6 +148,9 @@ namespace Bitfinex.Client.Websocket.Client
                 case "trades":
                     _channelIdToHandler[channelId] = data => OnTrades(data, response);
                     break;
+                case "candles":
+                    _channelIdToHandler[channelId] = data => OnCandles(data, response);
+                    break;
             }
         }
 
@@ -156,7 +161,7 @@ namespace Bitfinex.Client.Websocket.Client
             if (data.Type != JTokenType.Array)
             {
                 // probably heartbeat, ignore
-                return; 
+                return;
             }
 
             var ticker = data.ToObject<Ticker>();
@@ -205,6 +210,23 @@ namespace Bitfinex.Client.Websocket.Client
                 trade.Pair = subscription.Pair;
                 Streams.Raise(trade);
             }
+        }
+
+        private void OnCandles(JToken token, SubscribedResponse subscription)
+        {
+            var data = token[1];
+
+            if (data.Type != JTokenType.Array)
+            {
+                // probably heartbeat, ignore
+                return;
+            }
+
+            var candles = data.ToObject<Candles>();
+
+            candles.TimeFrame = new BitfinexTimeFrame().GetFieldByStringValue(subscription.Key.Split(':')[1]);
+            candles.Pair = subscription.Key.Split(':')[2].Remove(0, 1);
+            Streams.Raise(candles);
         }
 
         private T Deserialize<T>(string msg)

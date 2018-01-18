@@ -8,6 +8,7 @@ using System.Threading;
 using Bitfinex.Client.Websocket.Client;
 using Bitfinex.Client.Websocket.Requests;
 using Bitfinex.Client.Websocket.Responses.Trades;
+using Bitfinex.Client.Websocket.Utils;
 using Bitfinex.Client.Websocket.Websockets;
 using Serilog;
 using Serilog.Events;
@@ -44,12 +45,21 @@ namespace Bitfinex.Client.Websocket.Sample
             {
                 using (var client = new BitfinexWebsocketClient(communicator))
                 {
-
+                    
                     client.Streams.PongStream.Subscribe(pong => Log.Information($"Pong received! Id: {pong.Cid}"));
                     client.Streams.TickerStream.Subscribe(ticker => 
                         Log.Information($"{ticker.Pair} - last price: {ticker.LastPrice}, bid: {ticker.Bid}, ask: {ticker.Ask}"));
                     client.Streams.TradesStream.Where(x => x.Type == TradeType.Executed).Subscribe(x => 
                         Log.Information($"Trade {x.Pair} executed. Time: {x.Mts:mm:ss.fff}, Amount: {x.Amount}, Price: {x.Price}"));
+
+                    client.Streams.CandlesStream.Subscribe(candles =>
+                    {
+                        candles.CandleList.OrderBy(x => x.Mts).ToList().ForEach(x =>
+                        {
+                            Log.Information(
+                                $"Candle(Pair : {candles.Pair} TimeFrame : {candles.TimeFrame.GetStringValue()}) --> {x.Mts} High : {x.High} Low : {x.Low} Open : {x.Open} Close : {x.Close}");
+                        });
+                    });
 
                     client.Streams.AuthenticationStream.Subscribe(auth => Log.Information($"Authenticated: {auth.IsAuthenticated}"));
                     client.Streams.WalletsStream
@@ -59,9 +69,14 @@ namespace Bitfinex.Client.Websocket.Sample
                     communicator.Start().Wait();
 
                     client.Send(new PingRequest() {Cid = 123456});
+
                     //client.Send(new TickerSubscribeRequest("BTC/USD"));
-                    client.Send(new TickerSubscribeRequest("ETH/USD"));
-                    client.Send(new TradesSubscribeRequest("ETH/USD"));
+                    //client.Send(new TickerSubscribeRequest("ETH/USD"));
+
+                    //client.Send(new TradesSubscribeRequest("ETH/USD"));
+
+                    client.Send(new CandlesSubscribeRequest("BTC/USD", BitfinexTimeFrame.OneMinute));
+                    client.Send(new CandlesSubscribeRequest("ETH/USD", BitfinexTimeFrame.OneMinute));
 
                     if (!string.IsNullOrWhiteSpace(API_SECRET))
                     {

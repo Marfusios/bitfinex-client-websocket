@@ -56,7 +56,7 @@ More usage examples:
 | Trades                 |  ✔            |
 | Books                  |                |
 | Raw books              |                |
-| Candles                |                |
+| Candles                |  ✔            |
 
 | AUTHENTICATED          |    Covered     |  
 |------------------------|:--------------:|
