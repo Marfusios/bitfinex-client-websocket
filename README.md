@@ -53,7 +53,7 @@ More usage examples:
 | Channel subscribing    |  ✔            |
 | Channel unsubscribing  |  ✔            |
 | Ticker                 |  ✔            |
-| Trades                 |                |
+| Trades                 |  ✔            |
 | Books                  |                |
 | Raw books              |                |
 | Candles                |                |

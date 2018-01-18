@@ -7,6 +7,7 @@ using Bitfinex.Client.Websocket.Messages;
 using Bitfinex.Client.Websocket.Requests;
 using Bitfinex.Client.Websocket.Responses;
 using Bitfinex.Client.Websocket.Responses.Tickers;
+using Bitfinex.Client.Websocket.Responses.Trades;
 using Bitfinex.Client.Websocket.Validations;
 using Bitfinex.Client.Websocket.Websockets;
 using Newtonsoft.Json;
@@ -142,6 +143,9 @@ namespace Bitfinex.Client.Websocket.Client
                 case "ticker":
                     _channelIdToHandler[channelId] = data => OnTicker(data, response);
                     break;
+                case "trades":
+                    _channelIdToHandler[channelId] = data => OnTrades(data, response);
+                    break;
             }
         }
 
@@ -158,6 +162,49 @@ namespace Bitfinex.Client.Websocket.Client
             var ticker = data.ToObject<Ticker>();
             ticker.Pair = subscription.Pair;
             Streams.Raise(ticker);
+        }
+
+        private void OnTrades(JToken token, SubscribedResponse subscription)
+        {
+            var firstPosition = token[1];
+            if (firstPosition.Type == JTokenType.Array)
+            {
+                // initial snapshot
+                OnTrades(firstPosition.ToObject<Trade[]>(), subscription);
+                return;
+            }
+
+            var tradeType = TradeType.Executed;
+            if (firstPosition.Type == JTokenType.String)
+            {
+                if((string)firstPosition == "tu")
+                    tradeType = TradeType.UpdateExecution;
+                else if((string)firstPosition == "hb")
+                    return; // heartbeat, ignore
+            }
+
+            var data = token[2];
+            if (data.Type != JTokenType.Array)
+            {
+                // bad format, ignore
+                return; 
+            }
+
+            var trade = data.ToObject<Trade>();
+            trade.Type = tradeType;
+            trade.Pair = subscription.Pair;
+            Streams.Raise(trade);
+        }
+
+        private void OnTrades(Trade[] trades, SubscribedResponse subscription)
+        {
+            var reversed = trades.Reverse().ToArray(); // newest last
+            foreach (var trade in reversed)
+            {
+                trade.Type = TradeType.Executed;
+                trade.Pair = subscription.Pair;
+                Streams.Raise(trade);
+            }
         }
 
         private T Deserialize<T>(string msg)
