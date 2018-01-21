@@ -7,7 +7,7 @@ namespace Bitfinex.Client.Websocket.Responses.Wallets
     [JsonConverter(typeof(WalletConverter))]
     public class Wallet
     {
-        public string WalletType { get; set; }
+        public WalletType Type { get; set; }
         public string Currency { get; set; }
         public double Balance { get; set; }
         public double UnsettledInterest { get; set; }

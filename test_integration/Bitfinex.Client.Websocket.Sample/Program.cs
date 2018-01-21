@@ -61,22 +61,29 @@ namespace Bitfinex.Client.Websocket.Sample
                         });
                     });
 
+                    client.Streams.BookStream.Subscribe(book =>
+                        Log.Information(
+                            $"Book | channel: {book.ChanId} pair: {book.Pair}, price: {book.Price}, amount {book.Amount}, count: {book.Count}"));
+
                     client.Streams.AuthenticationStream.Subscribe(auth => Log.Information($"Authenticated: {auth.IsAuthenticated}"));
-                    client.Streams.WalletsStream
-                        .Subscribe(wallets => wallets.ToList().ForEach(wallet =>
-                            Log.Information($"Wallet {wallet.Currency} balance: {wallet.Balance}")));
+                    client.Streams.WalletStream
+                        .Subscribe(wallet =>
+                            Log.Information($"Wallet {wallet.Currency} balance: {wallet.Balance} type: {wallet.Type}"));
 
                     communicator.Start().Wait();
 
                     client.Send(new PingRequest() {Cid = 123456});
 
-                    //client.Send(new TickerSubscribeRequest("BTC/USD"));
-                    //client.Send(new TickerSubscribeRequest("ETH/USD"));
+                    client.Send(new TickerSubscribeRequest("BTC/USD"));
+                    client.Send(new TickerSubscribeRequest("ETH/USD"));
 
                     //client.Send(new TradesSubscribeRequest("ETH/USD"));
 
-                    client.Send(new CandlesSubscribeRequest("BTC/USD", BitfinexTimeFrame.OneMinute));
-                    client.Send(new CandlesSubscribeRequest("ETH/USD", BitfinexTimeFrame.OneMinute));
+                    //client.Send(new CandlesSubscribeRequest("BTC/USD", BitfinexTimeFrame.OneMinute));
+                    //client.Send(new CandlesSubscribeRequest("ETH/USD", BitfinexTimeFrame.OneMinute));
+
+                    //client.Send(new BookSubscribeRequest("BTC/USD", BitfinexPrecision.P0, BitfinexFrequency.TwoSecDelay));
+                    //client.Send(new BookSubscribeRequest("BTC/USD", BitfinexPrecision.P3, BitfinexFrequency.Realtime));
 
                     if (!string.IsNullOrWhiteSpace(API_SECRET))
                     {

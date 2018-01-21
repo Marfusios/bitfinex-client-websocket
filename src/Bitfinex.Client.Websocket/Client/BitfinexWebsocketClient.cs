@@ -6,6 +6,7 @@ using Bitfinex.Client.Websocket.Json;
 using Bitfinex.Client.Websocket.Messages;
 using Bitfinex.Client.Websocket.Requests;
 using Bitfinex.Client.Websocket.Responses;
+using Bitfinex.Client.Websocket.Responses.Books;
 using Bitfinex.Client.Websocket.Responses.Candles;
 using Bitfinex.Client.Websocket.Responses.Tickers;
 using Bitfinex.Client.Websocket.Responses.Trades;
@@ -151,6 +152,9 @@ namespace Bitfinex.Client.Websocket.Client
                 case "candles":
                     _channelIdToHandler[channelId] = data => OnCandles(data, response);
                     break;
+                case "book":
+                    _channelIdToHandler[channelId] = data => OnBook(data, response);
+                    break;
             }
         }
 
@@ -166,6 +170,7 @@ namespace Bitfinex.Client.Websocket.Client
 
             var ticker = data.ToObject<Ticker>();
             ticker.Pair = subscription.Pair;
+            ticker.ChanId = subscription.ChanId;
             Streams.Raise(ticker);
         }
 
@@ -198,6 +203,7 @@ namespace Bitfinex.Client.Websocket.Client
             var trade = data.ToObject<Trade>();
             trade.Type = tradeType;
             trade.Pair = subscription.Pair;
+            trade.ChanId = subscription.ChanId;
             Streams.Raise(trade);
         }
 
@@ -208,6 +214,7 @@ namespace Bitfinex.Client.Websocket.Client
             {
                 trade.Type = TradeType.Executed;
                 trade.Pair = subscription.Pair;
+                trade.ChanId = subscription.ChanId;
                 Streams.Raise(trade);
             }
         }
@@ -226,7 +233,41 @@ namespace Bitfinex.Client.Websocket.Client
 
             candles.TimeFrame = new BitfinexTimeFrame().GetFieldByStringValue(subscription.Key.Split(':')[1]);
             candles.Pair = subscription.Key.Split(':')[2].Remove(0, 1);
+            candles.ChanId = subscription.ChanId;
             Streams.Raise(candles);
+        }
+
+        private void OnBook(JToken token, SubscribedResponse subscription)
+        {
+            var data = token[1];
+
+            if (data.Type != JTokenType.Array)
+            {
+                return; // heartbeat, ignore
+            }
+
+            if(data.First.Type == JTokenType.Array)
+            {
+                // initial snapshot
+                OnBooks(data.ToObject<Book[]>(), subscription);
+                return;
+            }
+
+            var book = data.ToObject<Book>();
+            book.Pair = subscription.Pair;
+            book.ChanId = subscription.ChanId;
+            Streams.Raise(book);
+        }
+
+        private void OnBooks(Book[] books, SubscribedResponse subscription)
+        {
+            //var reversed = books.Reverse().ToArray(); // newest last
+            foreach (var book in books)
+            {
+                book.Pair = subscription.Pair;
+                book.ChanId = subscription.ChanId;
+                Streams.Raise(book);
+            }
         }
 
         private T Deserialize<T>(string msg)

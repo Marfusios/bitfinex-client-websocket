@@ -14,7 +14,7 @@ namespace Bitfinex.Client.Websocket.Responses.Trades
     /// The order that causes the trade determines if it is a buy or a sell.
     /// </summary>
     [JsonConverter(typeof(TradeConverter))]
-    public class Trade
+    public class Trade : ResponseBase
     {
         public long Id { get; set; }
 

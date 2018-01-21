@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 namespace Bitfinex.Client.Websocket.Responses.Candles
 {
     [JsonConverter(typeof(CandlesConverter))]
-    public class Candles
+    public class Candles : ResponseBase
     {
         public Candle[] CandleList { get; set; }
         public BitfinexTimeFrame TimeFrame { get; set; }

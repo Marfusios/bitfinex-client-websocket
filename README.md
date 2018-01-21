@@ -54,7 +54,7 @@ More usage examples:
 | Channel unsubscribing  |  ✔            |
 | Ticker                 |  ✔            |
 | Trades                 |  ✔            |
-| Books                  |                |
+| Books                  |  ✔            |
 | Raw books              |                |
 | Candles                |  ✔            |
 

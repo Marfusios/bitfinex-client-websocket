@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Bitfinex.Client.Websocket.Responses;
+using Bitfinex.Client.Websocket.Responses.Books;
 using Bitfinex.Client.Websocket.Responses.Candles;
 using Bitfinex.Client.Websocket.Responses.Orders;
 using Bitfinex.Client.Websocket.Responses.Tickers;
@@ -23,8 +23,10 @@ namespace Bitfinex.Client.Websocket.Client
         private readonly Subject<Ticker> _tickerSubject = new Subject<Ticker>();
         private readonly Subject<Trade> _tradesSubject = new Subject<Trade>();
         private readonly Subject<Candles> _candlesSubject = new Subject<Candles>();
+        private readonly Subject<Book> _bookSubject = new Subject<Book>();
 
         private readonly Subject<Wallet[]> _walletsSubject = new Subject<Wallet[]>();
+        private readonly Subject<Wallet> _walletSubject = new Subject<Wallet>();
         private readonly Subject<Order[]> _ordersSubject = new Subject<Order[]>();
         private readonly Subject<Order> _orderCreatedSubject = new Subject<Order>();
         private readonly Subject<Order> _orderUpdatedSubject = new Subject<Order>();
@@ -37,9 +39,24 @@ namespace Bitfinex.Client.Websocket.Client
         public IObservable<Ticker> TickerStream => _tickerSubject.AsObservable();
         public IObservable<Trade> TradesStream => _tradesSubject.AsObservable();
         public IObservable<Candles> CandlesStream => _candlesSubject.AsObservable();
+        public IObservable<Book> BookStream => _bookSubject.AsObservable();
 
+        /// <summary>
+        /// Initial info about all wallets/balances (streamed only on authentication)
+        /// </summary>
         public IObservable<Wallet[]> WalletsStream => _walletsSubject.AsObservable();
+
+        /// <summary>
+        /// Stream for every wallet balance update (initial wallets info is also streamed, same as 'WalletsStream')
+        /// </summary>
+        public IObservable<Wallet> WalletStream => _walletSubject.AsObservable();
+        
+
+        /// <summary>
+        /// Initial info about all opened orders (streamed only on authentication)
+        /// </summary>
         public IObservable<Order[]> OrdersStream => _ordersSubject.AsObservable();
+
         public IObservable<Order> OrderCreatedStream => _orderCreatedSubject.AsObservable();
         public IObservable<Order> OrderUpdatedStream => _orderUpdatedSubject.AsObservable();
         public IObservable<Order> OrderCanceledStream => _orderCanceledSubject.AsObservable();
@@ -82,6 +99,9 @@ namespace Bitfinex.Client.Websocket.Client
             {
                 case "ws":
                     HandleWalletsInfo(token);
+                    break;
+                case "wu":
+                    HandleWalletInfo(token);
                     break;
                 case "os":
                     HandleOrdersInfo(token);
@@ -128,6 +148,11 @@ namespace Bitfinex.Client.Websocket.Client
             _candlesSubject.OnNext(candles);
         }
 
+        internal void Raise(Book response)
+        {
+            _bookSubject.OnNext(response);
+        }
+
         internal void Raise(AuthenticationResponse response)
         {
             _authenticationSubject.OnNext(response);
@@ -144,6 +169,20 @@ namespace Bitfinex.Client.Websocket.Client
 
             var parsed = data.ToObject<Wallet[]>();
             _walletsSubject.OnNext(parsed);
+            parsed.ToList().ForEach(wallet => _walletSubject.OnNext(wallet));
+        }
+
+        private void HandleWalletInfo(JToken token)
+        {
+            var data = token[2];
+            if (data.Type != JTokenType.Array)
+            {
+                Log.Warning(L("Wallet update - Invalid message format, third param not array"));
+                return;
+            }
+
+            var parsed = data.ToObject<Wallet>();
+            _walletSubject.OnNext(parsed);
         }
 
         private void HandleOrdersInfo(JToken token)
