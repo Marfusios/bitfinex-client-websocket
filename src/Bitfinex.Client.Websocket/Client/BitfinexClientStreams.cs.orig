@@ -4,7 +4,10 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Bitfinex.Client.Websocket.Responses;
+<<<<<<< HEAD
+=======
 using Bitfinex.Client.Websocket.Responses.Books;
+>>>>>>> a88b19b574465cab2e72bbd0c4dde80e010eb0f6
 using Bitfinex.Client.Websocket.Responses.Candles;
 using Bitfinex.Client.Websocket.Responses.Orders;
 using Bitfinex.Client.Websocket.Responses.Tickers;
@@ -22,9 +25,13 @@ namespace Bitfinex.Client.Websocket.Client
         private readonly Subject<PongResponse> _pongSubject = new Subject<PongResponse>();
         private readonly Subject<AuthenticationResponse> _authenticationSubject = new Subject<AuthenticationResponse>();
         private readonly Subject<Ticker> _tickerSubject = new Subject<Ticker>();
+<<<<<<< HEAD
+        private readonly Subject<Candles> _candlesSubject = new Subject<Candles>();
+=======
         private readonly Subject<Trade> _tradesSubject = new Subject<Trade>();
         private readonly Subject<Candles> _candlesSubject = new Subject<Candles>();
         private readonly Subject<Book> _bookSubject = new Subject<Book>();
+>>>>>>> a88b19b574465cab2e72bbd0c4dde80e010eb0f6
 
         private readonly Subject<Wallet[]> _walletsSubject = new Subject<Wallet[]>();
         private readonly Subject<Wallet> _walletSubject = new Subject<Wallet>();
@@ -38,9 +45,13 @@ namespace Bitfinex.Client.Websocket.Client
         public IObservable<PongResponse> PongStream => _pongSubject.AsObservable();
         public IObservable<AuthenticationResponse> AuthenticationStream => _authenticationSubject.AsObservable();
         public IObservable<Ticker> TickerStream => _tickerSubject.AsObservable();
+<<<<<<< HEAD
+        public IObservable<Candles> CandlesStream => _candlesSubject.AsObservable();
+=======
         public IObservable<Trade> TradesStream => _tradesSubject.AsObservable();
         public IObservable<Candles> CandlesStream => _candlesSubject.AsObservable();
         public IObservable<Book> BookStream => _bookSubject.AsObservable();
+>>>>>>> a88b19b574465cab2e72bbd0c4dde80e010eb0f6
 
         /// <summary>
         /// Initial info about all wallets/balances (streamed only on authentication)
@@ -51,7 +62,7 @@ namespace Bitfinex.Client.Websocket.Client
         /// Stream for every wallet balance update (initial wallets info is also streamed, same as 'WalletsStream')
         /// </summary>
         public IObservable<Wallet> WalletStream => _walletSubject.AsObservable();
-
+        
 
         /// <summary>
         /// Initial info about all opened orders (streamed only on authentication)
@@ -139,21 +150,27 @@ namespace Bitfinex.Client.Websocket.Client
             _tickerSubject.OnNext(response);
         }
 
-        internal void Raise(Candles candles)
-        {
-            _candlesSubject.OnNext(candles);
-        }
-
+<<<<<<< HEAD
+=======
         internal void Raise(Trade response)
         {
             _tradesSubject.OnNext(response);
         }
 
+>>>>>>> a88b19b574465cab2e72bbd0c4dde80e010eb0f6
+        internal void Raise(Candles candles)
+        {
+            _candlesSubject.OnNext(candles);
+        }
+
+<<<<<<< HEAD
+=======
         internal void Raise(Book response)
         {
             _bookSubject.OnNext(response);
         }
 
+>>>>>>> a88b19b574465cab2e72bbd0c4dde80e010eb0f6
         internal void Raise(AuthenticationResponse response)
         {
             _authenticationSubject.OnNext(response);
