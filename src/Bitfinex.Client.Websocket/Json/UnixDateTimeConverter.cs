@@ -17,7 +17,7 @@ namespace Bitfinex.Client.Websocket.Json
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             if (reader.Value == null) { return null; }
-            return BitfinexTime.UnixBase.AddMilliseconds((long)reader.Value);
+            return BitfinexTime.ConvertToTime((long)reader.Value);
         }
     }
 }

@@ -7,7 +7,10 @@ namespace Bitfinex.Client.Websocket.Responses
         public string Channel { get; set; }
         public int ChanId { get; set; }
         public string Pair { get; set; }
+<<<<<<< HEAD
+=======
         public string Symbol { get; set; }
+>>>>>>> a88b19b574465cab2e72bbd0c4dde80e010eb0f6
         public string Key { get; set; }
     }
 }

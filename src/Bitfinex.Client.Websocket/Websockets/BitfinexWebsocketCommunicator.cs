@@ -14,6 +14,7 @@ namespace Bitfinex.Client.Websocket.Websockets
     {
         private readonly Uri _url;
         private readonly Timer _lastChanceTimer;
+        private readonly Func<ClientWebSocket> _clientFactory;
 
         private DateTime _lastReceivedMsg = DateTime.UtcNow; 
 
@@ -26,12 +27,15 @@ namespace Bitfinex.Client.Websocket.Websockets
 
         public IObservable<string> MessageReceived => _messageReceivedSubject.AsObservable();
 
-        public BitfinexWebsocketCommunicator(Uri url, ClientWebSocket websocketClient = null)
+        public BitfinexWebsocketCommunicator(Uri url, Func<ClientWebSocket> clientFactory = null)
         {
             BfxValidations.ValidateInput(url, nameof(url));
 
             _url = url;
-            _client = websocketClient;
+            _clientFactory = clientFactory ?? (() => new ClientWebSocket()
+            {
+                Options = {KeepAliveInterval = new TimeSpan(0, 0, 0, 10)}
+            }); 
 
             var minute = 1000 * 60;
             _lastChanceTimer = new Timer(async x => await LastChance(x), null, minute, minute);
@@ -69,7 +73,7 @@ namespace Bitfinex.Client.Websocket.Websockets
 
         private async Task StartClient(Uri uri, CancellationToken token)
         {
-            _client = _client ?? new ClientWebSocket() {Options = {KeepAliveInterval = new TimeSpan(0, 0, 0, 10)}};
+            _client = _clientFactory();
             
             try
             {
@@ -138,11 +142,12 @@ namespace Bitfinex.Client.Websocket.Websockets
             var diffMin = Math.Abs(DateTime.UtcNow.Subtract(_lastReceivedMsg).TotalMinutes);
             if(diffMin > 1)
                 Log.Information(L($"Last message received {diffMin} min ago"));
-            if (diffMin > 10)
+            if (diffMin > 3)
             {
-                Log.Information(L("Last message received more than 10 min ago. Hard restart.."));
+                Log.Information(L("Last message received more than 3 min ago. Hard restart.."));
 
                 _client?.Abort();
+                _client?.Dispose();
                 await Reconnect();
             }
         }

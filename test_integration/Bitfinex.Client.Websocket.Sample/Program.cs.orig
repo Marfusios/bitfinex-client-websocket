@@ -7,7 +7,10 @@ using System.Runtime.Loader;
 using System.Threading;
 using Bitfinex.Client.Websocket.Client;
 using Bitfinex.Client.Websocket.Requests;
+<<<<<<< HEAD
+=======
 using Bitfinex.Client.Websocket.Responses.Trades;
+>>>>>>> a88b19b574465cab2e72bbd0c4dde80e010eb0f6
 using Bitfinex.Client.Websocket.Utils;
 using Bitfinex.Client.Websocket.Websockets;
 using Serilog;
@@ -67,10 +70,10 @@ namespace Bitfinex.Client.Websocket.Sample
 
                     client.Streams.CandlesStream.Subscribe(candles =>
                     {
-                        candles.CandleList.OrderBy(x => x.Mts).ToList().ForEach(x =>
+                        candles.CandleList.OrderBy(x => x.TimeStamp).ToList().ForEach(x =>
                         {
                             Log.Information(
-                                $"Candle(Pair : {candles.Pair} TimeFrame : {candles.TimeFrame.GetStringValue()}) --> {x.Mts} High : {x.High} Low : {x.Low} Open : {x.Open} Close : {x.Close}");
+                                $"Candle(Pair : {candles.Pair} TimeFrame : {candles.TimeFrame.GetStringValue()}) --> {x.TimeStamp} High : {x.High} Low : {x.Low} Open : {x.Open} Close : {x.Close}");
                         });
                     });
 
@@ -81,15 +84,21 @@ namespace Bitfinex.Client.Websocket.Sample
 
                     communicator.Start().Wait();
 
+<<<<<<< HEAD
                     client.Send(new PingRequest() { Cid = 123456 });
+=======
+                    client.Send(new PingRequest() {Cid = 123456});
 
+>>>>>>> a88b19b574465cab2e72bbd0c4dde80e010eb0f6
                     client.Send(new TickerSubscribeRequest("BTC/USD"));
                     client.Send(new TickerSubscribeRequest("ETH/USD"));
+                    client.Send(new CandlesSubscribeRequest("BTC/USD", BitfinexTimeFrame.OneMinute));
+                    client.Send(new CandlesSubscribeRequest("ETH/USD", BitfinexTimeFrame.OneMinute));
 
                     //client.Send(new TradesSubscribeRequest("ETH/USD"));
 
-                    client.Send(new CandlesSubscribeRequest("BTC/USD", BitfinexTimeFrame.OneMinute));
-                    client.Send(new CandlesSubscribeRequest("ETH/USD", BitfinexTimeFrame.OneMinute));
+                    //client.Send(new CandlesSubscribeRequest("BTC/USD", BitfinexTimeFrame.OneMinute));
+                    //client.Send(new CandlesSubscribeRequest("ETH/USD", BitfinexTimeFrame.OneMinute));
 
                     //client.Send(new BookSubscribeRequest("BTC/USD", BitfinexPrecision.P0, BitfinexFrequency.TwoSecDelay));
                     //client.Send(new BookSubscribeRequest("BTC/USD", BitfinexPrecision.P3, BitfinexFrequency.Realtime));

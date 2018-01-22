@@ -2,16 +2,16 @@
 
 namespace Bitfinex.Client.Websocket.Requests
 {
-    public class TickerSubscribeRequest : SubscribeRequestBase
+    public class TradesSubscribeRequest : SubscribeRequestBase
     {
-        public TickerSubscribeRequest(string pair)
+        public TradesSubscribeRequest(string pair)
         {
             BfxValidations.ValidateInput(pair, nameof(pair));
 
             Symbol = FormatPairToSymbol(pair);
         }
 
-        public override string Channel => "ticker";
+        public override string Channel => "trades";
         public string Symbol { get; }
     }
 }

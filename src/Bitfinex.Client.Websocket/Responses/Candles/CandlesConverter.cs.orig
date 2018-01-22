@@ -1,15 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
+<<<<<<< HEAD
+=======
 using Bitfinex.Client.Websocket.Utils;
+>>>>>>> a88b19b574465cab2e72bbd0c4dde80e010eb0f6
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace Bitfinex.Client.Websocket.Responses.Candles
 {
+<<<<<<< HEAD
+    public class CandlesConverter : JsonConverter
+    {
+=======
     class CandlesConverter : JsonConverter
     {
         public override bool CanWrite => false;
 
+>>>>>>> a88b19b574465cab2e72bbd0c4dde80e010eb0f6
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
             throw new NotImplementedException();
@@ -28,21 +36,35 @@ namespace Bitfinex.Client.Websocket.Responses.Candles
         private Candles JArrayToCandles(JArray jArray)
         {
             var candles = new Candles();
+<<<<<<< HEAD
+
+            if (jArray.Count==6)
+            {
+                candles.CandleList.Add(JArrayToCandle(jArray));
+=======
             var candleList = new List<Candle>();
 
             if (jArray.Count==6)
             {
                 candleList.Add(JArrayToCandle(jArray));
+>>>>>>> a88b19b574465cab2e72bbd0c4dde80e010eb0f6
             }
             else
             {
                 foreach (var candle in jArray)
                 {
+<<<<<<< HEAD
+                    candles.CandleList.Add(JArrayToCandle(candle));
+                }
+            }
+
+=======
                     candleList.Add(JArrayToCandle(candle));
                 }
             }
 
             candles.CandleList = candleList.ToArray();
+>>>>>>> a88b19b574465cab2e72bbd0c4dde80e010eb0f6
             return candles;
         }
 
@@ -50,7 +72,11 @@ namespace Bitfinex.Client.Websocket.Responses.Candles
         {
             return new Candle
             {
+<<<<<<< HEAD
+                Mts = Int64.Parse(jToken[0].ToString()),
+=======
                 Mts = BitfinexTime.ConvertToTime((long)jToken[0]),
+>>>>>>> a88b19b574465cab2e72bbd0c4dde80e010eb0f6
                 Open = (double) jToken[1],
                 Close = (double) jToken[2],
                 High = (double) jToken[3],

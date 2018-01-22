@@ -12,5 +12,9 @@ namespace Bitfinex.Client.Websocket.Utils
             return (long)substracted.TotalMilliseconds;
         }
 
+        public static DateTime ConvertToTime(long timeInMs)
+        {
+            return UnixBase.AddMilliseconds(timeInMs);
+        }
     }
 }

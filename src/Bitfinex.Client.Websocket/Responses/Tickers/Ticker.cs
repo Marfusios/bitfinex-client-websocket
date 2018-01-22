@@ -3,7 +3,7 @@
 namespace Bitfinex.Client.Websocket.Responses.Tickers
 {
     [JsonConverter(typeof(TickerConverter))]
-    public class Ticker
+    public class Ticker : ResponseBase
     {
         /// <summary>
         /// Price of last highest bid

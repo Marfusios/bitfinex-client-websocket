@@ -1,6 +1,7 @@
 ﻿using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Serilog;
 
 namespace Bitfinex.Client.Websocket.Responses.Wallets
 {
@@ -29,12 +30,33 @@ namespace Bitfinex.Client.Websocket.Responses.Wallets
         {
             return new Wallet
             {
-                WalletType = (string)array[0],
+                Type = ParseWalletType((string)array[0]),
                 Currency = (string)array[1],
                 Balance = (double)array[2],
                 UnsettledInterest = (double)array[3],
                 BalanceAvailable = (double?)array[4]
             };
+        }
+
+        public static WalletType ParseWalletType(string type)
+        {
+            if (string.IsNullOrWhiteSpace(type))
+                return WalletType.Undefined;
+            var safe = type.ToLower().Trim();
+            switch (safe)
+            {
+                case "exchange":
+                case var s when s.StartsWith("exchange"):
+                    return WalletType.Exchange;
+                case "margin":
+                case var s when s.StartsWith("margin"):
+                    return WalletType.Margin;
+                case "funding":
+                case var s when s.StartsWith("funding"):
+                    return WalletType.Funding;
+            }
+            Log.Warning("Can't parse WalletType, input: " + safe);
+            return WalletType.Undefined;
         }
     }
 }

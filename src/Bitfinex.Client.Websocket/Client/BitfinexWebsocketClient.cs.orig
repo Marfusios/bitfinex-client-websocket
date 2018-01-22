@@ -6,10 +6,15 @@ using Bitfinex.Client.Websocket.Json;
 using Bitfinex.Client.Websocket.Messages;
 using Bitfinex.Client.Websocket.Requests;
 using Bitfinex.Client.Websocket.Responses;
+<<<<<<< HEAD
+using Bitfinex.Client.Websocket.Responses.Candles;
+using Bitfinex.Client.Websocket.Responses.Tickers;
+=======
 using Bitfinex.Client.Websocket.Responses.Books;
 using Bitfinex.Client.Websocket.Responses.Candles;
 using Bitfinex.Client.Websocket.Responses.Tickers;
 using Bitfinex.Client.Websocket.Responses.Trades;
+>>>>>>> a88b19b574465cab2e72bbd0c4dde80e010eb0f6
 using Bitfinex.Client.Websocket.Utils;
 using Bitfinex.Client.Websocket.Validations;
 using Bitfinex.Client.Websocket.Websockets;
@@ -146,6 +151,11 @@ namespace Bitfinex.Client.Websocket.Client
                 case "ticker":
                     _channelIdToHandler[channelId] = data => OnTicker(data, response);
                     break;
+<<<<<<< HEAD
+                case "candles":
+                    _channelIdToHandler[channelId] = data => OnCandles(data, response);
+                    break;
+=======
                 case "trades":
                     _channelIdToHandler[channelId] = data => OnTrades(data, response);
                     break;
@@ -155,6 +165,7 @@ namespace Bitfinex.Client.Websocket.Client
                 case "book":
                     _channelIdToHandler[channelId] = data => OnBook(data, response);
                     break;
+>>>>>>> a88b19b574465cab2e72bbd0c4dde80e010eb0f6
             }
         }
 
@@ -174,6 +185,8 @@ namespace Bitfinex.Client.Websocket.Client
             Streams.Raise(ticker);
         }
 
+<<<<<<< HEAD
+=======
         private void OnTrades(JToken token, SubscribedResponse subscription)
         {
             var firstPosition = token[1];
@@ -219,6 +232,7 @@ namespace Bitfinex.Client.Websocket.Client
             }
         }
 
+>>>>>>> a88b19b574465cab2e72bbd0c4dde80e010eb0f6
         private void OnCandles(JToken token, SubscribedResponse subscription)
         {
             var data = token[1];
@@ -233,6 +247,11 @@ namespace Bitfinex.Client.Websocket.Client
 
             candles.TimeFrame = new BitfinexTimeFrame().GetFieldByStringValue(subscription.Key.Split(':')[1]);
             candles.Pair = subscription.Key.Split(':')[2].Remove(0, 1);
+<<<<<<< HEAD
+            Streams.Raise(candles);
+        }
+
+=======
             candles.ChanId = subscription.ChanId;
             Streams.Raise(candles);
         }
@@ -270,6 +289,7 @@ namespace Bitfinex.Client.Websocket.Client
             }
         }
 
+>>>>>>> a88b19b574465cab2e72bbd0c4dde80e010eb0f6
         private T Deserialize<T>(string msg)
         {
             return JsonConvert.DeserializeObject<T>(msg, BitfinexJsonSerializer.Settings);

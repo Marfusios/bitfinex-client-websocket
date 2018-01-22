@@ -53,10 +53,10 @@ More usage examples:
 | Channel subscribing    |  ✔            |
 | Channel unsubscribing  |  ✔            |
 | Ticker                 |  ✔            |
-| Trades                 |                |
-| Books                  |                |
+| Trades                 |  ✔            |
+| Books                  |  ✔            |
 | Raw books              |                |
-| Candles                |                |
+| Candles                |  ✔            |
 
 | AUTHENTICATED          |    Covered     |  
 |------------------------|:--------------:|
