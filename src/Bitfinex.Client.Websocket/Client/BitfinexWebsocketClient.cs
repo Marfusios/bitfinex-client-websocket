@@ -25,14 +25,16 @@ namespace Bitfinex.Client.Websocket.Client
         private readonly IDisposable _messageReceivedSubsciption;
 
         private readonly Dictionary<int, Action<JToken>> _channelIdToHandler = new Dictionary<int, Action<JToken>>();
+        
 
-        public BitfinexWebsocketClient(BitfinexWebsocketCommunicator communicator)
+        public BitfinexWebsocketClient()
         {
-            BfxValidations.ValidateInput(communicator, nameof(communicator));
+            var url = BitfinexValues.ApiWebsocketUrl;
+            _communicator = new BitfinexWebsocketCommunicator(url);
 
-            _communicator = communicator;
             _channelIdToHandler[0] = Streams.HandleAccountInfo;
             _messageReceivedSubsciption = _communicator.MessageReceived.Subscribe(HandleMessage);
+
         }
 
         public BitfinexClientStreams Streams { get; } = new BitfinexClientStreams();
@@ -42,18 +44,31 @@ namespace Bitfinex.Client.Websocket.Client
             _messageReceivedSubsciption?.Dispose();
         }
 
-        public Task Send<T>(T request)
+        public Task Start()
         {
-            BfxValidations.ValidateInput(request, nameof(request));
+            return _communicator.Start();
+        }
 
-            var serialized = JsonConvert.SerializeObject(request, BitfinexJsonSerializer.Settings);
-            return _communicator.Send(serialized);
+        public Task Ping(int Cid)
+        {
+            return _communicator.Send(new PingRequest() { Cid = Cid });
+        }
+
+        public void SubscribeTicker(string pair)
+        {
+            _communicator.Send(new TickerSubscribeRequest(pair));
+        }
+
+        public void SubscribeCandle(string pair, BitfinexTimeFrame timeframe)
+        {
+            _communicator.Send(new CandlesSubscribeRequest(pair, timeframe));
         }
 
         public Task Authenticate(string apiKey, string apiSecret)
         {
-            return Send(new AuthenticationRequest(apiKey, apiSecret));
+            return _communicator.Send(new AuthenticationRequest(apiKey, apiSecret));
         }
+
 
 
 
