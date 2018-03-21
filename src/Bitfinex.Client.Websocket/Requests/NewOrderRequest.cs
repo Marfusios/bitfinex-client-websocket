@@ -82,9 +82,14 @@ namespace Bitfinex.Client.Websocket.Requests
         public int Hidden { get; set; }
 
         /// <summary>
-        /// (optional) Whether the order is postonly (1) or not (0)
+        /// You may sum flag values to pass multiple flags. For example passing 4160 (64 + 4096) means hidden post only.
+        /// ------------------------------------------------------------------------------------------------------------
+        /// 64	    The hidden order option ensures an order does not appear in the order book; thus does not influence other market participants.
+        /// 512	    Close position if position present.
+        /// 4096	The post-only limit order option ensures the limit order will be added to the order book and not match with a pre-existing order.
+        /// 16384	The one cancels other order option allows you to place a pair of orders stipulating that if one order is executed fully or partially, then the other is automatically canceled.
         /// </summary>
-        public int? Postonly { get; set; }
+        public int? Flags { get; set; }
     }
 
     /*

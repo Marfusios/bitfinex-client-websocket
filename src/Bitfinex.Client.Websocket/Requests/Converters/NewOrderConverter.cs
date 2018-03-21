@@ -60,10 +60,10 @@ namespace Bitfinex.Client.Websocket.Requests.Converters
             writer.WritePropertyName("hidden");
             writer.WriteValue(order.Hidden);
 
-            if (order.Postonly.HasValue)
+            if (order.Flags.HasValue)
             {
-                writer.WritePropertyName("postonly");
-                writer.WriteValue(order.Postonly.Value.ToString(CultureInfo.InvariantCulture));
+                writer.WritePropertyName("flags");
+                writer.WriteValue(order.Flags.Value.ToString(CultureInfo.InvariantCulture));
             }
 
 
