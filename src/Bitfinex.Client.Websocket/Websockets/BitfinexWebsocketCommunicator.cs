@@ -1,11 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.WebSockets;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Bitfinex.Client.Websocket.Json;
+using Bitfinex.Client.Websocket.Requests;
 using Bitfinex.Client.Websocket.Validations;
+using Newtonsoft.Json;
 using Serilog;
 
 namespace Bitfinex.Client.Websocket.Websockets
@@ -21,6 +26,8 @@ namespace Bitfinex.Client.Websocket.Websockets
         private bool _disposing = false;
         private ClientWebSocket _client;
         private CancellationTokenSource _cancelation;
+        
+        private List<SubscribeRequestBase> _storedSubscriptions;        
 
         private readonly Subject<string> _messageReceivedSubject = new Subject<string>();
 
@@ -39,6 +46,8 @@ namespace Bitfinex.Client.Websocket.Websockets
 
             var minute = 1000 * 60;
             _lastChanceTimer = new Timer(async x => await LastChance(x), null, minute, minute);
+
+            _storedSubscriptions = new List<SubscribeRequestBase>();
         }
 
         public void Dispose()
@@ -60,7 +69,7 @@ namespace Bitfinex.Client.Websocket.Websockets
             return StartClient(_url, _cancelation.Token);
         }
 
-        public async Task Send(string message)
+        public async Task SendInternal(string message)
         {
             BfxValidations.ValidateInput(message, nameof(message));
 
@@ -70,6 +79,26 @@ namespace Bitfinex.Client.Websocket.Websockets
             var client = await GetClient();
             await client.SendAsync(messageSegment, WebSocketMessageType.Text, true, _cancelation.Token);
         }
+
+        public Task Send<T>(T request, bool resubscribe = false)
+        {
+            BfxValidations.ValidateInput(request, nameof(request));
+
+            if (!resubscribe)
+            {
+                //Store subscriptions to re-establish if communication is lost and re-established
+                if (request is SubscribeRequestBase)
+                {
+                    _storedSubscriptions.Add(request as SubscribeRequestBase);
+                }
+            }
+
+            var serialized = JsonConvert.SerializeObject(request, BitfinexJsonSerializer.Settings);
+            return this.SendInternal(serialized);
+        }
+
+
+      
 
         private async Task StartClient(Uri uri, CancellationToken token)
         {
@@ -109,6 +138,16 @@ namespace Bitfinex.Client.Websocket.Websockets
 
             _cancelation = new CancellationTokenSource();
             await StartClient(_url, _cancelation.Token);
+
+            List<Task> resubscribeTasks = new List<Task>();
+
+            Log.Information(L("Re-subscribing..."));
+
+            _storedSubscriptions.Select(sub=> this.Send(sub, true)).ToArray();
+
+            Task.WaitAll(resubscribeTasks.ToArray());
+
+            Log.Information(L($"Resent {_storedSubscriptions.Count} subscriptions"));
         }
 
         private async Task Listen(ClientWebSocket client, CancellationToken token)

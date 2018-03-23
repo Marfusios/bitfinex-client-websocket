@@ -18,31 +18,30 @@ namespace Bitfinex.Client.Websocket.Tests.Integration
         public async Task PingPong()
         {
             var url = BitfinexValues.ApiWebsocketUrl;
-            using (var communicator = new BitfinexWebsocketCommunicator(url))
+
+            PongResponse received = null;
+            var receivedEvent = new ManualResetEvent(false);
+
+            using (var client = new BitfinexWebsocketClient())
             {
-                PongResponse received = null;
-                var receivedEvent = new ManualResetEvent(false);
 
-                using (var client = new BitfinexWebsocketClient(communicator))
+                client.Streams.PongStream.Subscribe(pong =>
                 {
+                    received = pong;
+                    receivedEvent.Set();
+                });
 
-                    client.Streams.PongStream.Subscribe(pong =>
-                    {
-                        received = pong;
-                        receivedEvent.Set();
-                    });
+                await client.Start();
 
-                    await communicator.Start();
+                await client.Ping(123456);
 
-                    await client.Send(new PingRequest() {Cid = 123456});
+                receivedEvent.WaitOne(TimeSpan.FromSeconds(30));
 
-                    receivedEvent.WaitOne(TimeSpan.FromSeconds(30));
-
-                    Assert.NotNull(received);
-                    Assert.Equal(123456, received.Cid);
-                    Assert.True(DateTime.UtcNow.Subtract(received.Ts).TotalSeconds < 15);
-                }
+                Assert.NotNull(received);
+                Assert.Equal(123456, received.Cid);
+                Assert.True(DateTime.UtcNow.Subtract(received.Ts).TotalSeconds < 15);
             }
+
         }
 
         [SkippableFact]
@@ -51,31 +50,30 @@ namespace Bitfinex.Client.Websocket.Tests.Integration
             Skip.If(string.IsNullOrWhiteSpace(API_SECRET));
 
             var url = BitfinexValues.ApiWebsocketUrl;
-            using (var communicator = new BitfinexWebsocketCommunicator(url))
+
+            AuthenticationResponse received = null;
+            var receivedEvent = new ManualResetEvent(false);
+
+            using (var client = new BitfinexWebsocketClient())
             {
-                AuthenticationResponse received = null;
-                var receivedEvent = new ManualResetEvent(false);
 
-                using (var client = new BitfinexWebsocketClient(communicator))
+                client.Streams.AuthenticationStream.Subscribe(auth =>
                 {
+                    received = auth;
+                    receivedEvent.Set();
+                });
 
-                    client.Streams.AuthenticationStream.Subscribe(auth =>
-                    {
-                        received = auth;
-                        receivedEvent.Set();
-                    });
+                await client.Start();
 
-                    await communicator.Start();
+                await client.Authenticate(API_KEY, API_SECRET);
 
-                    await client.Authenticate(API_KEY, API_SECRET);
+                receivedEvent.WaitOne(TimeSpan.FromSeconds(30));
 
-                    receivedEvent.WaitOne(TimeSpan.FromSeconds(30));
-
-                    Assert.NotNull(received);
-                    Assert.True(received.IsAuthenticated);
-                }
+                Assert.NotNull(received);
+                Assert.True(received.IsAuthenticated);
             }
         }
+
 
     }
 }
