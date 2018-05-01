@@ -25,10 +25,16 @@ using (var communicator = new BitfinexWebsocketCommunicator(url))
 {
     using (var client = new BitfinexWebsocketClient(communicator))
     {
-        client.Streams.PongStream.Subscribe(pong =>
+        client.Streams.InfoStream.Subscribe(info =>
         {
-            Console.WriteLine($"Pong received! Id: {pong.Cid}") // Pong received! Id: 123456
-            exitEvent.Set();
+            Log.Information($"Info received, version: {info.Version}, reconnection happened, resubscribing to streams");
+            
+            client.Streams.PongStream.Subscribe(pong =>
+            {
+                Console.WriteLine($"Pong received! Id: {pong.Cid}") // Pong received! Id: 123456
+                exitEvent.Set();
+            });
+
         });
 
         await communicator.Start();

@@ -45,39 +45,11 @@ namespace Bitfinex.Client.Websocket.Sample
             {
                 using (var client = new BitfinexWebsocketClient(communicator))
                 {
-                    
-                    client.Streams.PongStream.Subscribe(pong => Log.Information($"Pong received! Id: {pong.Cid}"));
-                    client.Streams.TickerStream.Subscribe(ticker => 
-                        Log.Information($"{ticker.Pair} - last price: {ticker.LastPrice}, bid: {ticker.Bid}, ask: {ticker.Ask}"));
-                    client.Streams.TradesStream.Where(x => x.Type == TradeType.Executed).Subscribe(x => 
-                        Log.Information($"Trade {x.Pair} executed. Time: {x.Mts:mm:ss.fff}, Amount: {x.Amount}, Price: {x.Price}"));
-
-                    client.Streams.CandlesStream.Subscribe(candles =>
+                    client.Streams.InfoStream.Subscribe(info =>
                     {
-                        candles.CandleList.OrderBy(x => x.Mts).ToList().ForEach(x =>
-                        {
-                            Log.Information(
-                                $"Candle(Pair : {candles.Pair} TimeFrame : {candles.TimeFrame.GetStringValue()}) --> {x.Mts} High : {x.High} Low : {x.Low} Open : {x.Open} Close : {x.Close}");
-                        });
+                        Log.Information($"Info received version: {info.Version}, reconnection happened, resubscribing to streams");
+                        SubscribeToStreams(client);
                     });
-
-                    client.Streams.BookStream.Subscribe(book =>
-                        Log.Information(
-                            $"Book | channel: {book.ChanId} pair: {book.Pair}, price: {book.Price}, amount {book.Amount}, count: {book.Count}"));
-
-                    client.Streams.CandlesStream.Subscribe(candles =>
-                    {
-                        candles.CandleList.OrderBy(x => x.Mts).ToList().ForEach(x =>
-                        {
-                            Log.Information(
-                                $"Candle(Pair : {candles.Pair} TimeFrame : {candles.TimeFrame.GetStringValue()}) --> {x.Mts} High : {x.High} Low : {x.Low} Open : {x.Open} Close : {x.Close}");
-                        });
-                    });
-
-                    client.Streams.AuthenticationStream.Subscribe(auth => Log.Information($"Authenticated: {auth.IsAuthenticated}"));
-                    client.Streams.WalletStream
-                        .Subscribe(wallet =>
-                            Log.Information($"Wallet {wallet.Currency} balance: {wallet.Balance} type: {wallet.Type}"));
 
                     communicator.Start().Wait();
 
@@ -86,10 +58,10 @@ namespace Bitfinex.Client.Websocket.Sample
                     client.Send(new TickerSubscribeRequest("BTC/USD"));
                     client.Send(new TickerSubscribeRequest("ETH/USD"));
 
-                    //client.Send(new TradesSubscribeRequest("ETH/USD"));
+                    client.Send(new TradesSubscribeRequest("ETH/USD"));
 
-                    client.Send(new CandlesSubscribeRequest("BTC/USD", BitfinexTimeFrame.OneMinute));
-                    client.Send(new CandlesSubscribeRequest("ETH/USD", BitfinexTimeFrame.OneMinute));
+                    //client.Send(new CandlesSubscribeRequest("BTC/USD", BitfinexTimeFrame.OneMinute));
+                    //client.Send(new CandlesSubscribeRequest("ETH/USD", BitfinexTimeFrame.OneMinute));
 
                     //client.Send(new BookSubscribeRequest("BTC/USD", BitfinexPrecision.P0, BitfinexFrequency.TwoSecDelay));
                     //client.Send(new BookSubscribeRequest("BTC/USD", BitfinexPrecision.P3, BitfinexFrequency.Realtime));
@@ -116,6 +88,42 @@ namespace Bitfinex.Client.Websocket.Sample
             Log.Debug("              STOPPING              ");
             Log.Debug("====================================");
             Log.CloseAndFlush();
+        }
+
+        private static void SubscribeToStreams(BitfinexWebsocketClient client)
+        {
+            client.Streams.PongStream.Subscribe(pong => Log.Information($"Pong received! Id: {pong.Cid}"));
+            client.Streams.TickerStream.Subscribe(ticker =>
+                Log.Information($"{ticker.Pair} - last price: {ticker.LastPrice}, bid: {ticker.Bid}, ask: {ticker.Ask}"));
+            client.Streams.TradesStream.Where(x => x.Type == TradeType.Executed).Subscribe(x =>
+                Log.Information($"Trade {x.Pair} executed. Time: {x.Mts:mm:ss.fff}, Amount: {x.Amount}, Price: {x.Price}"));
+
+            client.Streams.CandlesStream.Subscribe(candles =>
+            {
+                candles.CandleList.OrderBy(x => x.Mts).ToList().ForEach(x =>
+                {
+                    Log.Information(
+                        $"Candle(Pair : {candles.Pair} TimeFrame : {candles.TimeFrame.GetStringValue()}) --> {x.Mts} High : {x.High} Low : {x.Low} Open : {x.Open} Close : {x.Close}");
+                });
+            });
+
+            client.Streams.BookStream.Subscribe(book =>
+                Log.Information(
+                    $"Book | channel: {book.ChanId} pair: {book.Pair}, price: {book.Price}, amount {book.Amount}, count: {book.Count}"));
+
+            client.Streams.CandlesStream.Subscribe(candles =>
+            {
+                candles.CandleList.OrderBy(x => x.Mts).ToList().ForEach(x =>
+                {
+                    Log.Information(
+                        $"Candle(Pair : {candles.Pair} TimeFrame : {candles.TimeFrame.GetStringValue()}) --> {x.Mts} High : {x.High} Low : {x.Low} Open : {x.Open} Close : {x.Close}");
+                });
+            });
+
+            client.Streams.AuthenticationStream.Subscribe(auth => Log.Information($"Authenticated: {auth.IsAuthenticated}"));
+            client.Streams.WalletStream
+                .Subscribe(wallet =>
+                    Log.Information($"Wallet {wallet.Currency} balance: {wallet.Balance} type: {wallet.Type}"));
         }
 
         private static void InitLogging()
