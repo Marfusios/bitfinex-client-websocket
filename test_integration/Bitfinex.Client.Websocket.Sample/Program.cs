@@ -48,37 +48,12 @@ namespace Bitfinex.Client.Websocket.Sample
                     client.Streams.InfoStream.Subscribe(info =>
                     {
                         Log.Information($"Info received version: {info.Version}, reconnection happened, resubscribing to streams");
-                        SubscribeToStreams(client);
+                        SendSubscriptionRequests(client);
                     });
 
+                    SubscribeToStreams(client);
+
                     communicator.Start().Wait();
-
-                    client.Send(new PingRequest() { Cid = 123456 });
-
-                    client.Send(new TickerSubscribeRequest("BTC/USD"));
-                    client.Send(new TickerSubscribeRequest("ETH/USD"));
-
-                    client.Send(new TradesSubscribeRequest("ETH/USD"));
-
-                    //client.Send(new CandlesSubscribeRequest("BTC/USD", BitfinexTimeFrame.OneMinute));
-                    //client.Send(new CandlesSubscribeRequest("ETH/USD", BitfinexTimeFrame.OneMinute));
-
-                    //client.Send(new BookSubscribeRequest("BTC/USD", BitfinexPrecision.P0, BitfinexFrequency.TwoSecDelay));
-                    //client.Send(new BookSubscribeRequest("BTC/USD", BitfinexPrecision.P3, BitfinexFrequency.Realtime));
-
-                    if (!string.IsNullOrWhiteSpace(API_SECRET))
-                    {
-                        client.Authenticate(API_KEY, API_SECRET);
-
-                        // Place BUY order
-                        // client.Send(new NewOrderRequest(33, 1, "ETH/USD", OrderType.ExchangeLimit, 0.2, 100));
-
-                        // Place SELL order
-                        // client.Send(new NewOrderRequest(33, 2, "ETH/USD", OrderType.ExchangeLimit, -0.2, 2000));
-
-                        // Cancel order
-                        // client.Send(new CancelOrderRequest(1));
-                    }
 
                     ExitEvent.WaitOne();
                 }
@@ -88,6 +63,36 @@ namespace Bitfinex.Client.Websocket.Sample
             Log.Debug("              STOPPING              ");
             Log.Debug("====================================");
             Log.CloseAndFlush();
+        }
+
+        private static void SendSubscriptionRequests(BitfinexWebsocketClient client)
+        {
+            client.Send(new PingRequest() {Cid = 123456});
+
+            client.Send(new TickerSubscribeRequest("BTC/USD"));
+            client.Send(new TickerSubscribeRequest("ETH/USD"));
+
+            client.Send(new TradesSubscribeRequest("ETH/USD"));
+
+            //client.Send(new CandlesSubscribeRequest("BTC/USD", BitfinexTimeFrame.OneMinute));
+            //client.Send(new CandlesSubscribeRequest("ETH/USD", BitfinexTimeFrame.OneMinute));
+
+            //client.Send(new BookSubscribeRequest("BTC/USD", BitfinexPrecision.P0, BitfinexFrequency.TwoSecDelay));
+            //client.Send(new BookSubscribeRequest("BTC/USD", BitfinexPrecision.P3, BitfinexFrequency.Realtime));
+
+            if (!string.IsNullOrWhiteSpace(API_SECRET))
+            {
+                client.Authenticate(API_KEY, API_SECRET);
+
+                // Place BUY order
+                // client.Send(new NewOrderRequest(33, 1, "ETH/USD", OrderType.ExchangeLimit, 0.2, 100));
+
+                // Place SELL order
+                // client.Send(new NewOrderRequest(33, 2, "ETH/USD", OrderType.ExchangeLimit, -0.2, 2000));
+
+                // Cancel order
+                // client.Send(new CancelOrderRequest(1));
+            }
         }
 
         private static void SubscribeToStreams(BitfinexWebsocketClient client)

@@ -27,18 +27,19 @@ using (var communicator = new BitfinexWebsocketCommunicator(url))
     {
         client.Streams.InfoStream.Subscribe(info =>
         {
-            Log.Information($"Info received, version: {info.Version}, reconnection happened, resubscribing to streams");
+            Log.Information($"Info received, reconnection happened, resubscribing to streams");
             
-            client.Streams.PongStream.Subscribe(pong =>
-            {
-                Console.WriteLine($"Pong received! Id: {pong.Cid}") // Pong received! Id: 123456
-                exitEvent.Set();
-            });
+            await client.Send(new PingRequest() {Cid = 123456});
+            //await client.Send(new TickerSubscribeRequest("BTC/USD"));
+        });
 
+        client.Streams.PongStream.Subscribe(pong =>
+        {
+            Console.WriteLine($"Pong received! Id: {pong.Cid}") // Pong received! Id: 123456
+            exitEvent.Set();
         });
 
         await communicator.Start();
-        await client.Send(new PingRequest() {Cid = 123456});
 
         exitEvent.WaitOne(TimeSpan.FromSeconds(30));
     }
