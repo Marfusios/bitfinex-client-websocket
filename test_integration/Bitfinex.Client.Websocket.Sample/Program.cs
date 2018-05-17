@@ -53,7 +53,7 @@ namespace Bitfinex.Client.Websocket.Sample
 
                     SubscribeToStreams(client);
 
-                    communicator.Start().Wait();
+                    communicator.Start();
 
                     ExitEvent.WaitOne();
                 }
