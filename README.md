@@ -1,4 +1,4 @@
-![Logo](https://p14.zdassets.com/hc/settings_assets/1315777/200292465/pEpGWSnJxXt635uBwBtVxQ-logo-bfx.svg)
+![Logo](bitfinex_logo.png)
 # Bitfinex websocket API version 2.0 client [![Build Status](https://travis-ci.org/Marfusios/bitfinex-client-websocket.svg?branch=master)](https://travis-ci.org/Marfusios/bitfinex-client-websocket) [![NuGet version](https://badge.fury.io/nu/Bitfinex.Client.Websocket.svg)](https://badge.fury.io/nu/Bitfinex.Client.Websocket)
 
 This is a C# implementation of the Bitfinex websocket API version 2.0 (BETA) found here:
