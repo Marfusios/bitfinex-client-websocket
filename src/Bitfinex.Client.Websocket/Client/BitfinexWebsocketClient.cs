@@ -42,12 +42,20 @@ namespace Bitfinex.Client.Websocket.Client
             _messageReceivedSubsciption?.Dispose();
         }
 
-        public Task Send<T>(T request)
+        public async Task Send<T>(T request)
         {
-            BfxValidations.ValidateInput(request, nameof(request));
+            try
+            {
+                BfxValidations.ValidateInput(request, nameof(request));
 
-            var serialized = JsonConvert.SerializeObject(request, BitfinexJsonSerializer.Settings);
-            return _communicator.Send(serialized);
+                var serialized = JsonConvert.SerializeObject(request, BitfinexJsonSerializer.Settings);
+                await _communicator.Send(serialized);
+            }
+            catch (Exception e)
+            {
+                Log.Error(e, L($"Exception while sending message '{request}'. Error: {e.Message}"));
+                throw;
+            }
         }
 
         public Task Authenticate(string apiKey, string apiSecret)
