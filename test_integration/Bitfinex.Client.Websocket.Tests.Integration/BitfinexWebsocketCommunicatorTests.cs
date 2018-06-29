@@ -28,7 +28,7 @@ namespace Bitfinex.Client.Websocket.Tests.Integration
                 receivedEvent.WaitOne(TimeSpan.FromSeconds(30));
 
                 Assert.NotNull(received);
-                Assert.Equal("{\"event\":\"info\",\"version\":2}", received);
+                Assert.Contains("\"event\":\"info\",\"version\":2", received);
             }
         }
     }
