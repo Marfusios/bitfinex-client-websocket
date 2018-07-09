@@ -38,7 +38,7 @@ namespace Bitfinex.Client.Websocket.Websockets
         }
 
         /// <summary>
-        /// Stream with raw received message
+        /// Stream with received message (raw format)
         /// </summary>
         public IObservable<string> MessageReceived => _messageReceivedSubject.AsObservable();
 
@@ -77,7 +77,6 @@ namespace Bitfinex.Client.Websocket.Websockets
         /// <summary>
         /// Start listening to the websocket stream on the background thread
         /// </summary>
-        /// <returns></returns>
         public Task Start()
         {
             Log.Debug(L("Starting.."));
@@ -89,8 +88,7 @@ namespace Bitfinex.Client.Websocket.Websockets
         /// <summary>
         /// Send message to the websocket channel
         /// </summary>
-        /// <param name="message"></param>
-        /// <returns></returns>
+        /// <param name="message">Message to be sent</param>
         public async Task Send(string message)
         {
             BfxValidations.ValidateInput(message, nameof(message));

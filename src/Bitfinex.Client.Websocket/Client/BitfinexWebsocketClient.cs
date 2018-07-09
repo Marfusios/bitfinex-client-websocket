@@ -50,7 +50,7 @@ namespace Bitfinex.Client.Websocket.Client
 
         /// <summary>
         /// Serializes request and sends message via websocket communicator. 
-        /// It logs and re-throw every exception. 
+        /// It logs and re-throws every exception. 
         /// </summary>
         /// <param name="request">Request/message to be sent</param>
         public async Task Send<T>(T request)

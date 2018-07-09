@@ -44,12 +44,12 @@ namespace Bitfinex.Client.Websocket.Sample
             var url = BitfinexValues.ApiWebsocketUrl;
             using (var communicator = new BitfinexWebsocketCommunicator(url))
             {
+                communicator.ReconnectTimeoutMs = (int)TimeSpan.FromSeconds(30).TotalMilliseconds;
+                communicator.ReconnectionHappened.Subscribe(type =>
+                    Log.Information($"Reconnection happened, type: {type}"));
+
                 using (var client = new BitfinexWebsocketClient(communicator))
                 {
-                    communicator.ReconnectTimeoutMs = (int)TimeSpan.FromSeconds(30).TotalMilliseconds;
-                    communicator.ReconnectionHappened.Subscribe(type =>
-                        Log.Information($"Reconnection happened, type: {type}"));
-
                     client.Streams.InfoStream.Subscribe(info =>
                     {
                         Log.Information($"Info received version: {info.Version}, reconnection happened, resubscribing to streams");
