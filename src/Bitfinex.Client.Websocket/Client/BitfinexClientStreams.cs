@@ -6,6 +6,7 @@ using System.Reactive.Subjects;
 using Bitfinex.Client.Websocket.Responses;
 using Bitfinex.Client.Websocket.Responses.Books;
 using Bitfinex.Client.Websocket.Responses.Candles;
+using Bitfinex.Client.Websocket.Responses.Fundings;
 using Bitfinex.Client.Websocket.Responses.Orders;
 using Bitfinex.Client.Websocket.Responses.Tickers;
 using Bitfinex.Client.Websocket.Responses.Trades;
@@ -23,6 +24,7 @@ namespace Bitfinex.Client.Websocket.Client
         private readonly Subject<AuthenticationResponse> _authenticationSubject = new Subject<AuthenticationResponse>();
         private readonly Subject<Ticker> _tickerSubject = new Subject<Ticker>();
         private readonly Subject<Trade> _tradesSubject = new Subject<Trade>();
+        private readonly Subject<Funding> _fundingsSubject = new Subject<Funding>();
         private readonly Subject<Candles> _candlesSubject = new Subject<Candles>();
         private readonly Subject<Book> _bookSubject = new Subject<Book>();
 
@@ -39,6 +41,7 @@ namespace Bitfinex.Client.Websocket.Client
         public IObservable<AuthenticationResponse> AuthenticationStream => _authenticationSubject.AsObservable();
         public IObservable<Ticker> TickerStream => _tickerSubject.AsObservable();
         public IObservable<Trade> TradesStream => _tradesSubject.AsObservable();
+        public IObservable<Funding> FundingStream => _fundingsSubject.AsObservable();
         public IObservable<Candles> CandlesStream => _candlesSubject.AsObservable();
         public IObservable<Book> BookStream => _bookSubject.AsObservable();
 
@@ -147,6 +150,11 @@ namespace Bitfinex.Client.Websocket.Client
         internal void Raise(Trade response)
         {
             _tradesSubject.OnNext(response);
+        }
+
+        internal void Raise(Funding response)
+        {
+            _fundingsSubject.OnNext(response);
         }
 
         internal void Raise(Book response)

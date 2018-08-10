@@ -8,6 +8,7 @@ using Bitfinex.Client.Websocket.Requests;
 using Bitfinex.Client.Websocket.Responses;
 using Bitfinex.Client.Websocket.Responses.Books;
 using Bitfinex.Client.Websocket.Responses.Candles;
+using Bitfinex.Client.Websocket.Responses.Fundings;
 using Bitfinex.Client.Websocket.Responses.Tickers;
 using Bitfinex.Client.Websocket.Responses.Trades;
 using Bitfinex.Client.Websocket.Utils;
@@ -171,7 +172,11 @@ namespace Bitfinex.Client.Websocket.Client
                     _channelIdToHandler[channelId] = data => OnTicker(data, response);
                     break;
                 case "trades":
-                    _channelIdToHandler[channelId] = data => OnTrades(data, response);
+                    //if pair is null means that is funding
+                    if (response.Pair == null)
+                        _channelIdToHandler[channelId] = data => OnFundings(data, response);
+                    else
+                        _channelIdToHandler[channelId] = data => OnTrades(data, response);
                     break;
                 case "candles":
                     _channelIdToHandler[channelId] = data => OnCandles(data, response);
@@ -240,6 +245,51 @@ namespace Bitfinex.Client.Websocket.Client
                 trade.Pair = subscription.Pair;
                 trade.ChanId = subscription.ChanId;
                 Streams.Raise(trade);
+            }
+        }
+
+        private void OnFundings(JToken token, SubscribedResponse subscription)
+        {
+            var firstPosition = token[1];
+            if (firstPosition.Type == JTokenType.Array)
+            {
+                // initial snapshot
+                OnFundings(firstPosition.ToObject<Funding[]>(), subscription);
+                return;
+            }
+
+            var fundingType = FundingType.Executed;
+            if (firstPosition.Type == JTokenType.String)
+            {
+                if ((string)firstPosition == "ftu")
+                    fundingType = FundingType.UpdateExecution;
+                else if ((string)firstPosition == "hb")
+                    return; // heartbeat, ignore
+            }
+
+            var data = token[2];
+            if (data.Type != JTokenType.Array)
+            {
+                // bad format, ignore
+                return;
+            }
+
+            var funding = data.ToObject<Funding>();
+            funding.Type = fundingType;
+            funding.Symbol = subscription.Symbol;
+            funding.ChanId = subscription.ChanId;
+            Streams.Raise(funding);
+        }
+
+        private void OnFundings(Funding[] fundings, SubscribedResponse subscription)
+        {
+            var reversed = fundings.Reverse().ToArray(); // newest last
+            foreach (var funding in reversed)
+            {
+                funding.Type = FundingType.Executed;
+                funding.Symbol = subscription.Symbol;
+                funding.ChanId = subscription.ChanId;
+                Streams.Raise(funding);
             }
         }
 
