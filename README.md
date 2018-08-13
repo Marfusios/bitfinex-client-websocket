@@ -65,6 +65,7 @@ More usage examples:
 | Books                  |  ✔            |
 | Raw books              |                |
 | Candles                |  ✔            |
+| Funding                |  ✔            |
 
 | AUTHENTICATED          |    Covered     |  
 |------------------------|:--------------:|

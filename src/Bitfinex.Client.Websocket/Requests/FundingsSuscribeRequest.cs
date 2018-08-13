@@ -1,7 +1,4 @@
 ﻿using Bitfinex.Client.Websocket.Validations;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Bitfinex.Client.Websocket.Requests
 {

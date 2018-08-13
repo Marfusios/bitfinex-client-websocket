@@ -19,16 +19,6 @@ namespace Bitfinex.Client.Websocket.Requests
             return $"t{formatted}";
         }
 
-        protected string FormatPairToSymbolFunding(string pair)
-        {
-            var formatted = pair
-                .Trim()
-                .Replace("/", string.Empty)
-                .Replace("\\", string.Empty)
-                .ToUpper();
-            return $"f{formatted}";
-        }
-
         protected string FormatSymbolFunding(string symbol)
         {
             var formatted = symbol
