@@ -28,5 +28,15 @@ namespace Bitfinex.Client.Websocket.Requests
                 .ToUpper();
             return $"f{formatted}";
         }
+
+        protected string FormatSymbolFunding(string symbol)
+        {
+            var formatted = symbol
+                .Trim()
+                .Replace("/", string.Empty)
+                .Replace("\\", string.Empty)
+                .ToUpper();
+            return $"f{formatted}";
+        }
     }
 }

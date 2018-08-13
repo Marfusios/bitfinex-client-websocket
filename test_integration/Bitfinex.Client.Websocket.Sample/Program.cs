@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Bitfinex.Client.Websocket.Client;
 using Bitfinex.Client.Websocket.Requests;
+using Bitfinex.Client.Websocket.Responses.Fundings;
 using Bitfinex.Client.Websocket.Responses.Trades;
 using Bitfinex.Client.Websocket.Utils;
 using Bitfinex.Client.Websocket.Websockets;
@@ -78,6 +79,8 @@ namespace Bitfinex.Client.Websocket.Sample
             await client.Send(new TickerSubscribeRequest("ETH/USD"));
 
             await client.Send(new TradesSubscribeRequest("ETH/USD"));
+            await client.Send(new FundingsSuscribeRequest("BTC"));
+            await client.Send(new FundingsSuscribeRequest("USD"));
 
             //await client.Send(new CandlesSubscribeRequest("BTC/USD", BitfinexTimeFrame.OneMinute));
             //await client.Send(new CandlesSubscribeRequest("ETH/USD", BitfinexTimeFrame.OneMinute));
@@ -107,6 +110,8 @@ namespace Bitfinex.Client.Websocket.Sample
                 Log.Information($"{ticker.Pair} - last price: {ticker.LastPrice}, bid: {ticker.Bid}, ask: {ticker.Ask}"));
             client.Streams.TradesStream.Where(x => x.Type == TradeType.Executed).Subscribe(x =>
                 Log.Information($"Trade {x.Pair} executed. Time: {x.Mts:mm:ss.fff}, Amount: {x.Amount}, Price: {x.Price}"));
+            client.Streams.FundingStream.Where(x => x.Type == FundingType.Executed).Subscribe(x =>
+                Log.Information($"Funding,  Symbol {x.Symbol} executed. Time: {x.Mts:mm:ss.fff}, Amount: {x.Amount}, Rate: {x.Rate}, Period: {x.Period}"));
 
             client.Streams.CandlesStream.Subscribe(candles =>
             {
