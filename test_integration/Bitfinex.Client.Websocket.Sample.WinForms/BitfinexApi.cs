@@ -1,9 +1,6 @@
 ﻿using System;
-using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
-using System.Reflection;
-using System.Runtime.Loader;
 using System.Threading;
 using System.Threading.Tasks;
 using Bitfinex.Client.Websocket.Client;
@@ -15,21 +12,20 @@ using Bitfinex.Client.Websocket.Websockets;
 using Serilog;
 using Serilog.Events;
 
-namespace Bitfinex.Client.Websocket.Sample
+namespace Bitfinex.Client.Websocket.Sample.WinForms
 {
-    class Program
+    class BitfinexApi
     {
         private static readonly ManualResetEvent ExitEvent = new ManualResetEvent(false);
 
         private static readonly string API_KEY = "your_api_key";
         private static readonly string API_SECRET = "";
 
-        static void Main(string[] args)
+        public static void Start()
         {
             InitLogging();
 
             AppDomain.CurrentDomain.ProcessExit += CurrentDomainOnProcessExit;
-            AssemblyLoadContext.Default.Unloading += DefaultOnUnloading;
             Console.CancelKeyPress += ConsoleOnCancelKeyPress;
 
             Console.WriteLine("|=======================|");
@@ -73,20 +69,20 @@ namespace Bitfinex.Client.Websocket.Sample
 
         private static async Task SendSubscriptionRequests(BitfinexWebsocketClient client)
         {
-            await client.Send(new PingRequest() {Cid = 123456});
+            //await client.Send(new PingRequest() {Cid = 123456});
 
             //await client.Send(new TickerSubscribeRequest("BTC/USD"));
             //await client.Send(new TickerSubscribeRequest("ETH/USD"));
 
-            await client.Send(new TradesSubscribeRequest("BTC/USD"));
+            //await client.Send(new TradesSubscribeRequest("ETH/USD"));
             //await client.Send(new FundingsSuscribeRequest("BTC"));
             //await client.Send(new FundingsSuscribeRequest("USD"));
 
             //await client.Send(new CandlesSubscribeRequest("BTC/USD", BitfinexTimeFrame.OneMinute));
             //await client.Send(new CandlesSubscribeRequest("ETH/USD", BitfinexTimeFrame.OneMinute));
 
-            await client.Send(new BookSubscribeRequest("BTC/USD", BitfinexPrecision.P0, BitfinexFrequency.TwoSecDelay));
-            //await client.Send(new BookSubscribeRequest("BTC/USD", BitfinexPrecision.P3, BitfinexFrequency.Realtime));
+            //await client.Send(new BookSubscribeRequest("BTC/USD", BitfinexPrecision.P0, BitfinexFrequency.TwoSecDelay));
+            await client.Send(new BookSubscribeRequest("BTC/USD", BitfinexPrecision.P3, BitfinexFrequency.Realtime));
 
             if (!string.IsNullOrWhiteSpace(API_SECRET))
             {
@@ -143,11 +139,11 @@ namespace Bitfinex.Client.Websocket.Sample
 
         private static void InitLogging()
         {
-            var executingDir = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-            var logPath = Path.Combine(executingDir, "logs", "verbose.log");
+            //var executingDir = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+            //var logPath = Path.Combine(executingDir, "logs", "verbose.log");
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Verbose()
-                .WriteTo.File(logPath, rollingInterval: RollingInterval.Day)
+                //.WriteTo.File(logPath, rollingInterval: RollingInterval.Day)
                 .WriteTo.ColoredConsole(LogEventLevel.Information)
                 .CreateLogger();
         }
@@ -155,12 +151,6 @@ namespace Bitfinex.Client.Websocket.Sample
         private static void CurrentDomainOnProcessExit(object sender, EventArgs eventArgs)
         {
             Log.Warning("Exiting process");
-            ExitEvent.Set();
-        }
-
-        private static void DefaultOnUnloading(AssemblyLoadContext assemblyLoadContext)
-        {
-            Log.Warning("Unloading process");
             ExitEvent.Set();
         }
 

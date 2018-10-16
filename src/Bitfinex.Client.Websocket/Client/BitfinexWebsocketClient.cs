@@ -335,13 +335,17 @@ namespace Bitfinex.Client.Websocket.Client
 
         private void OnBooks(Book[] books, SubscribedResponse subscription)
         {
-            //var reversed = books.Reverse().ToArray(); // newest last
             foreach (var book in books)
             {
                 book.Pair = subscription.Pair;
                 book.ChanId = subscription.ChanId;
+
+                // raise as normal book stream
                 Streams.Raise(book);
             }
+
+            // raise as snapshot book stream
+            Streams.Raise(books);
         }
 
         private T Deserialize<T>(string msg)
