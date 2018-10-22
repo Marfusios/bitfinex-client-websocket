@@ -95,7 +95,7 @@ Observables from Reactive Extensions are single threaded by default. It means th
 
 #### Default behavior
 
-Every subscription code is called on a main websocket thread. Every subscription is synchronized together. No parallel execution. Will block the receiving thread. 
+Every subscription code is called on a main websocket thread. Every subscription is synchronized together. No parallel execution. It will block the receiving thread. 
 
 ```csharp
 client
@@ -106,7 +106,7 @@ client
 client
     .Streams
     .BookStream
-    .Subscribe(trade => { code2 });
+    .Subscribe(book => { code2 });
 
 // 'code1' and 'code2' are called in a correct order, according to websocket flow
 // ----- code1 ----- code1 ----- ----- code1
@@ -128,7 +128,7 @@ client
     .Streams
     .BookStream
     .ObserveOn(TaskPoolScheduler.Default)
-    .Subscribe(trade => { code2 });
+    .Subscribe(book => { code2 });
 
 // 'code1' and 'code2' are called in parallel, do not follow websocket flow
 // ----- code1 ----- code1 ----- code1 -----
@@ -153,7 +153,7 @@ client
     .BookStream
     .ObserveOn(TaskPoolScheduler.Default)
     .Synchronize(GATE1)
-    .Subscribe(trade => { code2 });
+    .Subscribe(book => { code2 });
 
 // 'code1' and 'code2' are called concurrently and follow websocket flow
 // ----- code1 ----- code1 ----- ----- code1
