@@ -23,6 +23,7 @@ namespace Bitfinex.Client.Websocket.Websockets
         private bool _started = false;
         private ClientWebSocket _client;
         private CancellationTokenSource _cancelation;
+        private CancellationTokenSource _cancelationTotal;
 
         private readonly Subject<string> _messageReceivedSubject = new Subject<string>();
         private readonly Subject<ReconnectionType> _reconnectionSubject = new Subject<ReconnectionType>();
@@ -73,9 +74,11 @@ namespace Bitfinex.Client.Websocket.Websockets
             Log.Debug(L("Disposing.."));
             _lastChanceTimer?.Dispose();
             _cancelation?.Cancel();
+            _cancelationTotal?.Cancel();
             _client?.Abort();
             _client?.Dispose();
             _cancelation?.Dispose();
+            _cancelationTotal?.Dispose();
             _messagesToSendQueue?.Dispose();
             _started = false;
         }
@@ -94,8 +97,9 @@ namespace Bitfinex.Client.Websocket.Websockets
 
             Log.Debug(L("Starting.."));
             _cancelation = new CancellationTokenSource();
+            _cancelationTotal = new CancellationTokenSource();
 
-            Task.Factory.StartNew(_ => SendFromQueue(), TaskCreationOptions.LongRunning, _cancelation.Token);
+            Task.Factory.StartNew(_ => SendFromQueue(), TaskCreationOptions.LongRunning, _cancelationTotal.Token);
 
             return StartClient(_url, _cancelation.Token, ReconnectionType.Initial);
         }
@@ -129,7 +133,7 @@ namespace Bitfinex.Client.Websocket.Websockets
 
         private async Task SendFromQueue()
         {
-            foreach (var message in _messagesToSendQueue.GetConsumingEnumerable(_cancelation.Token))
+            foreach (var message in _messagesToSendQueue.GetConsumingEnumerable(_cancelationTotal.Token))
             {
                 await SendInternal(message);
             }
@@ -229,7 +233,7 @@ namespace Bitfinex.Client.Websocket.Websockets
         private void ActivateLastChance()
         {
             var timerMs = 1000 * 5;
-            _lastChanceTimer = new Timer(async x => await LastChance(x), null, timerMs, timerMs);
+            _lastChanceTimer = new Timer(LastChance, null, timerMs, timerMs);
         }
 
         private void DeactiveLastChance()
@@ -238,7 +242,7 @@ namespace Bitfinex.Client.Websocket.Websockets
             _lastChanceTimer = null;
         }
 
-        private async Task LastChance(object state)
+        private void LastChance(object state)
         {
             var timeoutMs = Math.Abs(ReconnectTimeoutMs);
             var halfTimeoutMs = timeoutMs / 1.5;
@@ -249,9 +253,12 @@ namespace Bitfinex.Client.Websocket.Websockets
             {
                 Log.Debug(L($"Last message received more than {timeoutMs:F} ms ago. Hard restart.."));
 
+                DeactiveLastChance();
                 _client?.Abort();
                 _client?.Dispose();
-                await Reconnect(ReconnectionType.NoMessageReceived);
+#pragma warning disable 4014
+                Reconnect(ReconnectionType.NoMessageReceived);
+#pragma warning restore 4014
             }
         }
 
