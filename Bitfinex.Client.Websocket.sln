@@ -17,6 +17,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bitfinex.Client.Websocket.T
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bitfinex.Client.Websocket.Sample", "test_integration\Bitfinex.Client.Websocket.Sample\Bitfinex.Client.Websocket.Sample.csproj", "{7B649867-E540-4592-A821-8EB06BFB01C6}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{6D0FCFA1-4C4C-4BBD-83CC-22C8E464E338}"
+	ProjectSection(SolutionItems) = preProject
+		.travis.yml = .travis.yml
+		LICENSE = LICENSE
+		README.md = README.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

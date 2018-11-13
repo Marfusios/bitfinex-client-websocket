@@ -87,7 +87,40 @@ More usage examples:
 
 **Pull Requests are welcome!**
 
+### Reconnecting
 
+There is a built-in reconnection which invokes after 1 minute (default) of not receiving any messages from the server. It is possible to configure that timeout via `communicator.ReconnectTimeoutMs`. Also, there is a stream `ReconnectionHappened` which sends information about a type of reconnection. However, if you are subscribed to low rate channels, it is very likely that you will encounter that timeout - higher the timeout to a few minutes or call `PingRequest` by your own every few seconds. 
+
+In the case of Bitfinex outage, there is a built-in functionality which slow downs reconnection requests (could be configured via `communicator.ErrorReconnectTimeoutMs`, the default is 1 minute).
+
+Beware that you **need to resubscribe to channels** after reconnection happens. You should subscribe to `Streams.InfoStream`, `Streams.AuthenticationStream` and send subscriptions requests (see #12 for example). 
+
+### Backtesting
+
+The library is prepared for backtesting. The dependency between `Client` and `Communicator` is via abstraction `IBitfinexCommunicator`. There are two communicator implementations: 
+* `BitfinexWebsocketCommunicator` - a realtime communication with Bitfinex via websocket API.
+* `BitfinexFileCommunicator` - a simulated communication, raw data are loaded from files and streamed. If you are **interested in buying historical raw data** (trades, order book events), contact me.
+
+Feel free to implement `IBitfinexCommunicator` on your own, for example, load raw data from database, cache, etc. 
+
+Usage: 
+
+```csharp
+var communicator = new BitfinexFileCommunicator();
+communicator.FileNames = new[]
+{
+    "data/bitfinex_raw_2018-11-12.txt"
+};
+communicator.Delimiter = ";;";
+
+var client = new BitfinexWebsocketClient(communicator);
+client.Streams.TradesStream.Subscribe(trade =>
+{
+    // do something with trade
+});
+
+await communicator.Start();
+```
 
 ### Multi-threading
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Bitfinex.Client.Websocket.Communicator;
 using Bitfinex.Client.Websocket.Json;
 using Bitfinex.Client.Websocket.Messages;
 using Bitfinex.Client.Websocket.Requests;
@@ -13,7 +14,6 @@ using Bitfinex.Client.Websocket.Responses.Tickers;
 using Bitfinex.Client.Websocket.Responses.Trades;
 using Bitfinex.Client.Websocket.Utils;
 using Bitfinex.Client.Websocket.Validations;
-using Bitfinex.Client.Websocket.Websockets;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Serilog;
@@ -22,12 +22,12 @@ namespace Bitfinex.Client.Websocket.Client
 {
     public class BitfinexWebsocketClient : IDisposable
     {
-        private readonly BitfinexWebsocketCommunicator _communicator;
+        private readonly IBitfinexCommunicator _communicator;
         private readonly IDisposable _messageReceivedSubsciption;
 
         private readonly Dictionary<int, Action<JToken>> _channelIdToHandler = new Dictionary<int, Action<JToken>>();
 
-        public BitfinexWebsocketClient(BitfinexWebsocketCommunicator communicator)
+        public BitfinexWebsocketClient(IBitfinexCommunicator communicator)
         {
             BfxValidations.ValidateInput(communicator, nameof(communicator));
 

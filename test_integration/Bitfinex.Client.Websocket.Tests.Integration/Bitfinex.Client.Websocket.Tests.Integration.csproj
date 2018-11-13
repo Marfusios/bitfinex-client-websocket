@@ -18,4 +18,10 @@
     <ProjectReference Include="..\..\src\Bitfinex.Client.Websocket\Bitfinex.Client.Websocket.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="data\bitfinex_raw_2018-11-12.txt.gz">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

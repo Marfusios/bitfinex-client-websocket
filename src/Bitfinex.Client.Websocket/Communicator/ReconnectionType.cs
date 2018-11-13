@@ -1,4 +1,4 @@
-﻿namespace Bitfinex.Client.Websocket.Websockets
+﻿namespace Bitfinex.Client.Websocket.Communicator
 {
     public enum ReconnectionType
     {
@@ -8,17 +8,17 @@
         Initial,
 
         /// <summary>
-        /// Type used when connection to websocket was lost in meantime
+        /// Type used when connection to websocket stream was lost in meantime
         /// </summary>
         Lost,
 
         /// <summary>
-        /// Type used when connection to websocket was lost by not receiving any message in given timerange
+        /// Type used when connection to websocket stream was lost by not receiving any message in given timerange
         /// </summary>
         NoMessageReceived, 
 
         /// <summary>
-        /// Type used after unsuccessful previous reconnection
+        /// Type used after unsuccessful previous reconnection to websocket stream
         /// </summary>
         Error
     }

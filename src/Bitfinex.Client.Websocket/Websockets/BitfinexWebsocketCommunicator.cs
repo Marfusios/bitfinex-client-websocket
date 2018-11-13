@@ -6,12 +6,13 @@ using System.Reactive.Subjects;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Bitfinex.Client.Websocket.Communicator;
 using Bitfinex.Client.Websocket.Validations;
 using Serilog;
 
 namespace Bitfinex.Client.Websocket.Websockets
 {
-    public class BitfinexWebsocketCommunicator : IDisposable
+    public class BitfinexWebsocketCommunicator : IBitfinexCommunicator
     {
         private readonly Uri _url;
         private Timer _lastChanceTimer;
