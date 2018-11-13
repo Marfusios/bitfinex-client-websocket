@@ -141,6 +141,10 @@ namespace Bitfinex.Client.Websocket.Websockets
             return SendInternal(message);
         }
 
+        /// <summary>
+        /// Force reconnection. 
+        /// Closes current websocket stream and perform a new connection to the server.
+        /// </summary>
         public async Task Reconnect()
         {
             if (!IsStarted)
@@ -176,12 +180,12 @@ namespace Bitfinex.Client.Websocket.Websockets
             try
             {
                 await _client.ConnectAsync(uri, token);
+                IsRunning = true;
+                _reconnectionSubject.OnNext(type);
 #pragma warning disable 4014
                 Listen(_client, token);
 #pragma warning restore 4014
                 ActivateLastChance();
-                IsRunning = true;
-                _reconnectionSubject.OnNext(type);
             }
             catch (Exception e)
             {
@@ -231,8 +235,9 @@ namespace Bitfinex.Client.Websocket.Websockets
                         var receivedMessage = Encoding.UTF8.GetString(buffer, 0, result.Count);
                         resultMessage.Append(receivedMessage);
                         if (result.MessageType != WebSocketMessageType.Text)
+                        {
                             break;
-
+                        }
                     } while (!result.EndOfMessage);
 
                     var received = resultMessage.ToString();
