@@ -28,13 +28,23 @@ namespace Bitfinex.Client.Websocket.Communicator
         int ErrorReconnectTimeoutMs { get; set; }
 
         /// <summary>
+        /// Returns true if Start() method was called at least once. False if not started or disposed
+        /// </summary>
+        bool IsStarted { get; }
+
+        /// <summary>
+        /// Returns true if communicator is running and connected to the server
+        /// </summary>
+        bool IsRunning { get; }
+
+        /// <summary>
         /// Start listening to the stream on the background thread
         /// </summary>
         Task Start();
 
         /// <summary>
         /// Send message to the stream channel. 
-        /// It inserts the message to the queue and actual sending is done on an other thread
+        /// It inserts the message to the queue and actual sending is done on an other thread.
         /// </summary>
         /// <param name="message">Message to be sent</param>
         Task Send(string message);
@@ -47,5 +57,11 @@ namespace Bitfinex.Client.Websocket.Communicator
         /// </summary>
         /// <param name="message">Message to be sent</param>
         Task SendInstant(string message);
+
+        /// <summary>
+        /// Force reconnection. 
+        /// Closes current websocket stream and perform a new connection to the server.
+        /// </summary>
+        Task Reconnect();
     }
 }

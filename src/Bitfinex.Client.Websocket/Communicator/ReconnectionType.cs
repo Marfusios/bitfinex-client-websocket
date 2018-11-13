@@ -20,6 +20,11 @@
         /// <summary>
         /// Type used after unsuccessful previous reconnection to websocket stream
         /// </summary>
-        Error
+        Error,
+
+        /// <summary>
+        /// Type used when reconnection was requested by user
+        /// </summary>
+        ByUser
     }
 }

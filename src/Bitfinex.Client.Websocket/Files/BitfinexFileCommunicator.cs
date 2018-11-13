@@ -17,6 +17,8 @@ namespace Bitfinex.Client.Websocket.Files
 
         public int ReconnectTimeoutMs { get; set; } = 60 * 1000;
         public int ErrorReconnectTimeoutMs { get; set; } = 60 * 1000;
+        public bool IsStarted { get; private set; }
+        public bool IsRunning { get; private set; }
 
         public string[] FileNames { get; set; }
         public string Delimiter { get; set; }
@@ -40,6 +42,11 @@ namespace Bitfinex.Client.Websocket.Files
         }
 
         public virtual Task SendInstant(string message)
+        {
+            return Task.CompletedTask;
+        }
+
+        public Task Reconnect()
         {
             return Task.CompletedTask;
         }
