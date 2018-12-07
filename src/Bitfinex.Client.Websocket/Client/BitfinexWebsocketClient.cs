@@ -61,7 +61,7 @@ namespace Bitfinex.Client.Websocket.Client
                 BfxValidations.ValidateInput(request, nameof(request));
 
                 var serialized = JsonConvert.SerializeObject(request, BitfinexJsonSerializer.Settings);
-                await _communicator.Send(serialized);
+                await _communicator.Send(serialized).ConfigureAwait(false);
             }
             catch (Exception e)
             {
