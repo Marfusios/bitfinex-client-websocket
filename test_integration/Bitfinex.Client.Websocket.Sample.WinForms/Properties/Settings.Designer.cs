@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Bitfinex.Client.Websocket.Sample.WinForms.Properties
+namespace Bitmex.Client.Websocket.Sample.WinForms.Properties
 {
 
 

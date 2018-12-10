@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Bitfinex.Client.Websocket.Sample.WinForms.Properties
+namespace Bitmex.Client.Websocket.Sample.WinForms.Properties
 {
 
 
@@ -44,7 +44,7 @@ namespace Bitfinex.Client.Websocket.Sample.WinForms.Properties
             {
                 if ((resourceMan == null))
                 {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Bitfinex.Client.Websocket.Sample.WinForms.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Bitmex.Client.Websocket.Sample.WinForms.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
