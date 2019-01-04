@@ -78,6 +78,7 @@ namespace Bitfinex.Client.Websocket.Responses.Orders
                     return OrderStatus.PartiallyFilled;
                 case "canceled":
                 case var s when s.Contains("canceled"):
+                case "insufficient balance":
                     return OrderStatus.Canceled;
             }
             Log.Warning("Can't parse OrderStatus, input: " + safe);
