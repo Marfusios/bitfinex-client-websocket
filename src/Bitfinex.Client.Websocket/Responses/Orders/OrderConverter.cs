@@ -74,10 +74,10 @@ namespace Bitfinex.Client.Websocket.Responses.Orders
                 case var s when s.StartsWith("executed"):
                     return OrderStatus.Executed;
                 case "partially filled":
-                case var s when s.StartsWith("partially filled"):
+                case var s when s.Contains("partially filled"):
                     return OrderStatus.PartiallyFilled;
                 case "canceled":
-                case var s when s.StartsWith("canceled"):
+                case var s when s.Contains("canceled"):
                     return OrderStatus.Canceled;
             }
             Log.Warning("Can't parse OrderStatus, input: " + safe);
@@ -128,7 +128,7 @@ namespace Bitfinex.Client.Websocket.Responses.Orders
                 case var s when s.StartsWith("exchange fok"):
                     return OrderType.ExchangeFok;
             }
-            Log.Warning("Can't parse OrderStatus, input: " + safe);
+            Log.Warning("Can't parse OrderType, input: " + safe);
             return OrderType.Undefined;
         }
 
