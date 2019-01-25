@@ -1,9 +1,9 @@
 ﻿using Bitfinex.Client.Websocket.Json;
-using Bitfinex.Client.Websocket.Responses.Trades;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Linq;
+using System.Reactive.Subjects;
+using Newtonsoft.Json.Linq;
 
 namespace Bitfinex.Client.Websocket.Responses.Fundings
 {
@@ -51,6 +51,53 @@ namespace Bitfinex.Client.Websocket.Responses.Fundings
         /// </summary>        
         [JsonIgnore]
         public string Symbol { get; set; }
+
+
+
+        internal static void Handle(JToken token, SubscribedResponse subscription, Subject<Funding> subject)
+        {
+            var firstPosition = token[1];
+            if (firstPosition.Type == JTokenType.Array)
+            {
+                // initial snapshot
+                Handle(firstPosition.ToObject<Funding[]>(), subscription, subject);
+                return;
+            }
+
+            var fundingType = FundingType.Executed;
+            if (firstPosition.Type == JTokenType.String)
+            {
+                if ((string)firstPosition == "ftu")
+                    fundingType = FundingType.UpdateExecution;
+                else if ((string)firstPosition == "hb")
+                    return; // heartbeat, ignore
+            }
+
+            var data = token[2];
+            if (data.Type != JTokenType.Array)
+            {
+                // bad format, ignore
+                return;
+            }
+
+            var funding = data.ToObject<Funding>();
+            funding.Type = fundingType;
+            funding.Symbol = subscription.Symbol;
+            funding.ChanId = subscription.ChanId;
+            subject.OnNext(funding);
+        }
+
+        internal static void Handle(Funding[] fundings, SubscribedResponse subscription, Subject<Funding> subject)
+        {
+            var reversed = fundings.Reverse().ToArray(); // newest last
+            foreach (var funding in reversed)
+            {
+                funding.Type = FundingType.Executed;
+                funding.Symbol = subscription.Symbol;
+                funding.ChanId = subscription.ChanId;
+                subject.OnNext(funding);
+            }
+        }
 
     }
     

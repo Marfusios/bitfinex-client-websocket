@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Bitfinex.Client.Websocket.Responses;
@@ -11,248 +9,126 @@ using Bitfinex.Client.Websocket.Responses.Orders;
 using Bitfinex.Client.Websocket.Responses.Tickers;
 using Bitfinex.Client.Websocket.Responses.Trades;
 using Bitfinex.Client.Websocket.Responses.Wallets;
-using Newtonsoft.Json.Linq;
-using Serilog;
 
 namespace Bitfinex.Client.Websocket.Client
 {
+    /// <summary>
+    /// All provided streams from Bitfinex websocket API.
+    /// You need to subscribe first, send subscription request (for example: `new TradesSubscribeRequest(pair)`)
+    /// </summary>
     public class BitfinexClientStreams
     {
-        private readonly Subject<ErrorResponse> _errorSubject = new Subject<ErrorResponse>();
-        private readonly Subject<InfoResponse> _infoSubject = new Subject<InfoResponse>();
-        private readonly Subject<PongResponse> _pongSubject = new Subject<PongResponse>();
-        private readonly Subject<AuthenticationResponse> _authenticationSubject = new Subject<AuthenticationResponse>();
-        private readonly Subject<Ticker> _tickerSubject = new Subject<Ticker>();
-        private readonly Subject<Trade> _tradesSubject = new Subject<Trade>();
-        private readonly Subject<Funding> _fundingsSubject = new Subject<Funding>();
-        private readonly Subject<Candles> _candlesSubject = new Subject<Candles>();
-        private readonly Subject<Book> _bookSubject = new Subject<Book>();
-        private readonly Subject<Book[]> _bookSnapshotSubject = new Subject<Book[]>();
+        internal readonly Subject<ErrorResponse> ErrorSubject = new Subject<ErrorResponse>();
+        internal readonly Subject<InfoResponse> InfoSubject = new Subject<InfoResponse>();
+        internal readonly Subject<PongResponse> PongSubject = new Subject<PongResponse>();
+        internal readonly Subject<AuthenticationResponse> AuthenticationSubject = new Subject<AuthenticationResponse>();
+        internal readonly Subject<Ticker> TickerSubject = new Subject<Ticker>();
+        internal readonly Subject<Trade> TradesSubject = new Subject<Trade>();
+        internal readonly Subject<Funding> FundingsSubject = new Subject<Funding>();
+        internal readonly Subject<Candles> CandlesSubject = new Subject<Candles>();
+        internal readonly Subject<Book> BookSubject = new Subject<Book>();
+        internal readonly Subject<Book[]> BookSnapshotSubject = new Subject<Book[]>();
 
-        private readonly Subject<Wallet[]> _walletsSubject = new Subject<Wallet[]>();
-        private readonly Subject<Wallet> _walletSubject = new Subject<Wallet>();
-        private readonly Subject<Order[]> _ordersSubject = new Subject<Order[]>();
-        private readonly Subject<Order> _orderCreatedSubject = new Subject<Order>();
-        private readonly Subject<Order> _orderUpdatedSubject = new Subject<Order>();
-        private readonly Subject<Order> _orderCanceledSubject = new Subject<Order>();
-
-        public IObservable<ErrorResponse> ErrorStream => _errorSubject.AsObservable();
-        public IObservable<InfoResponse> InfoStream => _infoSubject.AsObservable();
-        public IObservable<PongResponse> PongStream => _pongSubject.AsObservable();
-        public IObservable<AuthenticationResponse> AuthenticationStream => _authenticationSubject.AsObservable();
-        public IObservable<Ticker> TickerStream => _tickerSubject.AsObservable();
-        public IObservable<Trade> TradesStream => _tradesSubject.AsObservable();
-        public IObservable<Funding> FundingStream => _fundingsSubject.AsObservable();
-        public IObservable<Candles> CandlesStream => _candlesSubject.AsObservable();
-
-        /// <summary>
-        /// Order book stream, contains also values from initial snapshot
-        /// </summary>
-        public IObservable<Book> BookStream => _bookSubject.AsObservable();
-
-        /// <summary>
-        /// Only initial snapshot of the order book 
-        /// </summary>
-        public IObservable<Book[]> BookSnapshotStream => _bookSnapshotSubject.AsObservable();
-
-        /// <summary>
-        /// Initial info about all wallets/balances (streamed only on authentication)
-        /// </summary>
-        public IObservable<Wallet[]> WalletsStream => _walletsSubject.AsObservable();
-
-        /// <summary>
-        /// Stream for every wallet balance update (initial wallets info is also streamed, same as 'WalletsStream')
-        /// </summary>
-        public IObservable<Wallet> WalletStream => _walletSubject.AsObservable();
+        internal readonly Subject<Wallet[]> WalletsSubject = new Subject<Wallet[]>();
+        internal readonly Subject<Wallet> WalletSubject = new Subject<Wallet>();
+        internal readonly Subject<Order[]> OrdersSubject = new Subject<Order[]>();
+        internal readonly Subject<Order> OrderCreatedSubject = new Subject<Order>();
+        internal readonly Subject<Order> OrderUpdatedSubject = new Subject<Order>();
+        internal readonly Subject<Order> OrderCanceledSubject = new Subject<Order>();
 
 
         /// <summary>
-        /// Initial info about all opened orders (streamed only on authentication)
+        /// Info about every occurred error
         /// </summary>
-        public IObservable<Order[]> OrdersStream => _ordersSubject.AsObservable();
+        public IObservable<ErrorResponse> ErrorStream => ErrorSubject.AsObservable();
 
-        public IObservable<Order> OrderCreatedStream => _orderCreatedSubject.AsObservable();
-        public IObservable<Order> OrderUpdatedStream => _orderUpdatedSubject.AsObservable();
-        public IObservable<Order> OrderCanceledStream => _orderCanceledSubject.AsObservable();
+        /// <summary>
+        /// Initial info stream, publishes always on a new connection
+        /// </summary>
+        public IObservable<InfoResponse> InfoStream => InfoSubject.AsObservable();
+
+        /// <summary>
+        /// Pong stream to match every ping request
+        /// </summary>
+        public IObservable<PongResponse> PongStream => PongSubject.AsObservable();
+
+        /// <summary>
+        /// Info about processed authentication
+        /// </summary>
+        public IObservable<AuthenticationResponse> AuthenticationStream => AuthenticationSubject.AsObservable();
+
+        /// <summary>
+        /// Public ticker stream for subscribed pair.
+        /// The ticker is a high level overview of the state of the market. It shows you the current best bid and ask, as well as the last trade price.
+        /// It also includes information such as daily volume and how much the price has moved over the last day.
+        /// </summary>
+        public IObservable<Ticker> TickerStream => TickerSubject.AsObservable();
+
+        /// <summary>
+        /// Public trades stream for subscribed pair.
+        /// This channel sends a trade message whenever a trade occurs at Bitfinex. It includes all the pertinent details of the trade, such as price, size and time.
+        /// </summary>
+        public IObservable<Trade> TradesStream => TradesSubject.AsObservable();
+
+        /// <summary>
+        /// Public funding stream for subscribed pair
+        /// </summary>
+        public IObservable<Funding> FundingStream => FundingsSubject.AsObservable();
+
+        /// <summary>
+        /// Public candles stream for subscribed pair.
+        /// Provides a way to access charting candle info
+        /// </summary>
+        public IObservable<Candles> CandlesStream => CandlesSubject.AsObservable();
+
+        /// <summary>
+        /// Public order book stream, contains also values from initial snapshot.
+        /// The Order Books channel allow you to keep track of the state of the Bitfinex order book.
+        /// It is provided on a price aggregated basis, with customizable precision.
+        /// After receiving the response, you will receive a snapshot of the book,
+        /// followed by updates upon any changes to the book.
+        /// </summary>
+        public IObservable<Book> BookStream => BookSubject.AsObservable();
+
+        /// <summary>
+        /// Public initial snapshot of the order book 
+        /// </summary>
+        public IObservable<Book[]> BookSnapshotStream => BookSnapshotSubject.AsObservable();
+
+        /// <summary>
+        /// Private initial info about all wallets/balances (streamed only on authentication)
+        /// </summary>
+        public IObservable<Wallet[]> WalletsStream => WalletsSubject.AsObservable();
+
+        /// <summary>
+        /// Private stream for every wallet balance update (initial wallets info is also streamed, same as 'WalletsStream')
+        /// </summary>
+        public IObservable<Wallet> WalletStream => WalletSubject.AsObservable();
+
+
+        /// <summary>
+        /// Private initial info about all opened orders (streamed only on authentication)
+        /// </summary>
+        public IObservable<Order[]> OrdersStream => OrdersSubject.AsObservable();
+
+        /// <summary>
+        /// Private info about created/placed order
+        /// </summary>
+        public IObservable<Order> OrderCreatedStream => OrderCreatedSubject.AsObservable();
+
+        /// <summary>
+        /// Private info about updated order
+        /// </summary>
+        public IObservable<Order> OrderUpdatedStream => OrderUpdatedSubject.AsObservable();
+
+        /// <summary>
+        /// Private info about canceled or executed order
+        /// </summary>
+        public IObservable<Order> OrderCanceledStream => OrderCanceledSubject.AsObservable();
 
 
         internal BitfinexClientStreams()
         {
-
-        }
-
-        internal void HandleAccountInfo(JToken token)
-        {
-            var itemsCount = token?.Count();
-            if (token == null || itemsCount < 2)
-            {
-                Log.Warning($"Invalid message format, too low items");
-                return;
-            }
-
-            var secondItem = token[1];
-            if (secondItem.Type != JTokenType.String)
-            {
-                Log.Warning(L("Invalid message format, second param is not string"));
-                return;
-            }
-            var msgType = (string)secondItem;
-            if (msgType == "hb")
-            {
-                // hearbeat, ignore
-                return;
-            }
-
-            if (itemsCount < 3)
-            {
-                Log.Warning(L("Invalid message format, too low items"));
-                return;
-            }
-
-            switch (msgType)
-            {
-                case "ws":
-                    HandleWalletsInfo(token);
-                    break;
-                case "wu":
-                    HandleWalletInfo(token);
-                    break;
-                case "os":
-                    HandleOrdersInfo(token);
-                    break;
-                case "on":
-                    HandleOrderCreate(token);
-                    break;
-                case "ou":
-                    HandleOrderUpdate(token);
-                    break;
-                case "oc":
-                    HandleOrderCancel(token);
-                    break;
-            }
-        }
-
-        internal void Raise(ErrorResponse response)
-        {
-            _errorSubject.OnNext(response);
-        }
-
-        internal void Raise(InfoResponse response)
-        {
-            _infoSubject.OnNext(response);
-        }
-
-        internal void Raise(PongResponse response)
-        {
-            _pongSubject.OnNext(response);
-        }
-
-        internal void Raise(Ticker response)
-        {
-            _tickerSubject.OnNext(response);
-        }
-
-        internal void Raise(Candles candles)
-        {
-            _candlesSubject.OnNext(candles);
-        }
-
-        internal void Raise(Trade response)
-        {
-            _tradesSubject.OnNext(response);
-        }
-
-        internal void Raise(Funding response)
-        {
-            _fundingsSubject.OnNext(response);
-        }
-
-        internal void Raise(Book response)
-        {
-            _bookSubject.OnNext(response);
-        }
-
-        internal void Raise(Book[] response)
-        {
-            _bookSnapshotSubject.OnNext(response);
-        }
-
-        internal void Raise(AuthenticationResponse response)
-        {
-            _authenticationSubject.OnNext(response);
-        }
-
-        private void HandleWalletsInfo(JToken token)
-        {
-            var data = token[2];
-            if (data.Type != JTokenType.Array)
-            {
-                Log.Warning(L("Wallets - Invalid message format, third param not array"));
-                return;
-            }
-
-            var parsed = data.ToObject<Wallet[]>();
-            _walletsSubject.OnNext(parsed);
-            parsed.ToList().ForEach(wallet => _walletSubject.OnNext(wallet));
-        }
-
-        private void HandleWalletInfo(JToken token)
-        {
-            var data = token[2];
-            if (data.Type != JTokenType.Array)
-            {
-                Log.Warning(L("Wallet update - Invalid message format, third param not array"));
-                return;
-            }
-
-            var parsed = data.ToObject<Wallet>();
-            _walletSubject.OnNext(parsed);
-        }
-
-        private void HandleOrdersInfo(JToken token)
-        {
-            var data = token[2];
-            if (data.Type != JTokenType.Array)
-            {
-                Log.Warning(L("Orders - Invalid message format, third param not array"));
-                return;
-            }
-
-            var parsed = data.ToObject<Order[]>();
-            _ordersSubject.OnNext(parsed);
-        }
-
-        private void HandleOrderCreate(JToken token)
-        {
-            _orderCreatedSubject.OnNext(ParseOrderInfo(token));
-        }
-
-        private void HandleOrderUpdate(JToken token)
-        {
-            _orderUpdatedSubject.OnNext(ParseOrderInfo(token));
-        }
-
-        private void HandleOrderCancel(JToken token)
-        {
-            _orderCanceledSubject.OnNext(ParseOrderInfo(token));
-        }
-
-        private Order ParseOrderInfo(JToken token)
-        {
-            var data = token[2];
-            if (data.Type != JTokenType.Array)
-            {
-                Log.Warning(L("Order info - Invalid message format, third param not array"));
-                return null;
-            }
-
-            var parsed = data.ToObject<Order>();
-            return parsed;
-        }
-
-        private string L(string msg)
-        {
-            return $"[BFX CLIENT STREAMS] {msg}";
         }
     }
 }

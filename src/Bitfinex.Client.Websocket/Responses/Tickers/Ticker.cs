@@ -1,7 +1,12 @@
-﻿using Newtonsoft.Json;
+﻿using System.Reactive.Subjects;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Bitfinex.Client.Websocket.Responses.Tickers
 {
+    /// <summary>
+    /// Current price (bid, ask) and statistics for target pair
+    /// </summary>
     [JsonConverter(typeof(TickerConverter))]
     public class Ticker : ResponseBase
     {
@@ -60,5 +65,22 @@ namespace Bitfinex.Client.Websocket.Responses.Tickers
         /// </summary>
         [JsonIgnore]
         public string Pair { get; set; }
+
+
+        internal static void Handle(JToken token, SubscribedResponse subscription, Subject<Ticker> subject)
+        {
+            var data = token[1];
+
+            if (data.Type != JTokenType.Array)
+            {
+                // probably heartbeat, ignore
+                return;
+            }
+
+            var ticker = data.ToObject<Ticker>();
+            ticker.Pair = subscription.Pair;
+            ticker.ChanId = subscription.ChanId;
+            subject.OnNext(ticker);
+        }
     }
 }

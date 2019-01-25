@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using System.Reactive.Subjects;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Bitfinex.Client.Websocket.Responses.Books
 {
@@ -40,5 +42,43 @@ namespace Bitfinex.Client.Websocket.Responses.Books
         /// </summary>
         [JsonIgnore]
         public string Pair { get; set; }
+
+
+        internal static void Handle(JToken token, SubscribedResponse subscription, Subject<Book> subject, Subject<Book[]> subjectMulti)
+        {
+            var data = token[1];
+
+            if (data.Type != JTokenType.Array)
+            {
+                return; // heartbeat, ignore
+            }
+
+            if(data.First.Type == JTokenType.Array)
+            {
+                // initial snapshot
+                Handle(data.ToObject<Book[]>(), subscription, subject, subjectMulti);
+                return;
+            }
+
+            var book = data.ToObject<Book>();
+            book.Pair = subscription.Pair;
+            book.ChanId = subscription.ChanId;
+            subject.OnNext(book);
+        }
+
+        internal static void Handle(Book[] books, SubscribedResponse subscription, Subject<Book> subject, Subject<Book[]> subjectMulti)
+        {
+            foreach (var book in books)
+            {
+                book.Pair = subscription.Pair;
+                book.ChanId = subscription.ChanId;
+
+                // raise as normal book stream
+                subject.OnNext(book);
+            }
+
+            // raise as snapshot book stream
+            subjectMulti.OnNext(books);
+        }
     }
 }
