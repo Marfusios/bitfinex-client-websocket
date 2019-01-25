@@ -22,6 +22,9 @@ namespace Bitfinex.Client.Websocket.Client
         internal readonly Subject<InfoResponse> InfoSubject = new Subject<InfoResponse>();
         internal readonly Subject<PongResponse> PongSubject = new Subject<PongResponse>();
         internal readonly Subject<AuthenticationResponse> AuthenticationSubject = new Subject<AuthenticationResponse>();
+        internal readonly Subject<SubscribedResponse> SubscriptionSubject = new Subject<SubscribedResponse>();
+        internal readonly Subject<UnsubscribedResponse> UnsubscriptionSubject = new Subject<UnsubscribedResponse>();
+
         internal readonly Subject<Ticker> TickerSubject = new Subject<Ticker>();
         internal readonly Subject<Trade> TradesSubject = new Subject<Trade>();
         internal readonly Subject<Funding> FundingsSubject = new Subject<Funding>();
@@ -56,6 +59,16 @@ namespace Bitfinex.Client.Websocket.Client
         /// Info about processed authentication
         /// </summary>
         public IObservable<AuthenticationResponse> AuthenticationStream => AuthenticationSubject.AsObservable();
+
+        /// <summary>
+        /// Info about subscribed channel, you need to store channel id in order to future unsubscription
+        /// </summary>
+        public IObservable<SubscribedResponse> SubscriptionStream => SubscriptionSubject.AsObservable();
+
+        /// <summary>
+        /// Info about unsubscription
+        /// </summary>
+        public IObservable<UnsubscribedResponse> UnsubscriptionStream => UnsubscriptionSubject.AsObservable();
 
         /// <summary>
         /// Public ticker stream for subscribed pair.

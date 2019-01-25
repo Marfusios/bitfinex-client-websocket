@@ -23,11 +23,9 @@ namespace Bitfinex.Client.Websocket.Responses
         internal static void Handle(string msg, Subject<AuthenticationResponse> subject)
         {
             var response = BitfinexSerialization.Deserialize<AuthenticationResponse>(msg);
-;            if (!response.IsAuthenticated)
+;           if (!response.IsAuthenticated)
                 Log.Warning(L("Authentication failed. Code: " + response.Code));
             subject.OnNext(response);
         }
-
-
     }
 }

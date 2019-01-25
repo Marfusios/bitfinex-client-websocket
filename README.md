@@ -59,6 +59,7 @@ More usage examples:
 | Info                   |  ✔            |
 | Ping-Pong              |  ✔            |
 | Errors                 |  ✔            |
+| Configuration          |  ✔            |
 | Channel subscribing    |  ✔            |
 | Channel unsubscribing  |  ✔            |
 | Ticker                 |  ✔            |

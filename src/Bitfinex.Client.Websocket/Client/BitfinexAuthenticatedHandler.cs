@@ -76,6 +76,9 @@ namespace Bitfinex.Client.Websocket.Client
                 case "oc":
                     Order.Handle(token, _streams.OrderCanceledSubject);
                     break;
+                //default:
+                //    Log.Warning($"Missing handler for '{msgType}'. Data: {token}");
+                //    break;
             }
         }
     }

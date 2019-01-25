@@ -8,6 +8,7 @@ using Bitfinex.Client.Websocket.Responses.Fundings;
 using Bitfinex.Client.Websocket.Responses.Tickers;
 using Bitfinex.Client.Websocket.Responses.Trades;
 using Newtonsoft.Json.Linq;
+using Serilog;
 
 namespace Bitfinex.Client.Websocket.Client
 {
@@ -43,13 +44,19 @@ namespace Bitfinex.Client.Websocket.Client
                 case MessageType.Subscribed:
                     OnSubscription(BitfinexSerialization.Deserialize<SubscribedResponse>(msg));
                     break;
-                default:
+                case MessageType.Unsubscribed:
+                    UnsubscribedResponse.Handle(msg, _streams.UnsubscriptionSubject);
                     break;
+                //default:
+                //    Log.Warning($"Missing handler for public stream, data: '{msg}'");
+                //    break;
             }
         }
 
         private void OnSubscription(SubscribedResponse response)
         {
+            _streams.SubscriptionSubject.OnNext(response);
+
             var channelId = response.ChanId;
 
             // ********************
@@ -74,6 +81,9 @@ namespace Bitfinex.Client.Websocket.Client
                 case "book":
                     _channelIdToHandler[channelId] = data => Book.Handle(data, response, _streams.BookSubject, _streams.BookSnapshotSubject);
                     break;
+                //default:
+                //    Log.Warning($"Missing subscription handler '{response.Channel}'");
+                //    break;
             }
         }
 
