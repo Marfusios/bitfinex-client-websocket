@@ -46,10 +46,19 @@ namespace Bitfinex.Client.Websocket.Responses.Books
 
 
         internal static void Handle(JToken token, SubscribedResponse subscription, ConfigurationState config, 
-            Subject<Book> subject, Subject<Book[]> subjectMulti)
+            Subject<Book> subject, Subject<Book[]> subjectMulti, Subject<ChecksumResponse> subjectChecksum)
         {
             var data = token[1];
 
+            if (config.IsChecksumEnabled)
+            {
+                if (data.Type == JTokenType.String && data.Value<string>() == "cs")
+                {
+                    ChecksumResponse.Handle(token, config, subjectChecksum);
+                    return;
+                }
+            }
+            
             if (data.Type != JTokenType.Array)
             {
                 return; // heartbeat, ignore

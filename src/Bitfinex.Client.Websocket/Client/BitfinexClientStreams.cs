@@ -33,6 +33,7 @@ namespace Bitfinex.Client.Websocket.Client
         internal readonly Subject<Candles> CandlesSubject = new Subject<Candles>();
         internal readonly Subject<Book> BookSubject = new Subject<Book>();
         internal readonly Subject<Book[]> BookSnapshotSubject = new Subject<Book[]>();
+        internal readonly Subject<ChecksumResponse> BookChecksumSubject = new Subject<ChecksumResponse>();
 
         internal readonly Subject<Wallet[]> WalletsSubject = new Subject<Wallet[]>();
         internal readonly Subject<Wallet> WalletSubject = new Subject<Wallet>();
@@ -114,6 +115,12 @@ namespace Bitfinex.Client.Websocket.Client
         /// Public initial snapshot of the order book 
         /// </summary>
         public IObservable<Book[]> BookSnapshotStream => BookSnapshotSubject.AsObservable();
+
+        /// <summary>
+        /// Checksum stream for every book iteration. Checks the top 25 entries for each side of book. Checksum is a signed int.
+        /// Must be enabled by configuration (see `ConfigurationRequest`)
+        /// </summary>
+        public IObservable<ChecksumResponse> BookChecksumStream => BookChecksumSubject.AsObservable();
 
         /// <summary>
         /// Private initial info about all wallets/balances (streamed only on authentication)

@@ -73,7 +73,7 @@ namespace Bitfinex.Client.Websocket.Sample
 
         private static async Task SendSubscriptionRequests(BitfinexWebsocketClient client)
         {
-            await client.Send(new ConfigurationRequest(ConfigurationFlag.Timestamp | ConfigurationFlag.Sequencing | ConfigurationFlag.Checksum));
+            await client.Send(new ConfigurationRequest(ConfigurationFlag.Timestamp | ConfigurationFlag.Sequencing));
             await client.Send(new PingRequest() {Cid = 123456});
 
             //await client.Send(new TickerSubscribeRequest("BTC/USD"));
@@ -144,6 +144,8 @@ namespace Bitfinex.Client.Websocket.Sample
                 .Subscribe(wallet =>
                     Log.Information($"Wallet {wallet.Currency} balance: {wallet.Balance} type: {wallet.Type}"));
 
+            client.Streams.BookChecksumStream.Subscribe(x =>
+                Log.Information($"{x.ServerSequence} [CHECKSUM] {x.Checksum}"));
 
 
             // Unsubscription example: 

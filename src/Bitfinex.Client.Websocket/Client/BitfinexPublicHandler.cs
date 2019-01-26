@@ -6,7 +6,6 @@ using Bitfinex.Client.Websocket.Responses.Configurations;
 using Bitfinex.Client.Websocket.Responses.Fundings;
 using Bitfinex.Client.Websocket.Responses.Tickers;
 using Bitfinex.Client.Websocket.Responses.Trades;
-using Serilog;
 
 namespace Bitfinex.Client.Websocket.Client
 {
@@ -89,7 +88,7 @@ namespace Bitfinex.Client.Websocket.Client
                     break;
                 case "book":
                     _channelIdToHandler[channelId] = (data, config) => 
-                        Book.Handle(data, response, config, _streams.BookSubject, _streams.BookSnapshotSubject);
+                        Book.Handle(data, response, config, _streams.BookSubject, _streams.BookSnapshotSubject, _streams.BookChecksumSubject);
                     break;
                 //default:
                 //    Log.Warning($"Missing subscription handler '{response.Channel}'");

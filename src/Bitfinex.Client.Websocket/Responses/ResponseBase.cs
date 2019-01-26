@@ -31,7 +31,7 @@ namespace Bitfinex.Client.Websocket.Responses
         /// <summary>
         /// Sets global data (timestamp, sequence) if it is enabled by configuration.
         /// </summary>
-        public static void SetGlobalData(ResponseBase response, ConfigurationState config, JToken data, int lastPosition = 1)
+        internal static void SetGlobalData(ResponseBase response, ConfigurationState config, JToken data, int lastPosition = 1)
         {
             try
             {

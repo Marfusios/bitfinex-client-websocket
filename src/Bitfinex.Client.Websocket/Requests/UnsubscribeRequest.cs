@@ -8,6 +8,23 @@ namespace Bitfinex.Client.Websocket.Requests
     /// </summary>
     public class UnsubscribeRequest: RequestBase
     {
+        /// <summary>
+        /// Unsubscribe from the channel request.
+        /// Don't forget to set `ChanId`
+        /// </summary>
+        public UnsubscribeRequest()
+        {
+        }
+
+        /// <summary>
+        /// Unsubscribe from the channel.
+        /// </summary>
+        /// <param name="chanId">Target channel id</param>
+        public UnsubscribeRequest(int chanId)
+        {
+            ChanId = chanId;
+        }
+
         /// <inheritdoc />
         public override MessageType EventType => MessageType.Unsubscribe;
 

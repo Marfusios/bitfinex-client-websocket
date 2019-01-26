@@ -68,6 +68,9 @@ More usage examples:
 | Raw books              |                |
 | Candles                |  ✔            |
 | Funding                |  ✔            |
+| Sequencing             |  ✔            |
+| Server timestamp       |  ✔            |
+| Book checksum          |  ✔            |
 
 | AUTHENTICATED          |    Covered     |
 |------------------------|:--------------:|
