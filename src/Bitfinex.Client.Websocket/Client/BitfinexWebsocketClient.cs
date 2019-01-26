@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Bitfinex.Client.Websocket.Communicator;
 using Bitfinex.Client.Websocket.Json;
 using Bitfinex.Client.Websocket.Requests;
+using Bitfinex.Client.Websocket.Responses.Configurations;
 using Bitfinex.Client.Websocket.Validations;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -22,8 +23,9 @@ namespace Bitfinex.Client.Websocket.Client
     {
         private readonly IBitfinexCommunicator _communicator;
         private readonly IDisposable _messageReceivedSubscription;
+        private readonly IDisposable __configurationSubscription;
 
-        private readonly Dictionary<int, Action<JToken>> _channelIdToHandler = new Dictionary<int, Action<JToken>>();
+        private readonly BitfinexChannelList _channelIdToHandler = new BitfinexChannelList();
 
         private readonly BitfinexAuthenticatedHandler _authenticatedHandler;
         private readonly BitfinexPublicHandler _publicHandler;
@@ -35,6 +37,7 @@ namespace Bitfinex.Client.Websocket.Client
 
             _communicator = communicator;
             _messageReceivedSubscription = _communicator.MessageReceived.Subscribe(HandleMessage);
+            __configurationSubscription = Streams.ConfigurationSubject.Subscribe(HandleConfiguration);
 
             _authenticatedHandler = new BitfinexAuthenticatedHandler(Streams, _channelIdToHandler);
             _publicHandler = new BitfinexPublicHandler(Streams, _channelIdToHandler);
@@ -46,11 +49,17 @@ namespace Bitfinex.Client.Websocket.Client
         public BitfinexClientStreams Streams { get; } = new BitfinexClientStreams();
 
         /// <summary>
+        /// Currently enabled features
+        /// </summary>
+        public ConfigurationState Configuration { get; private set; } = new ConfigurationState();
+
+        /// <summary>
         /// Cleanup everything
         /// </summary>
         public void Dispose()
         {
             _messageReceivedSubscription?.Dispose();
+            __configurationSubscription?.Dispose();
         }
 
         /// <summary>
@@ -83,6 +92,31 @@ namespace Bitfinex.Client.Websocket.Client
         public Task Authenticate(string apiKey, string apiSecret, bool deadManSwitchEnabled = false)
         {
             return Send(new AuthenticationRequest(apiKey, apiSecret, deadManSwitchEnabled));
+        }
+
+        private void HandleConfiguration(ConfigurationResponse response)
+        {
+            try
+            {
+                if (!response.IsConfigured || !response.Flags.HasValue)
+                {
+                    Configuration = new ConfigurationState();
+                    return;
+                }
+
+                var flags = response.Flags.Value;
+                Configuration = new ConfigurationState(
+                    (flags & (int)ConfigurationFlag.DecimalAsString) > 0,
+                    (flags & (int)ConfigurationFlag.TimeAsString) > 0,
+                    (flags & (int)ConfigurationFlag.Timestamp) > 0,
+                    (flags & (int)ConfigurationFlag.Sequencing) > 0,
+                    (flags & (int)ConfigurationFlag.Checksum) > 0
+                    );
+            }
+            catch (Exception e)
+            {
+                Log.Error(e, L("Exception while received configuration"));
+            }
         }
 
         private void HandleMessage(string message)
@@ -126,7 +160,7 @@ namespace Bitfinex.Client.Websocket.Client
                 return;
             }
 
-            _channelIdToHandler[channelId](parsed);
+            _channelIdToHandler[channelId](parsed, Configuration);
         }
     }
 }

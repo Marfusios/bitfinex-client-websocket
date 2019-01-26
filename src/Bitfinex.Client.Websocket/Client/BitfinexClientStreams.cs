@@ -4,6 +4,7 @@ using System.Reactive.Subjects;
 using Bitfinex.Client.Websocket.Responses;
 using Bitfinex.Client.Websocket.Responses.Books;
 using Bitfinex.Client.Websocket.Responses.Candles;
+using Bitfinex.Client.Websocket.Responses.Configurations;
 using Bitfinex.Client.Websocket.Responses.Fundings;
 using Bitfinex.Client.Websocket.Responses.Orders;
 using Bitfinex.Client.Websocket.Responses.Tickers;
@@ -14,7 +15,7 @@ namespace Bitfinex.Client.Websocket.Client
 {
     /// <summary>
     /// All provided streams from Bitfinex websocket API.
-    /// You need to subscribe first, send subscription request (for example: `new TradesSubscribeRequest(pair)`)
+    /// You need to subscribe first, send subscription request (for example: `await client.Send(new TradesSubscribeRequest(pair))`)
     /// </summary>
     public class BitfinexClientStreams
     {
@@ -22,6 +23,7 @@ namespace Bitfinex.Client.Websocket.Client
         internal readonly Subject<InfoResponse> InfoSubject = new Subject<InfoResponse>();
         internal readonly Subject<PongResponse> PongSubject = new Subject<PongResponse>();
         internal readonly Subject<AuthenticationResponse> AuthenticationSubject = new Subject<AuthenticationResponse>();
+        internal readonly Subject<ConfigurationResponse> ConfigurationSubject = new Subject<ConfigurationResponse>();
         internal readonly Subject<SubscribedResponse> SubscriptionSubject = new Subject<SubscribedResponse>();
         internal readonly Subject<UnsubscribedResponse> UnsubscriptionSubject = new Subject<UnsubscribedResponse>();
 
@@ -59,6 +61,11 @@ namespace Bitfinex.Client.Websocket.Client
         /// Info about processed authentication
         /// </summary>
         public IObservable<AuthenticationResponse> AuthenticationStream => AuthenticationSubject.AsObservable();
+
+        /// <summary>
+        /// Info about processed configuration
+        /// </summary>
+        public IObservable<ConfigurationResponse> ConfigurationStream => ConfigurationSubject.AsObservable();
 
         /// <summary>
         /// Info about subscribed channel, you need to store channel id in order to future unsubscription

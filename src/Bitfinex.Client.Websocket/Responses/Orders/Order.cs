@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Reactive.Subjects;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -36,12 +37,12 @@ namespace Bitfinex.Client.Websocket.Responses.Orders
         /// <summary>
         /// Millisecond timestamp of creation
         /// </summary>
-        public long? MtsCreate { get; set; }
+        public DateTime? MtsCreate { get; set; }
 
         /// <summary>
         /// Millisecond timestamp of update
         /// </summary>
-        public long? MtsUpdate { get; set; }
+        public DateTime? MtsUpdate { get; set; }
 
         /// <summary>
         /// Positive means buy, negative means sell.

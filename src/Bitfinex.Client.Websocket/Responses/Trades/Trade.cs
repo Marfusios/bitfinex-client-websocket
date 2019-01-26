@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Reactive.Subjects;
 using Bitfinex.Client.Websocket.Json;
+using Bitfinex.Client.Websocket.Responses.Configurations;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -12,7 +13,14 @@ namespace Bitfinex.Client.Websocket.Responses.Trades
     /// </summary>
     public enum TradeType
     {
+        /// <summary>
+        /// Initial information
+        /// </summary>
         Executed,
+
+        /// <summary>
+        /// Extended information
+        /// </summary>
         UpdateExecution
     }
 
@@ -53,6 +61,9 @@ namespace Bitfinex.Client.Websocket.Responses.Trades
         /// </summary>
         public double Period { get; set; }
 
+        /// <summary>
+        /// Type of the trade
+        /// </summary>
         [JsonIgnore]
         public TradeType Type { get; set; }
 
@@ -63,13 +74,13 @@ namespace Bitfinex.Client.Websocket.Responses.Trades
         public string Pair { get; set; }
 
 
-        internal static void Handle(JToken token, SubscribedResponse subscription, Subject<Trade> subject)
+        internal static void Handle(JToken token, SubscribedResponse subscription, ConfigurationState config, Subject<Trade> subject)
         {
             var firstPosition = token[1];
             if (firstPosition.Type == JTokenType.Array)
             {
                 // initial snapshot
-                Handle(firstPosition.ToObject<Trade[]>(), subscription, subject);
+                Handle(token, firstPosition.ToObject<Trade[]>(), subscription, config, subject);
                 return;
             }
 
@@ -93,10 +104,11 @@ namespace Bitfinex.Client.Websocket.Responses.Trades
             trade.Type = tradeType;
             trade.Pair = subscription.Pair;
             trade.ChanId = subscription.ChanId;
+            SetGlobalData(trade, config, token, 2);
             subject.OnNext(trade);
         }
 
-        internal static void Handle(Trade[] trades, SubscribedResponse subscription, Subject<Trade> subject)
+        internal static void Handle(JToken token, Trade[] trades, SubscribedResponse subscription, ConfigurationState config, Subject<Trade> subject)
         {
             var reversed = trades.Reverse().ToArray(); // newest last
             foreach (var trade in reversed)
@@ -104,6 +116,7 @@ namespace Bitfinex.Client.Websocket.Responses.Trades
                 trade.Type = TradeType.Executed;
                 trade.Pair = subscription.Pair;
                 trade.ChanId = subscription.ChanId;
+                SetGlobalData(trade, config, token);
                 subject.OnNext(trade);
             }
         }

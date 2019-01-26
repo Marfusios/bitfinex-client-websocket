@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using Bitfinex.Client.Websocket.Messages;
+﻿using Bitfinex.Client.Websocket.Messages;
 using Bitfinex.Client.Websocket.Responses;
 using Bitfinex.Client.Websocket.Responses.Books;
 using Bitfinex.Client.Websocket.Responses.Candles;
+using Bitfinex.Client.Websocket.Responses.Configurations;
 using Bitfinex.Client.Websocket.Responses.Fundings;
 using Bitfinex.Client.Websocket.Responses.Tickers;
 using Bitfinex.Client.Websocket.Responses.Trades;
-using Newtonsoft.Json.Linq;
 using Serilog;
 
 namespace Bitfinex.Client.Websocket.Client
@@ -15,9 +13,9 @@ namespace Bitfinex.Client.Websocket.Client
     internal class BitfinexPublicHandler
     {
         private readonly BitfinexClientStreams _streams;
-        private readonly Dictionary<int, Action<JToken>> _channelIdToHandler;
+        private readonly BitfinexChannelList _channelIdToHandler;
 
-        public BitfinexPublicHandler(BitfinexClientStreams streams, Dictionary<int, Action<JToken>> channelIdToHandler)
+        public BitfinexPublicHandler(BitfinexClientStreams streams, BitfinexChannelList channelIdToHandler)
         {
             _streams = streams;
             _channelIdToHandler = channelIdToHandler;
@@ -29,6 +27,9 @@ namespace Bitfinex.Client.Websocket.Client
 
             switch (parsed.Event)
             {
+                case MessageType.Pong:
+                    PongResponse.Handle(msg, _streams.PongSubject);
+                    break;
                 case MessageType.Error:
                     ErrorResponse.Handle(msg, _streams.ErrorSubject);
                     break;
@@ -38,8 +39,8 @@ namespace Bitfinex.Client.Websocket.Client
                 case MessageType.Auth:
                     AuthenticationResponse.Handle(msg, _streams.AuthenticationSubject);
                     break;
-                case MessageType.Pong:
-                    PongResponse.Handle(msg, _streams.PongSubject);
+                case MessageType.Conf:
+                    ConfigurationResponse.Handle(msg, _streams.ConfigurationSubject);
                     break;
                 case MessageType.Subscribed:
                     OnSubscription(BitfinexSerialization.Deserialize<SubscribedResponse>(msg));
@@ -66,20 +67,29 @@ namespace Bitfinex.Client.Websocket.Client
             switch (response.Channel)
             {
                 case "ticker":
-                    _channelIdToHandler[channelId] = data => Ticker.Handle(data, response, _streams.TickerSubject);
+                    _channelIdToHandler[channelId] = (data, config) => 
+                        Ticker.Handle(data, response, _streams.TickerSubject);
                     break;
                 case "trades":
                     //if pair is null means that is funding
                     if (response.Pair == null)
-                        _channelIdToHandler[channelId] = data => Funding.Handle(data, response, _streams.FundingsSubject);
+                    {
+                        _channelIdToHandler[channelId] = (data, config) => 
+                            Funding.Handle(data, response, config, _streams.FundingsSubject);
+                    }
                     else
-                        _channelIdToHandler[channelId] = data => Trade.Handle(data, response, _streams.TradesSubject);
+                    {
+                        _channelIdToHandler[channelId] = (data, config) => 
+                            Trade.Handle(data, response, config, _streams.TradesSubject);
+                    }
                     break;
                 case "candles":
-                    _channelIdToHandler[channelId] = data => Candles.Handle(data, response, _streams.CandlesSubject);
+                    _channelIdToHandler[channelId] = (data, config) => 
+                        Candles.Handle(data, response, _streams.CandlesSubject);
                     break;
                 case "book":
-                    _channelIdToHandler[channelId] = data => Book.Handle(data, response, _streams.BookSubject, _streams.BookSnapshotSubject);
+                    _channelIdToHandler[channelId] = (data, config) => 
+                        Book.Handle(data, response, config, _streams.BookSubject, _streams.BookSnapshotSubject);
                     break;
                 //default:
                 //    Log.Warning($"Missing subscription handler '{response.Channel}'");

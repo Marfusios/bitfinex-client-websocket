@@ -1,5 +1,6 @@
 ﻿using System;
 using Bitfinex.Client.Websocket.Exceptions;
+using Bitfinex.Client.Websocket.Utils;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Serilog;
@@ -35,8 +36,8 @@ namespace Bitfinex.Client.Websocket.Responses.Orders
                 Gid = (long?)array[1],
                 Cid = (long)array[2],
                 Symbol = (string)array[3],
-                MtsCreate = (long?)array[4],
-                MtsUpdate = (long?)array[5],
+                MtsCreate = BitfinexTime.ConvertToTime((long?)array[4]),
+                MtsUpdate = BitfinexTime.ConvertToTime((long?)array[5]),
                 Amount = (double?)array[6],
                 AmountOrig = (double?)array[7],
                 Type = ParseType((string)array[8]),

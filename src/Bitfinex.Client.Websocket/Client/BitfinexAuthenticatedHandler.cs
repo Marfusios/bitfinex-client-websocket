@@ -1,6 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
+using Bitfinex.Client.Websocket.Responses.Configurations;
 using Bitfinex.Client.Websocket.Responses.Orders;
 using Bitfinex.Client.Websocket.Responses.Wallets;
 using Newtonsoft.Json.Linq;
@@ -12,7 +11,7 @@ namespace Bitfinex.Client.Websocket.Client
     {
         private readonly BitfinexClientStreams _streams;
 
-        public BitfinexAuthenticatedHandler(BitfinexClientStreams streams, Dictionary<int, Action<JToken>> channelIdToHandler)
+        public BitfinexAuthenticatedHandler(BitfinexClientStreams streams, BitfinexChannelList channelIdToHandler)
         {
             _streams = streams;
 
@@ -24,7 +23,7 @@ namespace Bitfinex.Client.Websocket.Client
             return $"[BFX AUTHENTICATED HANDLER] {msg}";
         }
 
-        internal void HandleAccountInfo(JToken token)
+        internal void HandleAccountInfo(JToken token, ConfigurationState config)
         {
             var itemsCount = token?.Count();
             if (token == null || itemsCount < 2)

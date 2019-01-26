@@ -3,14 +3,24 @@ using Newtonsoft.Json;
 using System;
 using System.Linq;
 using System.Reactive.Subjects;
+using Bitfinex.Client.Websocket.Responses.Configurations;
 using Newtonsoft.Json.Linq;
 
 namespace Bitfinex.Client.Websocket.Responses.Fundings
 {
-
+    /// <summary>
+    /// Type of the funding
+    /// </summary>
     public enum FundingType
     {
+        /// <summary>
+        /// Initial information
+        /// </summary>
         Executed,
+
+        /// <summary>
+        /// Extended information
+        /// </summary>
         UpdateExecution
     }
 
@@ -43,6 +53,9 @@ namespace Bitfinex.Client.Websocket.Responses.Fundings
         /// </summary>
         public double Period { get; set; }
 
+        /// <summary>
+        /// Type of the funding
+        /// </summary>
         [JsonIgnore]
         public FundingType Type { get; set; }
 
@@ -54,13 +67,14 @@ namespace Bitfinex.Client.Websocket.Responses.Fundings
 
 
 
-        internal static void Handle(JToken token, SubscribedResponse subscription, Subject<Funding> subject)
+        internal static void Handle(JToken token, SubscribedResponse subscription, 
+            ConfigurationState config, Subject<Funding> subject)
         {
             var firstPosition = token[1];
             if (firstPosition.Type == JTokenType.Array)
             {
                 // initial snapshot
-                Handle(firstPosition.ToObject<Funding[]>(), subscription, subject);
+                Handle(token, firstPosition.ToObject<Funding[]>(),subscription, config, subject);
                 return;
             }
 
@@ -84,10 +98,12 @@ namespace Bitfinex.Client.Websocket.Responses.Fundings
             funding.Type = fundingType;
             funding.Symbol = subscription.Symbol;
             funding.ChanId = subscription.ChanId;
+            SetGlobalData(funding, config, token, 2);
             subject.OnNext(funding);
         }
 
-        internal static void Handle(Funding[] fundings, SubscribedResponse subscription, Subject<Funding> subject)
+        internal static void Handle(JToken token, Funding[] fundings, SubscribedResponse subscription, 
+            ConfigurationState config, Subject<Funding> subject)
         {
             var reversed = fundings.Reverse().ToArray(); // newest last
             foreach (var funding in reversed)
@@ -95,6 +111,7 @@ namespace Bitfinex.Client.Websocket.Responses.Fundings
                 funding.Type = FundingType.Executed;
                 funding.Symbol = subscription.Symbol;
                 funding.ChanId = subscription.ChanId;
+                SetGlobalData(funding, config, token);
                 subject.OnNext(funding);
             }
         }

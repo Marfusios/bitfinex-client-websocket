@@ -73,10 +73,11 @@ namespace Bitfinex.Client.Websocket.Sample
 
         private static async Task SendSubscriptionRequests(BitfinexWebsocketClient client)
         {
+            await client.Send(new ConfigurationRequest(ConfigurationFlag.Timestamp | ConfigurationFlag.Sequencing | ConfigurationFlag.Checksum));
             await client.Send(new PingRequest() {Cid = 123456});
 
-            await client.Send(new TickerSubscribeRequest("BTC/USD"));
-            await client.Send(new TickerSubscribeRequest("ETH/USD"));
+            //await client.Send(new TickerSubscribeRequest("BTC/USD"));
+            //await client.Send(new TickerSubscribeRequest("ETH/USD"));
 
             await client.Send(new TradesSubscribeRequest("BTC/USD"));
             //await client.Send(new FundingsSuscribeRequest("BTC"));
@@ -85,7 +86,7 @@ namespace Bitfinex.Client.Websocket.Sample
             //await client.Send(new CandlesSubscribeRequest("BTC/USD", BitfinexTimeFrame.OneMinute));
             //await client.Send(new CandlesSubscribeRequest("ETH/USD", BitfinexTimeFrame.OneMinute));
 
-            //await client.Send(new BookSubscribeRequest("BTC/USD", BitfinexPrecision.P0, BitfinexFrequency.Realtime));
+            await client.Send(new BookSubscribeRequest("BTC/USD", BitfinexPrecision.P0, BitfinexFrequency.Realtime));
             //await client.Send(new BookSubscribeRequest("BTC/USD", BitfinexPrecision.P3, BitfinexFrequency.Realtime));
 
             if (!string.IsNullOrWhiteSpace(API_SECRET))
@@ -105,11 +106,14 @@ namespace Bitfinex.Client.Websocket.Sample
 
         private static void SubscribeToStreams(BitfinexWebsocketClient client)
         {
+            client.Streams.ConfigurationStream.Subscribe(x =>
+                Log.Information($"Configuration happened {x.Status}, flags: {x.Flags}, server timestamp enabled: {client.Configuration.IsTimestampEnabled}"));
+
             client.Streams.PongStream.Subscribe(pong => Log.Information($"Pong received! Id: {pong.Cid}"));
             client.Streams.TickerStream.Subscribe(ticker =>
                 Log.Information($"{ticker.Pair} - last price: {ticker.LastPrice}, bid: {ticker.Bid}, ask: {ticker.Ask}"));
             client.Streams.TradesStream.Where(x => x.Type == TradeType.Executed).Subscribe(x =>
-                Log.Information($"Trade {x.Pair} executed. Time: {x.Mts:mm:ss.fff}, Amount: {x.Amount}, Price: {x.Price}"));
+                Log.Information($"{x.ServerSequence} Trade {x.Pair} executed. Time: {x.Mts:mm:ss.fff}, Amount: {x.Amount}, Price: {x.Price}, server timestamp: {x.ServerTimestamp:mm:ss.fff}"));
             client.Streams.FundingStream.Where(x => x.Type == FundingType.Executed).Subscribe(x =>
                 Log.Information($"Funding,  Symbol {x.Symbol} executed. Time: {x.Mts:mm:ss.fff}, Amount: {x.Amount}, Rate: {x.Rate}, Period: {x.Period}"));
 
@@ -124,7 +128,7 @@ namespace Bitfinex.Client.Websocket.Sample
 
             client.Streams.BookStream.Subscribe(book =>
                 Log.Information(
-                    $"Book | channel: {book.ChanId} pair: {book.Pair}, price: {book.Price}, amount {book.Amount}, count: {book.Count}"));
+                    $"{book.ServerSequence} Book | channel: {book.ChanId} pair: {book.Pair}, price: {book.Price}, amount {book.Amount}, count: {book.Count}, server timestamp: {book.ServerTimestamp:mm:ss.fff}"));
 
             client.Streams.CandlesStream.Subscribe(candles =>
             {
@@ -139,6 +143,19 @@ namespace Bitfinex.Client.Websocket.Sample
             client.Streams.WalletStream
                 .Subscribe(wallet =>
                     Log.Information($"Wallet {wallet.Currency} balance: {wallet.Balance} type: {wallet.Type}"));
+
+
+
+            // Unsubscription example: 
+
+            //client.Streams.SubscriptionStream.ObserveOn(TaskPoolScheduler.Default).Subscribe(info =>
+            //{
+            //    if(!info.Channel.Contains("book"))
+            //        return;
+            //    Task.Delay(5000).Wait();
+            //    var channelId = info.ChanId;
+            //    client.Send(new UnsubscribeRequest() {ChanId = channelId}).Wait();
+            //});
         }
 
         private static void InitLogging()
