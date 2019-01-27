@@ -1,9 +1,9 @@
 ![Logo](bitfinex_logo.png)
-# Bitfinex websocket API version 2.0 client [![Build Status](https://travis-ci.org/Marfusios/bitfinex-client-websocket.svg?branch=master)](https://travis-ci.org/Marfusios/bitfinex-client-websocket) [![NuGet version](https://badge.fury.io/nu/Bitfinex.Client.Websocket.svg)](https://badge.fury.io/nu/Bitfinex.Client.Websocket)
+# Bitfinex & Ethfinex websocket API client [![Build Status](https://travis-ci.org/Marfusios/bitfinex-client-websocket.svg?branch=master)](https://travis-ci.org/Marfusios/bitfinex-client-websocket) [![NuGet version](https://badge.fury.io/nu/Bitfinex.Client.Websocket.svg)](https://badge.fury.io/nu/Bitfinex.Client.Websocket)
 
-This is a C# implementation of the Bitfinex websocket API version 2.0 (BETA) found here:
+This is a C# implementation of the Bitfinex & Ethfinex websocket API version 2.0 (BETA) found here:
 
-https://bitfinex.readme.io/v2/docs
+https://bitfinex.readme.io/v2/docs ([Ethfinex](https://www.ethfinex.com/api_docs))
 
 ### License: 
     Apache License 2.0
