@@ -30,6 +30,7 @@ namespace Bitfinex.Client.Websocket.Client
 
         internal readonly Subject<Ticker> TickerSubject = new Subject<Ticker>();
         internal readonly Subject<Trade> TradesSubject = new Subject<Trade>();
+        internal readonly Subject<Trade[]> TradesSnapshotSubject = new Subject<Trade[]>();
         internal readonly Subject<Funding> FundingsSubject = new Subject<Funding>();
         internal readonly Subject<Candles> CandlesSubject = new Subject<Candles>();
         internal readonly Subject<Book> BookSubject = new Subject<Book>();
@@ -92,6 +93,11 @@ namespace Bitfinex.Client.Websocket.Client
         /// This channel sends a trade message whenever a trade occurs at Bitfinex. It includes all the pertinent details of the trade, such as price, size and time.
         /// </summary>
         public IObservable<Trade> TradesStream => TradesSubject.AsObservable();
+
+        /// <summary>
+        /// Public trades snapshot stream for subscribed pair. It streams only initial snapshot after a reconnection. 
+        /// </summary>
+        public IObservable<Trade[]> TradesSnapshotStream => TradesSnapshotSubject.AsObservable();
 
         /// <summary>
         /// Public funding stream for subscribed pair

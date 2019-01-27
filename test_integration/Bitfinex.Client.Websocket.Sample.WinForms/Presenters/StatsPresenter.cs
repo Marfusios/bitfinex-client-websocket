@@ -30,7 +30,7 @@ namespace Bitmex.Client.Websocket.Sample.WinForms.Presenters
         private BitfinexWebsocketClient _client;
 
         private IDisposable _pingSubscription;
-        private DateTime _pingRequest;
+        private Stopwatch _pingRequest = Stopwatch.StartNew();
 
         private string _defaultPair = "BTCUSD";
         private string _currency = "$";
@@ -192,21 +192,20 @@ namespace Bitmex.Client.Websocket.Sample.WinForms.Presenters
                 .Interval(TimeSpan.FromSeconds(5))
                 .Subscribe(async x =>
                 {
-                    _pingRequest = DateTime.UtcNow;
+                    _pingRequest = Stopwatch.StartNew();
                     await client.Send(new PingRequest());
                 });      
         }
 
         private void HandlePong(PongResponse pong)
         {
-            var current = DateTime.UtcNow;
-            ComputePing(current, _pingRequest);
+            ComputePing(_pingRequest);
         }
 
-        private void ComputePing(DateTime current, DateTime before)
+        private void ComputePing(Stopwatch sw)
         {
-            var diff = current.Subtract(before);
-            _view.Ping = $"{diff.TotalMilliseconds:###} ms";
+            var elapsed = sw.ElapsedMilliseconds;
+            _view.Ping = $"{elapsed:###} ms";
             _view.Status("Connected", StatusType.Info);
         }
 

@@ -46,7 +46,7 @@ namespace Bitfinex.Client.Websocket.Responses.Books
 
 
         internal static void Handle(JToken token, SubscribedResponse subscription, ConfigurationState config, 
-            Subject<Book> subject, Subject<Book[]> subjectMulti, Subject<ChecksumResponse> subjectChecksum)
+            Subject<Book> subject, Subject<Book[]> subjectSnapshot, Subject<ChecksumResponse> subjectChecksum)
         {
             var data = token[1];
 
@@ -67,7 +67,7 @@ namespace Bitfinex.Client.Websocket.Responses.Books
             if(data.First.Type == JTokenType.Array)
             {
                 // initial snapshot
-                Handle(token, data.ToObject<Book[]>(), subscription, config, subject, subjectMulti);
+                Handle(token, data.ToObject<Book[]>(), subscription, config, subject, subjectSnapshot);
                 return;
             }
 
@@ -79,7 +79,7 @@ namespace Bitfinex.Client.Websocket.Responses.Books
         }
 
         internal static void Handle(JToken token, Book[] books, SubscribedResponse subscription, ConfigurationState config, 
-            Subject<Book> subject, Subject<Book[]> subjectMulti)
+            Subject<Book> subject, Subject<Book[]> subjectSnapshot)
         {
             foreach (var book in books)
             {
@@ -92,7 +92,7 @@ namespace Bitfinex.Client.Websocket.Responses.Books
             }
 
             // raise as snapshot book stream
-            subjectMulti.OnNext(books);
+            subjectSnapshot.OnNext(books);
         }
     }
 }

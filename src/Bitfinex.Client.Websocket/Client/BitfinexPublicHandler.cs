@@ -80,7 +80,7 @@ namespace Bitfinex.Client.Websocket.Client
                     else
                     {
                         _channelIdToHandler[channelId] = (data, config) => 
-                            Trade.Handle(data, response, config, _streams.TradesSubject);
+                            Trade.Handle(data, response, config, _streams.TradesSubject, _streams.TradesSnapshotSubject);
                     }
                     break;
                 case "candles":
