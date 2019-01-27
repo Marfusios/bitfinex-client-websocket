@@ -89,6 +89,7 @@ namespace Bitfinex.Client.Websocket.Sample
 
             //await client.Send(new BookSubscribeRequest("BTC/USD", BitfinexPrecision.P0, BitfinexFrequency.Realtime));
             //await client.Send(new BookSubscribeRequest("BTC/USD", BitfinexPrecision.P3, BitfinexFrequency.Realtime));
+            //await client.Send(new BookSubscribeRequest("ETH/USD", BitfinexPrecision.P0, BitfinexFrequency.Realtime));
 
             if (!string.IsNullOrWhiteSpace(API_SECRET))
             {
@@ -143,7 +144,7 @@ namespace Bitfinex.Client.Websocket.Sample
             });
 
             client.Streams.BookChecksumStream.Subscribe(x =>
-                Log.Information($"{x.ServerSequence} [CHECKSUM] {x.Checksum}"));
+                Log.Information($"{x.ServerSequence} [CHECKSUM] {x.Pair}-{x.ChanId}  {x.Checksum}"));
 
 
 

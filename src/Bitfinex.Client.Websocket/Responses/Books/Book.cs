@@ -54,7 +54,7 @@ namespace Bitfinex.Client.Websocket.Responses.Books
             {
                 if (data.Type == JTokenType.String && data.Value<string>() == "cs")
                 {
-                    ChecksumResponse.Handle(token, config, subjectChecksum);
+                    ChecksumResponse.Handle(token, subscription, config, subjectChecksum);
                     return;
                 }
             }
