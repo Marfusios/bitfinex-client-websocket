@@ -6,6 +6,7 @@ using Bitfinex.Client.Websocket.Responses.Configurations;
 using Bitfinex.Client.Websocket.Responses.Fundings;
 using Bitfinex.Client.Websocket.Responses.Tickers;
 using Bitfinex.Client.Websocket.Responses.Trades;
+using Serilog;
 
 namespace Bitfinex.Client.Websocket.Client
 {

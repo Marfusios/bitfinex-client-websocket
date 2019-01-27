@@ -7,7 +7,7 @@ using Serilog;
 
 namespace Bitfinex.Client.Websocket.Responses.Orders
 {
-    class OrderConverter : JsonConverter
+    internal class OrderConverter : JsonConverter
     {
         public override bool CanConvert(Type objectType)
         {
@@ -42,7 +42,7 @@ namespace Bitfinex.Client.Websocket.Responses.Orders
                 AmountOrig = (double?)array[7],
                 Type = ParseType((string)array[8]),
                 TypePrev = ParseType((string)array[9]),
-                // 10
+                MtsTiff = BitfinexTime.ConvertToTime((long?)array[10]),
                 // 11
                 Flags = (int?)array[12],
                 OrderStatus = ParseStatus((string)array[13]),

@@ -5,7 +5,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Bitfinex.Client.Websocket.Responses.Trades
 {
-    class TradeConverter: JsonConverter
+    internal class TradeConverter : JsonConverter
     {
         public override bool CanConvert(Type objectType)
         {

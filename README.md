@@ -77,7 +77,7 @@ More usage examples:
 | Account info           |  ✔            |
 | Orders                 |  ✔            |
 | Positions              |                |
-| Trades                 |                |
+| Trades                 |  ✔            |
 | Funding                |                |
 | Wallets                |  ✔            |
 | Balance                |                |

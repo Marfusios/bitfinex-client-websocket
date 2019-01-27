@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Bitfinex.Client.Websocket.Client;
 using Bitfinex.Client.Websocket.Requests;
+using Bitfinex.Client.Websocket.Responses;
 using Bitfinex.Client.Websocket.Responses.Fundings;
 using Bitfinex.Client.Websocket.Responses.Trades;
 using Bitfinex.Client.Websocket.Utils;
@@ -45,7 +46,7 @@ namespace Bitfinex.Client.Websocket.Sample
             var url = BitfinexValues.ApiWebsocketUrl;
             using (var communicator = new BitfinexWebsocketCommunicator(url))
             {
-                communicator.ReconnectTimeoutMs = (int)TimeSpan.FromSeconds(30).TotalMilliseconds;
+                communicator.ReconnectTimeoutMs = (int)TimeSpan.FromSeconds(300).TotalMilliseconds;
                 communicator.ReconnectionHappened.Subscribe(type =>
                     Log.Information($"Reconnection happened, type: {type}"));
 
@@ -80,13 +81,13 @@ namespace Bitfinex.Client.Websocket.Sample
             //await client.Send(new TickerSubscribeRequest("ETH/USD"));
 
             await client.Send(new TradesSubscribeRequest("BTC/USD"));
-            //await client.Send(new FundingsSuscribeRequest("BTC"));
-            //await client.Send(new FundingsSuscribeRequest("USD"));
+            //await client.Send(new FundingsSubscribeRequest("BTC"));
+            //await client.Send(new FundingsSubscribeRequest("USD"));
 
             //await client.Send(new CandlesSubscribeRequest("BTC/USD", BitfinexTimeFrame.OneMinute));
             //await client.Send(new CandlesSubscribeRequest("ETH/USD", BitfinexTimeFrame.OneMinute));
 
-            await client.Send(new BookSubscribeRequest("BTC/USD", BitfinexPrecision.P0, BitfinexFrequency.Realtime));
+            //await client.Send(new BookSubscribeRequest("BTC/USD", BitfinexPrecision.P0, BitfinexFrequency.Realtime));
             //await client.Send(new BookSubscribeRequest("BTC/USD", BitfinexPrecision.P3, BitfinexFrequency.Realtime));
 
             if (!string.IsNullOrWhiteSpace(API_SECRET))
@@ -106,14 +107,16 @@ namespace Bitfinex.Client.Websocket.Sample
 
         private static void SubscribeToStreams(BitfinexWebsocketClient client)
         {
+            // public streams:
+
             client.Streams.ConfigurationStream.Subscribe(x =>
                 Log.Information($"Configuration happened {x.Status}, flags: {x.Flags}, server timestamp enabled: {client.Configuration.IsTimestampEnabled}"));
 
             client.Streams.PongStream.Subscribe(pong => Log.Information($"Pong received! Id: {pong.Cid}"));
             client.Streams.TickerStream.Subscribe(ticker =>
-                Log.Information($"{ticker.Pair} - last price: {ticker.LastPrice}, bid: {ticker.Bid}, ask: {ticker.Ask}"));
+                Log.Information($"{ticker.ServerSequence} {ticker.Pair} - last price: {ticker.LastPrice}, bid: {ticker.Bid}, ask: {ticker.Ask}, {ShowServerTimestamp(client, ticker)}"));
             client.Streams.TradesStream.Where(x => x.Type == TradeType.Executed).Subscribe(x =>
-                Log.Information($"{x.ServerSequence} Trade {x.Pair} executed. Time: {x.Mts:mm:ss.fff}, Amount: {x.Amount}, Price: {x.Price}, server timestamp: {x.ServerTimestamp:mm:ss.fff}"));
+                Log.Information($"{x.ServerSequence} Trade {x.Pair} executed. Time: {x.Mts:mm:ss.fff}, Amount: {x.Amount}, Price: {x.Price}, {ShowServerTimestamp(client, x)}"));
             client.Streams.FundingStream.Where(x => x.Type == FundingType.Executed).Subscribe(x =>
                 Log.Information($"Funding,  Symbol {x.Symbol} executed. Time: {x.Mts:mm:ss.fff}, Amount: {x.Amount}, Rate: {x.Rate}, Period: {x.Period}"));
 
@@ -128,7 +131,7 @@ namespace Bitfinex.Client.Websocket.Sample
 
             client.Streams.BookStream.Subscribe(book =>
                 Log.Information(
-                    $"{book.ServerSequence} Book | channel: {book.ChanId} pair: {book.Pair}, price: {book.Price}, amount {book.Amount}, count: {book.Count}, server timestamp: {book.ServerTimestamp:mm:ss.fff}"));
+                    $"{book.ServerSequence} Book | channel: {book.ChanId} pair: {book.Pair}, price: {book.Price}, amount {book.Amount}, count: {book.Count}, {ShowServerTimestamp(client, book)}"));
 
             client.Streams.CandlesStream.Subscribe(candles =>
             {
@@ -139,13 +142,41 @@ namespace Bitfinex.Client.Websocket.Sample
                 });
             });
 
+            client.Streams.BookChecksumStream.Subscribe(x =>
+                Log.Information($"{x.ServerSequence} [CHECKSUM] {x.Checksum}"));
+
+
+
+
+            // Private streams:
+
             client.Streams.AuthenticationStream.Subscribe(auth => Log.Information($"Authenticated: {auth.IsAuthenticated}"));
             client.Streams.WalletStream
                 .Subscribe(wallet =>
                     Log.Information($"Wallet {wallet.Currency} balance: {wallet.Balance} type: {wallet.Type}"));
 
-            client.Streams.BookChecksumStream.Subscribe(x =>
-                Log.Information($"{x.ServerSequence} [CHECKSUM] {x.Checksum}"));
+            client.Streams.OrdersStream.Subscribe(orders =>
+            {
+                foreach (var info in orders)
+                {
+                    Log.Information($"Order snapshot: {info.Pair} - {info.Type} - {info.Amount} @ {info.Price} | {info.OrderStatus}");
+                }
+            });
+
+            client.Streams.OrderCreatedStream.Subscribe(info =>
+                Log.Information($"Order created: {info.Pair} - {info.Type} - {info.Amount} @ {info.Price} | {info.OrderStatus}"));
+
+            client.Streams.OrderUpdatedStream.Subscribe(info =>
+                Log.Information($"Order updated: {info.Pair} - {info.Type} - {info.Amount} @ {info.Price} | {info.OrderStatus}"));
+
+            client.Streams.OrderCanceledStream.Subscribe(info =>
+                Log.Information($"Order canceled: {info.Pair} - {info.Type} - {info.Amount} @ {info.Price} | {info.OrderStatus}"));
+
+            client.Streams.PrivateTradeStream.Subscribe(trade => 
+                Log.Information($"Private trade {trade.Pair} executed. Time: {trade.MtsCreate:mm:ss.fff}, Amount: {trade.ExecAmount}, Price: {trade.ExecPrice}, " +
+                                $"Fee: {trade.Fee} {trade.FeeCurrency}, type: {trade.OrderType}, " +
+                                $"sequence: {trade.ServerSequence} / {trade.ServerPrivateSequence}, {ShowServerTimestamp(client, trade)}"));
+
 
 
             // Unsubscription example: 
@@ -158,6 +189,13 @@ namespace Bitfinex.Client.Websocket.Sample
             //    var channelId = info.ChanId;
             //    client.Send(new UnsubscribeRequest() {ChanId = channelId}).Wait();
             //});
+        }
+
+        private static string ShowServerTimestamp(BitfinexWebsocketClient client, ResponseBase response)
+        {
+            if(!client.Configuration.IsTimestampEnabled)
+                return string.Empty;
+            return $"server timestamp: {response.ServerTimestamp:mm:ss.fff}";
         }
 
         private static void InitLogging()

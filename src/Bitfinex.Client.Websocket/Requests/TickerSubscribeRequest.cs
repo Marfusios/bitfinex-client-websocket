@@ -1,4 +1,5 @@
-﻿using Bitfinex.Client.Websocket.Validations;
+﻿using Bitfinex.Client.Websocket.Utils;
+using Bitfinex.Client.Websocket.Validations;
 
 namespace Bitfinex.Client.Websocket.Requests
 {
@@ -8,7 +9,7 @@ namespace Bitfinex.Client.Websocket.Requests
         {
             BfxValidations.ValidateInput(pair, nameof(pair));
 
-            Symbol = FormatPairToSymbol(pair);
+            Symbol = BitfinexSymbolUtils.FormatPairToTradingSymbol(pair);
         }
 
         public override string Channel => "ticker";

@@ -22,7 +22,7 @@ namespace Bitfinex.Client.Websocket.Client
     {
         private readonly IBitfinexCommunicator _communicator;
         private readonly IDisposable _messageReceivedSubscription;
-        private readonly IDisposable __configurationSubscription;
+        private readonly IDisposable _configurationSubscription;
 
         private readonly BitfinexChannelList _channelIdToHandler = new BitfinexChannelList();
 
@@ -36,7 +36,7 @@ namespace Bitfinex.Client.Websocket.Client
 
             _communicator = communicator;
             _messageReceivedSubscription = _communicator.MessageReceived.Subscribe(HandleMessage);
-            __configurationSubscription = Streams.ConfigurationSubject.Subscribe(HandleConfiguration);
+            _configurationSubscription = Streams.ConfigurationSubject.Subscribe(HandleConfiguration);
 
             _authenticatedHandler = new BitfinexAuthenticatedHandler(Streams, _channelIdToHandler);
             _publicHandler = new BitfinexPublicHandler(Streams, _channelIdToHandler);
@@ -58,7 +58,7 @@ namespace Bitfinex.Client.Websocket.Client
         public void Dispose()
         {
             _messageReceivedSubscription?.Dispose();
-            __configurationSubscription?.Dispose();
+            _configurationSubscription?.Dispose();
         }
 
         /// <summary>

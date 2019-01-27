@@ -9,6 +9,7 @@ using Bitfinex.Client.Websocket.Responses.Fundings;
 using Bitfinex.Client.Websocket.Responses.Orders;
 using Bitfinex.Client.Websocket.Responses.Tickers;
 using Bitfinex.Client.Websocket.Responses.Trades;
+using Bitfinex.Client.Websocket.Responses.TradesPrivate;
 using Bitfinex.Client.Websocket.Responses.Wallets;
 
 namespace Bitfinex.Client.Websocket.Client
@@ -41,6 +42,7 @@ namespace Bitfinex.Client.Websocket.Client
         internal readonly Subject<Order> OrderCreatedSubject = new Subject<Order>();
         internal readonly Subject<Order> OrderUpdatedSubject = new Subject<Order>();
         internal readonly Subject<Order> OrderCanceledSubject = new Subject<Order>();
+        internal readonly Subject<PrivateTrade> PrivateTradeSubject = new Subject<PrivateTrade>();
 
 
         /// <summary>
@@ -152,6 +154,11 @@ namespace Bitfinex.Client.Websocket.Client
         /// Private info about canceled or executed order
         /// </summary>
         public IObservable<Order> OrderCanceledStream => OrderCanceledSubject.AsObservable();
+
+        /// <summary>
+        /// Private info about executed trades
+        /// </summary>
+        public IObservable<PrivateTrade> PrivateTradeStream => PrivateTradeSubject.AsObservable();
 
 
         internal BitfinexClientStreams()

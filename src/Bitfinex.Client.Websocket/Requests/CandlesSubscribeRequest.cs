@@ -9,7 +9,7 @@ namespace Bitfinex.Client.Websocket.Requests
         {
             BfxValidations.ValidateInput(pair, nameof(pair));
 
-            Key = $"trade:{TimeFrameToKeyCommand(bitfinexTimeFrame)}:{FormatPairToSymbol(pair)}";
+            Key = $"trade:{TimeFrameToKeyCommand(bitfinexTimeFrame)}:{BitfinexSymbolUtils.FormatPairToTradingSymbol(pair)}";
         }
 
         public override string Channel => "candles";

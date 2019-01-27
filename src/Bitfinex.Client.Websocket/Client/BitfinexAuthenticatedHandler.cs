@@ -1,6 +1,8 @@
 ﻿using System.Linq;
 using Bitfinex.Client.Websocket.Responses.Configurations;
 using Bitfinex.Client.Websocket.Responses.Orders;
+using Bitfinex.Client.Websocket.Responses.Trades;
+using Bitfinex.Client.Websocket.Responses.TradesPrivate;
 using Bitfinex.Client.Websocket.Responses.Wallets;
 using Newtonsoft.Json.Linq;
 using Serilog;
@@ -75,8 +77,14 @@ namespace Bitfinex.Client.Websocket.Client
                 case "oc":
                     Order.Handle(token, _streams.OrderCanceledSubject);
                     break;
+                case "te":
+                    PrivateTrade.Handle(token, config, _streams.PrivateTradeSubject, TradeType.Executed);
+                    break;
+                case "tu":
+                    PrivateTrade.Handle(token, config, _streams.PrivateTradeSubject, TradeType.UpdateExecution);
+                    break;
                 //default:
-                //    Log.Warning($"Missing handler for '{msgType}'. Data: {token}");
+                //    Log.Warning($"Missing private handler for '{msgType}'. Data: {token}");
                 //    break;
             }
         }

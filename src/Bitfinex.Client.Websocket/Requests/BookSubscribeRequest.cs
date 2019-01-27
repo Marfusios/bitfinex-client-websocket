@@ -13,7 +13,7 @@ namespace Bitfinex.Client.Websocket.Requests
         {
             BfxValidations.ValidateInput(pair, nameof(pair));
 
-            Symbol = FormatPairToSymbol(pair);
+            Symbol = BitfinexSymbolUtils.FormatPairToTradingSymbol(pair);
             Prec = precision.GetStringValue();
             Freq = frequency.GetStringValue();
             Len = string.IsNullOrWhiteSpace(length) ? "25" : length;

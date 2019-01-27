@@ -9,22 +9,6 @@ using Newtonsoft.Json.Linq;
 namespace Bitfinex.Client.Websocket.Responses.Fundings
 {
     /// <summary>
-    /// Type of the funding
-    /// </summary>
-    public enum FundingType
-    {
-        /// <summary>
-        /// Initial information
-        /// </summary>
-        Executed,
-
-        /// <summary>
-        /// Extended information
-        /// </summary>
-        UpdateExecution
-    }
-
-    /// <summary>
     /// The order that causes the trade determines if it is a buy or a sell.
     /// </summary>
     [JsonConverter(typeof(FundingConverter))]

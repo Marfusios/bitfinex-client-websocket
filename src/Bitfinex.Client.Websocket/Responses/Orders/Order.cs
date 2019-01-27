@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Reactive.Subjects;
+using Bitfinex.Client.Websocket.Utils;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Serilog;
@@ -65,6 +66,11 @@ namespace Bitfinex.Client.Websocket.Responses.Orders
         public OrderType TypePrev { get; set; }
 
         /// <summary>
+        /// Millisecond timestamp of Time-In-Force: automatic order cancellation
+        /// </summary>
+        public DateTime? MtsTiff { get; set; }
+
+        /// <summary>
         /// Hidden | Close | Post Only | Reduce Only | No Var Rates | OCO
         /// </summary>
         public int? Flags { get; set; }
@@ -112,17 +118,17 @@ namespace Bitfinex.Client.Websocket.Responses.Orders
         /// <summary>
         /// Removes trailing 'f' or 't' and returns raw pair
         /// </summary>
-        public string Pair => !string.IsNullOrWhiteSpace(Symbol) && Symbol.Length > 6 ? Symbol.Remove(0, 1) : string.Empty;
+        public string Pair => BitfinexSymbolUtils.ExtractPair(Symbol);
 
         /// <summary>
-        /// Base symbol
+        /// Base symbol (first position: BTC in BTCUSD)
         /// </summary>
-        public string PrimarySymbol => !string.IsNullOrWhiteSpace(Pair) && Pair.Length > 5 ? Pair.Substring(0, 3) : string.Empty;
+        public string BaseSymbol => BitfinexSymbolUtils.ExtractBaseSymbol(Pair);
 
         /// <summary>
-        /// Quote symbol
+        /// Quote symbol (second position: USD in BTCUSD)
         /// </summary>
-        public string SecondarySymbol => !string.IsNullOrWhiteSpace(Pair) && Pair.Length > 5 ? Pair.Substring(3, 3) : string.Empty;
+        public string QuoteSymbol => BitfinexSymbolUtils.ExtractQuoteSymbol(Pair);
 
 
         internal static void Handle(JToken token, Subject<Order[]> subject)
