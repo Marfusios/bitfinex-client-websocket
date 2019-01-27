@@ -67,7 +67,7 @@ namespace Bitfinex.Client.Websocket.Client
             {
                 case "ticker":
                     _channelIdToHandler[channelId] = (data, config) => 
-                        Ticker.Handle(data, response, _streams.TickerSubject);
+                        Ticker.Handle(data, response, config, _streams.TickerSubject);
                     break;
                 case "trades":
                     //if pair is null means that is funding

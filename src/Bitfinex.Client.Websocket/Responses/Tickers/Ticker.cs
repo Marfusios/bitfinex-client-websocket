@@ -1,4 +1,5 @@
 ﻿using System.Reactive.Subjects;
+using Bitfinex.Client.Websocket.Responses.Configurations;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -67,7 +68,7 @@ namespace Bitfinex.Client.Websocket.Responses.Tickers
         public string Pair { get; set; }
 
 
-        internal static void Handle(JToken token, SubscribedResponse subscription, Subject<Ticker> subject)
+        internal static void Handle(JToken token, SubscribedResponse subscription, ConfigurationState config, Subject<Ticker> subject)
         {
             var data = token[1];
 
@@ -80,6 +81,7 @@ namespace Bitfinex.Client.Websocket.Responses.Tickers
             var ticker = data.ToObject<Ticker>();
             ticker.Pair = subscription.Pair;
             ticker.ChanId = subscription.ChanId;
+            SetGlobalData(ticker, config, token);
             subject.OnNext(ticker);
         }
     }
