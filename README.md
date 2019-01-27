@@ -5,6 +5,9 @@ This is a C# implementation of the Bitfinex & Ethfinex websocket API version 2.0
 
 https://bitfinex.readme.io/v2/docs ([Ethfinex](https://www.ethfinex.com/api_docs))
 
+You can **do** almost **everything with** provided **websocket API**. Using REST API is unnecessary! 
+As a benefit, you will get real-time data and fast execution of your commands. 
+
 ### License: 
     Apache License 2.0
 
