@@ -96,9 +96,9 @@ namespace Bitfinex.Client.Websocket.Client
                 case "pc":
                     Position.Handle(token, config, _streams.PositionCanceledSubject);
                     break;
-                default:
-                    Log.Warning($"Missing private handler for '{msgType}'. Data: {token}");
-                    break;
+                //default:
+                //    Log.Warning($"Missing private handler for '{msgType}'. Data: {token}");
+                //    break;
             }
         }
     }
