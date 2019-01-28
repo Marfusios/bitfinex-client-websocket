@@ -6,7 +6,24 @@ using Newtonsoft.Json;
 
 namespace Bitfinex.Client.Websocket.Requests.Converters
 {
-    class NewOrderConverter : JsonConverter
+    /*
+     [
+        0,
+        "on",
+        null,
+        {
+        "gid": 999,
+        "cid": 999,
+        "type": "EXCHANGE TRAILING STOP",
+        "symbol": "tETHUSD",
+        "amount": "0.2",
+        "price": "10"
+        }
+    ]
+     
+     */
+
+    internal class NewOrderConverter : JsonConverter
     {
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
@@ -57,15 +74,23 @@ namespace Bitfinex.Client.Websocket.Requests.Converters
                 writer.WriteValue(order.PriceAuxLimit.Value.ToString(CultureInfo.InvariantCulture));
             }
 
-            writer.WritePropertyName("hidden");
-            writer.WriteValue(order.Hidden);
+            if (order.PriceOcoStop.HasValue)
+            {
+                writer.WritePropertyName("price_oco_stop");
+                writer.WriteValue(order.PriceOcoStop.Value.ToString(CultureInfo.InvariantCulture));
+            }
 
             if (order.Flags.HasValue)
             {
                 writer.WritePropertyName("flags");
-                writer.WriteValue(order.Flags.Value.ToString(CultureInfo.InvariantCulture));
+                writer.WriteValue((int)order.Flags);
             }
 
+            if (order.TimeInForce.HasValue)
+            {
+                writer.WritePropertyName("tif");
+                writer.WriteValue(order.TimeInForce.Value.ToString("u"));
+            }
 
             writer.WriteEndObject();
             writer.WriteEndArray();

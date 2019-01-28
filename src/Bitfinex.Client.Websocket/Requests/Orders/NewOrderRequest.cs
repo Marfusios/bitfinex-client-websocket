@@ -1,20 +1,32 @@
-﻿using Bitfinex.Client.Websocket.Requests.Converters;
+﻿using System;
+using Bitfinex.Client.Websocket.Requests.Converters;
 using Bitfinex.Client.Websocket.Responses.Orders;
 using Bitfinex.Client.Websocket.Validations;
 using Newtonsoft.Json;
 
 namespace Bitfinex.Client.Websocket.Requests
 {
+    /// <summary>
+    /// Request to create a new order.
+    /// You will receive a message of the appropriated type on the order streams
+    /// </summary>
     [JsonConverter(typeof(NewOrderConverter))]
     public class NewOrderRequest
     {
         private string _symbol;
 
+        /// <summary>
+        /// Don't forget to set relevant properties
+        /// </summary>
         public NewOrderRequest()
         {
             
         }
 
+        /// <summary>
+        /// Simple constructor mostly for LIMIT and MARKET order,
+        /// for other order types use parameter-less constructor and set properties by your own 
+        /// </summary>
         public NewOrderRequest(long gid, long cid, string symbol, OrderType type, double amount, double price)
         {
             BfxValidations.ValidateInput(cid, nameof(cid), 0);
@@ -53,7 +65,9 @@ namespace Bitfinex.Client.Websocket.Requests
             }
         }
 
-
+        /// <summary>
+        /// Type of the order
+        /// </summary>
         public OrderType Type { get; set; }
 
         /// <summary>
@@ -77,35 +91,20 @@ namespace Bitfinex.Client.Websocket.Requests
         public double? PriceAuxLimit { get; set; }
 
         /// <summary>
-        /// Whether the order is hidden (1) or not (0)
+        /// OCO stop price
         /// </summary>
-        public int Hidden { get; set; }
+        public double? PriceOcoStop { get; set; }
 
         /// <summary>
+        /// Additional order configuration, see OrderFlag enum. 
         /// You may sum flag values to pass multiple flags. For example passing 4160 (64 + 4096) means hidden post only.
-        /// ------------------------------------------------------------------------------------------------------------
-        /// 64	    The hidden order option ensures an order does not appear in the order book; thus does not influence other market participants.
-        /// 512	    Close position if position present.
-        /// 4096	The post-only limit order option ensures the limit order will be added to the order book and not match with a pre-existing order.
-        /// 16384	The one cancels other order option allows you to place a pair of orders stipulating that if one order is executed fully or partially, then the other is automatically canceled.
+        /// Use C# [Flags] to do that: Flags = OrderFlag.Hidden | OrderFlag.PostOnly
         /// </summary>
-        public int? Flags { get; set; }
-    }
+        public OrderFlag? Flags { get; set; }
 
-    /*
-     [
-        0,
-        "on",
-        null,
-        {
-        "gid": 999,
-        "cid": 999,
-        "type": "EXCHANGE TRAILING STOP",
-        "symbol": "tETHUSD",
-        "amount": "0.2",
-        "price": "10"
-        }
-    ]
-     
-     */
+        /// <summary>
+        /// Time-In-Force: datetime for automatic order cancellation (ie. 2020-01-01 10:45:23) )
+        /// </summary>
+        public DateTime? TimeInForce { get; set; }
+    }
 }

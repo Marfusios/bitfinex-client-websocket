@@ -22,8 +22,8 @@ namespace Bitfinex.Client.Websocket.Sample
     {
         private static readonly ManualResetEvent ExitEvent = new ManualResetEvent(false);
 
-        private static readonly string API_KEY = "WBzw0b7Z3ug4O7fqFXANC2JW8tjyoCXoS7bExnWyzkI";
-        private static readonly string API_SECRET = "p5jGUA1YEQheOCVmL3hJkPk0lhRu6HvC5OUHd7hzaCn";
+        private static readonly string API_KEY = "your_api_key";
+        private static readonly string API_SECRET = "";
 
         static void Main(string[] args)
         {
@@ -80,7 +80,7 @@ namespace Bitfinex.Client.Websocket.Sample
             //await client.Send(new TickerSubscribeRequest("BTC/USD"));
             //await client.Send(new TickerSubscribeRequest("ETH/USD"));
 
-            //await client.Send(new TradesSubscribeRequest("BTC/USD"));
+            await client.Send(new TradesSubscribeRequest("BTC/USD"));
             //await client.Send(new TradesSubscribeRequest("NEC/ETH")); // Nectar coin from ETHFINEX
             //await client.Send(new FundingsSubscribeRequest("BTC"));
             //await client.Send(new FundingsSubscribeRequest("USD"));
