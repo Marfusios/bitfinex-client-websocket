@@ -48,9 +48,9 @@ namespace Bitfinex.Client.Websocket.Client
                 case MessageType.Unsubscribed:
                     UnsubscribedResponse.Handle(msg, _streams.UnsubscriptionSubject);
                     break;
-                //default:
-                //    Log.Warning($"Missing handler for public stream, data: '{msg}'");
-                //    break;
+                default:
+                    Log.Warning($"Missing handler for public stream, data: '{msg}'");
+                    break;
             }
         }
 
@@ -91,9 +91,9 @@ namespace Bitfinex.Client.Websocket.Client
                     _channelIdToHandler[channelId] = (data, config) => 
                         Book.Handle(data, response, config, _streams.BookSubject, _streams.BookSnapshotSubject, _streams.BookChecksumSubject);
                     break;
-                //default:
-                //    Log.Warning($"Missing subscription handler '{response.Channel}'");
-                //    break;
+                default:
+                    Log.Warning($"Missing subscription handler '{response.Channel}'");
+                    break;
             }
         }
 

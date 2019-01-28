@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using Bitfinex.Client.Websocket.Responses.Configurations;
 using Bitfinex.Client.Websocket.Responses.Orders;
+using Bitfinex.Client.Websocket.Responses.Positions;
 using Bitfinex.Client.Websocket.Responses.Trades;
 using Bitfinex.Client.Websocket.Responses.TradesPrivate;
 using Bitfinex.Client.Websocket.Responses.Wallets;
@@ -83,9 +84,21 @@ namespace Bitfinex.Client.Websocket.Client
                 case "tu":
                     PrivateTrade.Handle(token, config, _streams.PrivateTradeSubject, TradeType.UpdateExecution);
                     break;
-                //default:
-                //    Log.Warning($"Missing private handler for '{msgType}'. Data: {token}");
-                //    break;
+                case "ps":
+                    Position.Handle(token, config, _streams.PositionsSubject);
+                    break;
+                case "pn":
+                    Position.Handle(token, config, _streams.PositionCreatedSubject);
+                    break;
+                case "pu":
+                    Position.Handle(token, config, _streams.PositionUpdatedSubject);
+                    break;
+                case "pc":
+                    Position.Handle(token, config, _streams.PositionCanceledSubject);
+                    break;
+                default:
+                    Log.Warning($"Missing private handler for '{msgType}'. Data: {token}");
+                    break;
             }
         }
     }

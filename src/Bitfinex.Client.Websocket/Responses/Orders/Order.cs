@@ -146,20 +146,16 @@ namespace Bitfinex.Client.Websocket.Responses.Orders
 
         internal static void Handle(JToken token, Subject<Order> subject)
         {
-            subject.OnNext(ParseOrderInfo(token));
-        }
-
-        private static Order ParseOrderInfo(JToken token)
-        {
             var data = token[2];
             if (data.Type != JTokenType.Array)
             {
                 Log.Warning(L("Order info - Invalid message format, third param not array"));
-                return null;
+                return;
             }
 
             var parsed = data.ToObject<Order>();
-            return parsed;
+
+            subject.OnNext(parsed);
         }
 
         private static string L(string msg)

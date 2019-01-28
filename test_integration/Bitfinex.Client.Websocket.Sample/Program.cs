@@ -22,8 +22,8 @@ namespace Bitfinex.Client.Websocket.Sample
     {
         private static readonly ManualResetEvent ExitEvent = new ManualResetEvent(false);
 
-        private static readonly string API_KEY = "your_api_key";
-        private static readonly string API_SECRET = "";
+        private static readonly string API_KEY = "WBzw0b7Z3ug4O7fqFXANC2JW8tjyoCXoS7bExnWyzkI";
+        private static readonly string API_SECRET = "p5jGUA1YEQheOCVmL3hJkPk0lhRu6HvC5OUHd7hzaCn";
 
         static void Main(string[] args)
         {
@@ -74,14 +74,14 @@ namespace Bitfinex.Client.Websocket.Sample
 
         private static async Task SendSubscriptionRequests(BitfinexWebsocketClient client)
         {
-            await client.Send(new ConfigurationRequest(ConfigurationFlag.Timestamp | ConfigurationFlag.Sequencing));
+            //await client.Send(new ConfigurationRequest(ConfigurationFlag.Timestamp | ConfigurationFlag.Sequencing));
             await client.Send(new PingRequest() {Cid = 123456});
 
             //await client.Send(new TickerSubscribeRequest("BTC/USD"));
             //await client.Send(new TickerSubscribeRequest("ETH/USD"));
 
-            await client.Send(new TradesSubscribeRequest("BTC/USD"));
-            await client.Send(new TradesSubscribeRequest("NEC/ETH")); // Nectar coin from ETHFINEX
+            //await client.Send(new TradesSubscribeRequest("BTC/USD"));
+            //await client.Send(new TradesSubscribeRequest("NEC/ETH")); // Nectar coin from ETHFINEX
             //await client.Send(new FundingsSubscribeRequest("BTC"));
             //await client.Send(new FundingsSubscribeRequest("USD"));
 
@@ -115,6 +115,7 @@ namespace Bitfinex.Client.Websocket.Sample
                 Log.Information($"Configuration happened {x.Status}, flags: {x.Flags}, server timestamp enabled: {client.Configuration.IsTimestampEnabled}"));
 
             client.Streams.PongStream.Subscribe(pong => Log.Information($"Pong received! Id: {pong.Cid}"));
+            
             client.Streams.TickerStream.Subscribe(ticker =>
                 Log.Information($"{ticker.ServerSequence} {ticker.Pair} - last price: {ticker.LastPrice}, bid: {ticker.Bid}, ask: {ticker.Ask}, {ShowServerTimestamp(client, ticker)}"));
             
@@ -183,13 +184,38 @@ namespace Bitfinex.Client.Websocket.Sample
                 Log.Information($"Order updated: {info.Pair} - {info.Type} - {info.Amount} @ {info.Price} | {info.OrderStatus}"));
 
             client.Streams.OrderCanceledStream.Subscribe(info =>
-                Log.Information($"Order canceled: {info.Pair} - {info.Type} - {info.Amount} @ {info.Price} | {info.OrderStatus}"));
+                Log.Information($"Order {info.OrderStatus}: {info.Pair} - {info.Type} - {info.Amount} @ {info.Price}"));
 
             client.Streams.PrivateTradeStream.Subscribe(trade => 
                 Log.Information($"Private trade {trade.Pair} executed. Time: {trade.MtsCreate:mm:ss.fff}, Amount: {trade.ExecAmount}, Price: {trade.ExecPrice}, " +
                                 $"Fee: {trade.Fee} {trade.FeeCurrency}, type: {trade.OrderType}, " +
-                                $"sequence: {trade.ServerSequence} / {trade.ServerPrivateSequence}, {ShowServerTimestamp(client, trade)}"));
+                                $"{ShowServerSequence(client, trade)}, {ShowServerTimestamp(client, trade)}"));
 
+
+            client.Streams.PositionsStream.Subscribe(positions =>
+            {
+                foreach (var info in positions)
+                {
+                    Log.Information($"Position snapshot: {info.Pair} - {info.Status} - {info.Amount} @ {info.BasePrice} " +
+                                    $"| PL: {info.ProfitLoss} {info.ProfitLossPercentage}% " +
+                                    $"{ShowServerSequence(client, info)}, {ShowServerTimestamp(client, info)}");
+                }
+            });
+
+            client.Streams.PositionCreatedStream.Subscribe(info =>
+                Log.Information($"Position created: {info.Pair} - {info.Status} - {info.Amount} @ {info.BasePrice} " +
+                                $"| PL: {info.ProfitLoss} {info.ProfitLossPercentage}% " +
+                                $"{ShowServerTimestamp(client, info)}"));
+
+            client.Streams.PositionUpdatedStream.Subscribe(info =>
+                Log.Information($"Position updated: {info.Pair} - {info.Status} - {info.Amount} @ {info.BasePrice} " +
+                                $"| PL: {info.ProfitLoss} {info.ProfitLossPercentage}% " +
+                                $"{ShowServerTimestamp(client, info)}"));
+
+            client.Streams.PositionCanceledStream.Subscribe(info =>
+                Log.Information($"Position canceled: {info.Pair} - {info.Status} - {info.Amount} @ {info.BasePrice} " +
+                                $"| PL: {info.ProfitLoss} {info.ProfitLossPercentage}% " +
+                                $"{ShowServerTimestamp(client, info)}"));
 
 
             // Unsubscription example: 
@@ -209,6 +235,13 @@ namespace Bitfinex.Client.Websocket.Sample
             if(!client.Configuration.IsTimestampEnabled)
                 return string.Empty;
             return $"server timestamp: {response.ServerTimestamp:mm:ss.fff}";
+        }
+
+        private static string ShowServerSequence(BitfinexWebsocketClient client, ResponseBase response)
+        {
+            if(!client.Configuration.IsSequencingEnabled)
+                return string.Empty;
+            return $"sequence: {response.ServerSequence} / {response.ServerPrivateSequence}";
         }
 
         private static void InitLogging()

@@ -7,6 +7,7 @@ using Bitfinex.Client.Websocket.Responses.Candles;
 using Bitfinex.Client.Websocket.Responses.Configurations;
 using Bitfinex.Client.Websocket.Responses.Fundings;
 using Bitfinex.Client.Websocket.Responses.Orders;
+using Bitfinex.Client.Websocket.Responses.Positions;
 using Bitfinex.Client.Websocket.Responses.Tickers;
 using Bitfinex.Client.Websocket.Responses.Trades;
 using Bitfinex.Client.Websocket.Responses.TradesPrivate;
@@ -39,11 +40,17 @@ namespace Bitfinex.Client.Websocket.Client
 
         internal readonly Subject<Wallet[]> WalletsSubject = new Subject<Wallet[]>();
         internal readonly Subject<Wallet> WalletSubject = new Subject<Wallet>();
+        internal readonly Subject<PrivateTrade> PrivateTradeSubject = new Subject<PrivateTrade>();
+
         internal readonly Subject<Order[]> OrdersSubject = new Subject<Order[]>();
         internal readonly Subject<Order> OrderCreatedSubject = new Subject<Order>();
         internal readonly Subject<Order> OrderUpdatedSubject = new Subject<Order>();
         internal readonly Subject<Order> OrderCanceledSubject = new Subject<Order>();
-        internal readonly Subject<PrivateTrade> PrivateTradeSubject = new Subject<PrivateTrade>();
+
+        internal readonly Subject<Position[]> PositionsSubject = new Subject<Position[]>();
+        internal readonly Subject<Position> PositionCreatedSubject = new Subject<Position>();
+        internal readonly Subject<Position> PositionUpdatedSubject = new Subject<Position>();
+        internal readonly Subject<Position> PositionCanceledSubject = new Subject<Position>();
 
 
         /// <summary>
@@ -140,6 +147,10 @@ namespace Bitfinex.Client.Websocket.Client
         /// </summary>
         public IObservable<Wallet> WalletStream => WalletSubject.AsObservable();
 
+        /// <summary>
+        /// Private info about executed trades
+        /// </summary>
+        public IObservable<PrivateTrade> PrivateTradeStream => PrivateTradeSubject.AsObservable();
 
         /// <summary>
         /// Private initial info about all opened orders (streamed only on authentication)
@@ -162,9 +173,24 @@ namespace Bitfinex.Client.Websocket.Client
         public IObservable<Order> OrderCanceledStream => OrderCanceledSubject.AsObservable();
 
         /// <summary>
-        /// Private info about executed trades
+        /// Private initial info about all opened positions (streamed only on authentication)
         /// </summary>
-        public IObservable<PrivateTrade> PrivateTradeStream => PrivateTradeSubject.AsObservable();
+        public IObservable<Position[]> PositionsStream => PositionsSubject.AsObservable();
+
+        /// <summary>
+        /// Private info about created/opened position
+        /// </summary>
+        public IObservable<Position> PositionCreatedStream => PositionCreatedSubject.AsObservable();
+
+        /// <summary>
+        /// Private info about updated position
+        /// </summary>
+        public IObservable<Position> PositionUpdatedStream => PositionUpdatedSubject.AsObservable();
+
+        /// <summary>
+        /// Private info about canceled or closed position
+        /// </summary>
+        public IObservable<Position> PositionCanceledStream => PositionCanceledSubject.AsObservable();
 
 
         internal BitfinexClientStreams()

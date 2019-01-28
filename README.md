@@ -79,7 +79,7 @@ More usage examples:
 |------------------------|:--------------:|
 | Account info           |  ✔            |
 | Orders                 |  ✔            |
-| Positions              |                |
+| Positions              |  ✔            |
 | Trades                 |  ✔            |
 | Funding                |                |
 | Wallets                |  ✔            |
