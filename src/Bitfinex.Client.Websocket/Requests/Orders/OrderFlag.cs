@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Bitfinex.Client.Websocket.Requests
+namespace Bitfinex.Client.Websocket.Requests.Orders
 {
     /// <summary>
     /// Additional configuration for the order

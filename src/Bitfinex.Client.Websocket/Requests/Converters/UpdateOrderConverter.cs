@@ -1,42 +1,27 @@
 ﻿using System;
 using System.Globalization;
 using Bitfinex.Client.Websocket.Exceptions;
-using Bitfinex.Client.Websocket.Responses.Orders;
 using Newtonsoft.Json;
 
 namespace Bitfinex.Client.Websocket.Requests.Converters
 {
-    /*
-     [
-        0,
-        "on",
-        null,
-        {
-        "gid": 999,
-        "cid": 999,
-        "type": "EXCHANGE TRAILING STOP",
-        "symbol": "tETHUSD",
-        "amount": "0.2",
-        "price": "10"
-        }
-    ]
-     
-     */
-
-    internal class NewOrderConverter : JsonConverter
+    internal class UpdateOrderConverter : JsonConverter
     {
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            if (!(value is NewOrderRequest request))
-                throw new BitfinexBadInputException("Can't serialize new order request");
+            if (!(value is UpdateOrderRequest request))
+                throw new BitfinexBadInputException("Can't serialize update order request");
 
             
             writer.WriteStartArray();
             writer.WriteValue(0);
-            writer.WriteValue("on");
+            writer.WriteValue("ou");
             writer.WriteValue((object)null);
 
             writer.WriteStartObject();
+
+            writer.WritePropertyName("id");
+            writer.WriteValue(request.Id);
 
             if (request.Gid.HasValue)
             {
@@ -44,22 +29,22 @@ namespace Bitfinex.Client.Websocket.Requests.Converters
                 writer.WriteValue(request.Gid.Value);
             }
 
-            writer.WritePropertyName("cid");
-            writer.WriteValue(request.Cid);
-
-            writer.WritePropertyName("type");
-            writer.WriteValue(OrderConverter.SerializeType(request.Type));
-
-            writer.WritePropertyName("symbol");
-            writer.WriteValue(request.Symbol);
-
-            writer.WritePropertyName("amount");
-            writer.WriteValue(request.Amount.ToString(CultureInfo.InvariantCulture));
-
             if (request.Price.HasValue)
             {
                 writer.WritePropertyName("price");
                 writer.WriteValue(request.Price.Value.ToString(CultureInfo.InvariantCulture));
+            }
+
+            if (request.Amount.HasValue)
+            {
+                writer.WritePropertyName("amount");
+                writer.WriteValue(request.Amount.Value.ToString(CultureInfo.InvariantCulture));
+            }
+
+            if (request.Delta.HasValue)
+            {
+                writer.WritePropertyName("delta");
+                writer.WriteValue(request.Delta.Value.ToString(CultureInfo.InvariantCulture));
             }
 
             if (request.PriceTrailing.HasValue)
@@ -72,12 +57,6 @@ namespace Bitfinex.Client.Websocket.Requests.Converters
             {
                 writer.WritePropertyName("price_aux_limit");
                 writer.WriteValue(request.PriceAuxLimit.Value.ToString(CultureInfo.InvariantCulture));
-            }
-
-            if (request.PriceOcoStop.HasValue)
-            {
-                writer.WritePropertyName("price_oco_stop");
-                writer.WriteValue(request.PriceOcoStop.Value.ToString(CultureInfo.InvariantCulture));
             }
 
             if (request.Flags.HasValue)
@@ -103,7 +82,7 @@ namespace Bitfinex.Client.Websocket.Requests.Converters
 
         public override bool CanConvert(Type objectType)
         {
-            return objectType == typeof(NewOrderRequest);
+            return objectType == typeof(UpdateOrderRequest);
         }
     }
 }

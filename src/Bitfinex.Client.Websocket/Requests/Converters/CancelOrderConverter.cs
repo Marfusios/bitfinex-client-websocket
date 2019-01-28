@@ -4,13 +4,12 @@ using Newtonsoft.Json;
 
 namespace Bitfinex.Client.Websocket.Requests.Converters
 {
-    [JsonConverter(typeof(NewOrderConverter))]
-    class CancelOrderConverter : JsonConverter
+    internal class CancelOrderConverter : JsonConverter
     {
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            if (!(value is CancelOrderRequest order))
-                throw new BitfinexBadInputException("Can't serialize order");
+            if (!(value is CancelOrderRequest request))
+                throw new BitfinexBadInputException("Can't serialize cancel order request");
 
 
             writer.WriteStartArray();
@@ -20,8 +19,20 @@ namespace Bitfinex.Client.Websocket.Requests.Converters
 
             writer.WriteStartObject();
 
-            writer.WritePropertyName("id");
-            writer.WriteValue(order.Id);
+            if (request.Id.HasValue)
+            {
+                writer.WritePropertyName("id");
+                writer.WriteValue(request.Id.Value);
+            }
+
+            if (request.CidPair != null)
+            {
+                writer.WritePropertyName("cid");
+                writer.WriteValue(request.CidPair.Cid);
+
+                writer.WritePropertyName("cid_date");
+                writer.WriteValue(request.CidPair.CidDate.ToString("yyyy-MM-dd"));
+            }
 
             writer.WriteEndObject();
             writer.WriteEndArray();

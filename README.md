@@ -89,9 +89,9 @@ More usage examples:
 | AUTHENTICATED - INPUT  |    Covered     |
 |------------------------|:--------------:|
 | New order              |  ✔            |
-| Update order           |                |
+| Update order           |  ✔            |
 | Cancel order           |  ✔            |
-| Cancel order multi     |                |
+| Cancel order multi     |  ✔            |
 | Order multi-op         |                |
 | New offer              |                |
 | Cancel offer           |                |

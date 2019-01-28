@@ -28,7 +28,7 @@ namespace Bitfinex.Client.Websocket.Responses.Orders
         /// <summary>
         /// Client Order ID
         /// </summary>
-        public long Cid { get; set; }
+        public long? Cid { get; set; }
 
         /// <summary>
         /// Pair (tBTCUSD, …)

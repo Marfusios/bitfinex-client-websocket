@@ -8,8 +8,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using Bitfinex.Client.Websocket.Client;
 using Bitfinex.Client.Websocket.Requests;
+using Bitfinex.Client.Websocket.Requests.Orders;
 using Bitfinex.Client.Websocket.Responses;
 using Bitfinex.Client.Websocket.Responses.Fundings;
+using Bitfinex.Client.Websocket.Responses.Orders;
 using Bitfinex.Client.Websocket.Responses.Trades;
 using Bitfinex.Client.Websocket.Utils;
 using Bitfinex.Client.Websocket.Websockets;
@@ -96,14 +98,43 @@ namespace Bitfinex.Client.Websocket.Sample
             {
                 await client.Authenticate(API_KEY, API_SECRET);
 
-                // Place BUY order
-                // await client.Send(new NewOrderRequest(33, 1, "ETH/USD", OrderType.ExchangeLimit, 0.2, 100));
+#pragma warning disable 4014
+                Task.Run(async () =>
+#pragma warning restore 4014
+                {
+                    Task.Delay(2000).Wait();
 
-                // Place SELL order
-                // await client.Send(new NewOrderRequest(33, 2, "ETH/USD", OrderType.ExchangeLimit, -0.2, 2000));
+                    // Place BUY order
+                    //await client.Send(new NewOrderRequest(1, 100, "ETH/USD", OrderType.Limit, 0.2, 103) {Flags = OrderFlag.PostOnly});
+                    //await client.Send(new NewOrderRequest(2, 101, "ETH/USD", OrderType.Limit, 0.2, 102) {Flags = OrderFlag.PostOnly});
+                    //await client.Send(new NewOrderRequest(33, 102, "ETH/USD", OrderType.Limit, 0.2, 101) {Flags = OrderFlag.PostOnly});
 
-                // Cancel order
-                // await client.Send(new CancelOrderRequest(1));
+                    // Place SELL order
+                    //await client.Send(new NewOrderRequest(1, 200, "ETH/USD", OrderType.Limit, -0.2, 108) {Flags = OrderFlag.PostOnly});
+                    //await client.Send(new NewOrderRequest(2, 201, "ETH/USD", OrderType.Limit, -0.2, 109) {Flags = OrderFlag.PostOnly});
+                    //await client.Send(new NewOrderRequest(33, 202, "ETH/USD", OrderType.Limit, -0.2, 110) {Flags = OrderFlag.PostOnly});
+
+                    Task.Delay(7000).Wait();
+
+                    // Cancel order separately
+                    //await client.Send(new CancelOrderRequest(new CidPair(100, DateTime.UtcNow)));
+                    //await client.Send(new CancelOrderRequest(new CidPair(200, DateTime.UtcNow)));
+
+                    Task.Delay(7000).Wait();
+
+                    // Cancel order multi
+                    //await client.Send(new CancelMultiOrderRequest(new[]
+                    //{
+                    //    new CidPair(101, DateTime.UtcNow),
+                    //    new CidPair(201, DateTime.UtcNow)
+                    //}));
+
+                    Task.Delay(2000).Wait();
+
+                    //await client.Send(CancelMultiOrderRequest.CancelGroup(33));
+                    //await client.Send(CancelMultiOrderRequest.CancelEverything());
+
+                });
             }
         }
 
@@ -173,18 +204,31 @@ namespace Bitfinex.Client.Websocket.Sample
             {
                 foreach (var info in orders)
                 {
-                    Log.Information($"Order snapshot: {info.Pair} - {info.Type} - {info.Amount} @ {info.Price} | {info.OrderStatus}");
+                    Log.Information($"Order #{info.Cid} group: {info.Gid} snapshot: {info.Pair} - {info.Type} - {info.Amount} @ {info.Price} | {info.OrderStatus}");
                 }
             });
 
-            client.Streams.OrderCreatedStream.Subscribe(info =>
-                Log.Information($"Order created: {info.Pair} - {info.Type} - {info.Amount} @ {info.Price} | {info.OrderStatus}"));
+            client.Streams.OrderCreatedStream.Subscribe(async info =>
+                {
+                    Log.Information(
+                        $"Order #{info.Cid} group: {info.Gid} created: {info.Pair} - {info.Type} - {info.Amount} @ {info.Price} | {info.OrderStatus}");
+
+                    // Update order
+                    //await Task.Delay(5000);
+                    //await client.Send(new UpdateOrderRequest(info.Id)
+                    //{
+                    //    Price = info.Price - 1,
+                    //    Amount = info.Amount + 0.1 * Math.Sign(info.Amount ?? 0),
+                    //    Flags = OrderFlag.PostOnly
+                    //});
+                });
+                
 
             client.Streams.OrderUpdatedStream.Subscribe(info =>
-                Log.Information($"Order updated: {info.Pair} - {info.Type} - {info.Amount} @ {info.Price} | {info.OrderStatus}"));
+                Log.Information($"Order #{info.Cid} group: {info.Gid} updated: {info.Pair} - {info.Type} - {info.Amount} @ {info.Price} | {info.OrderStatus}"));
 
             client.Streams.OrderCanceledStream.Subscribe(info =>
-                Log.Information($"Order {info.OrderStatus}: {info.Pair} - {info.Type} - {info.Amount} @ {info.Price}"));
+                Log.Information($"Order #{info.Cid} group: {info.Gid} {info.OrderStatus}: {info.Pair} - {info.Type} - {info.Amount} @ {info.Price}"));
 
             client.Streams.PrivateTradeStream.Subscribe(trade => 
                 Log.Information($"Private trade {trade.Pair} executed. Time: {trade.MtsCreate:mm:ss.fff}, Amount: {trade.ExecAmount}, Price: {trade.ExecPrice}, " +
@@ -251,7 +295,8 @@ namespace Bitfinex.Client.Websocket.Sample
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Verbose()
                 .WriteTo.File(logPath, rollingInterval: RollingInterval.Day)
-                .WriteTo.ColoredConsole(LogEventLevel.Information)
+                .WriteTo.ColoredConsole(LogEventLevel.Information, outputTemplate: 
+                    "[{Timestamp:HH:mm:ss.fff} {Level:u3}] {Message:lj}{NewLine}{Exception}")
                 .CreateLogger();
         }
 
