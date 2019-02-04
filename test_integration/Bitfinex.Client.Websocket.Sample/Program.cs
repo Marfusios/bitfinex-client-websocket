@@ -8,10 +8,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Bitfinex.Client.Websocket.Client;
 using Bitfinex.Client.Websocket.Requests;
-using Bitfinex.Client.Websocket.Requests.Orders;
+using Bitfinex.Client.Websocket.Requests.Subscriptions;
 using Bitfinex.Client.Websocket.Responses;
 using Bitfinex.Client.Websocket.Responses.Fundings;
-using Bitfinex.Client.Websocket.Responses.Orders;
 using Bitfinex.Client.Websocket.Responses.Trades;
 using Bitfinex.Client.Websocket.Utils;
 using Bitfinex.Client.Websocket.Websockets;
@@ -48,6 +47,7 @@ namespace Bitfinex.Client.Websocket.Sample
             var url = BitfinexValues.ApiWebsocketUrl;
             using (var communicator = new BitfinexWebsocketCommunicator(url))
             {
+                communicator.Name = "Bitfinex-1";
                 communicator.ReconnectTimeoutMs = (int)TimeSpan.FromSeconds(300).TotalMilliseconds;
                 communicator.ReconnectionHappened.Subscribe(type =>
                     Log.Information($"Reconnection happened, type: {type}"));

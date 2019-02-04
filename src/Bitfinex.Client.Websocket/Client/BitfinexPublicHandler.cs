@@ -1,4 +1,5 @@
-﻿using Bitfinex.Client.Websocket.Messages;
+﻿using Bitfinex.Client.Websocket.Logging;
+using Bitfinex.Client.Websocket.Messages;
 using Bitfinex.Client.Websocket.Responses;
 using Bitfinex.Client.Websocket.Responses.Books;
 using Bitfinex.Client.Websocket.Responses.Candles;
@@ -6,12 +7,13 @@ using Bitfinex.Client.Websocket.Responses.Configurations;
 using Bitfinex.Client.Websocket.Responses.Fundings;
 using Bitfinex.Client.Websocket.Responses.Tickers;
 using Bitfinex.Client.Websocket.Responses.Trades;
-using Serilog;
 
 namespace Bitfinex.Client.Websocket.Client
 {
     internal class BitfinexPublicHandler
     {
+        private static readonly ILog Log = LogProvider.GetCurrentClassLogger(); 
+
         private readonly BitfinexClientStreams _streams;
         private readonly BitfinexChannelList _channelIdToHandler;
 

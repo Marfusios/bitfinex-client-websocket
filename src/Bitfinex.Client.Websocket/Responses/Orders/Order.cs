@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Reactive.Subjects;
+using Bitfinex.Client.Websocket.Logging;
 using Bitfinex.Client.Websocket.Utils;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Serilog;
 
 namespace Bitfinex.Client.Websocket.Responses.Orders
 {
@@ -15,6 +15,8 @@ namespace Bitfinex.Client.Websocket.Responses.Orders
     [JsonConverter(typeof(OrderConverter))]
     public class Order
     {
+        private static readonly ILog Log = LogProvider.GetCurrentClassLogger(); 
+
         /// <summary>
         /// Order ID
         /// </summary>
@@ -136,7 +138,7 @@ namespace Bitfinex.Client.Websocket.Responses.Orders
             var data = token[2];
             if (data.Type != JTokenType.Array)
             {
-                Log.Warning(L("Orders - Invalid message format, third param not array"));
+                Log.Warn(L("Orders - Invalid message format, third param not array"));
                 return;
             }
 
@@ -149,7 +151,7 @@ namespace Bitfinex.Client.Websocket.Responses.Orders
             var data = token[2];
             if (data.Type != JTokenType.Array)
             {
-                Log.Warning(L("Order info - Invalid message format, third param not array"));
+                Log.Warn(L("Order info - Invalid message format, third param not array"));
                 return;
             }
 

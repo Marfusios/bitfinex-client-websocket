@@ -3,12 +3,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using Bitfinex.Client.Websocket.Communicator;
 using Bitfinex.Client.Websocket.Json;
+using Bitfinex.Client.Websocket.Logging;
 using Bitfinex.Client.Websocket.Requests;
+using Bitfinex.Client.Websocket.Requests.Configurations;
 using Bitfinex.Client.Websocket.Responses.Configurations;
 using Bitfinex.Client.Websocket.Validations;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Serilog;
 
 using static Bitfinex.Client.Websocket.Client.BitfinexLogger;
 
@@ -20,6 +21,8 @@ namespace Bitfinex.Client.Websocket.Client
     /// </summary>
     public class BitfinexWebsocketClient : IDisposable
     {
+        private static readonly ILog Log = LogProvider.GetCurrentClassLogger(); 
+
         private readonly IBitfinexCommunicator _communicator;
         private readonly IDisposable _messageReceivedSubscription;
         private readonly IDisposable _configurationSubscription;
@@ -147,7 +150,7 @@ namespace Bitfinex.Client.Websocket.Client
             var parsed = BitfinexSerialization.Deserialize<JArray>(msg);
             if (parsed.Count() < 2)
             {
-                Log.Warning(L("Invalid message format, too low items"));
+                Log.Warn(L("Invalid message format, too low items"));
                 return;
             }
 

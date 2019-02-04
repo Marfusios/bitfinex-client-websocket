@@ -1,7 +1,7 @@
 ﻿using Bitfinex.Client.Websocket.Messages;
 using Newtonsoft.Json;
 
-namespace Bitfinex.Client.Websocket.Requests
+namespace Bitfinex.Client.Websocket.Requests.Configurations
 {
     /// <summary>
     /// Request to configure websocket connection

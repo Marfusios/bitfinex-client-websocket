@@ -8,6 +8,8 @@ https://bitfinex.readme.io/v2/docs ([Ethfinex](https://www.ethfinex.com/api_docs
 You can **do** almost **everything with** provided **websocket API**. Using REST API is unnecessary! 
 As a benefit, you will get real-time data and fast execution of your commands. 
 
+[Releases and breaking changes](https://github.com/Marfusios/bitfinex-client-websocket/releases)
+
 ### License: 
     Apache License 2.0
 
@@ -17,7 +19,7 @@ As a benefit, you will get real-time data and fast execution of your commands.
 * public and authenticated API
 * targeting .NET Standard 2.0 (.NET Core, Linux/MacOS compatible)
 * reactive extensions ([Rx.NET](https://github.com/Reactive-Extensions/Rx.NET))
-* integrated logging ([Serilog](https://serilog.net/))
+* integrated logging abstraction ([LibLog](https://github.com/damianh/LibLog))
 
 ### Usage
 

@@ -1,7 +1,7 @@
 ﻿using Bitfinex.Client.Websocket.Utils;
 using Bitfinex.Client.Websocket.Validations;
 
-namespace Bitfinex.Client.Websocket.Requests
+namespace Bitfinex.Client.Websocket.Requests.Subscriptions
 {
     public class CandlesSubscribeRequest : SubscribeRequestBase
     {

@@ -1,7 +1,7 @@
 ﻿using System.Reactive.Subjects;
 using Bitfinex.Client.Websocket.Client;
+using Bitfinex.Client.Websocket.Logging;
 using Bitfinex.Client.Websocket.Messages;
-using Serilog;
 
 using static Bitfinex.Client.Websocket.Client.BitfinexLogger;
 
@@ -9,6 +9,8 @@ namespace Bitfinex.Client.Websocket.Responses
 {
     public class ErrorResponse : MessageBase
     {
+        private static readonly ILog Log = LogProvider.GetCurrentClassLogger(); 
+
         public string Code { get; set; }
         public string Msg { get; set; }
 

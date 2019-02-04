@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using Bitfinex.Client.Websocket.Exceptions;
+using Bitfinex.Client.Websocket.Requests.Orders;
 using Bitfinex.Client.Websocket.Responses.Orders;
 using Newtonsoft.Json;
 

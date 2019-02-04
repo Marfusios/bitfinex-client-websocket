@@ -7,6 +7,7 @@ using Bitfinex.Client.Websocket;
 using Bitfinex.Client.Websocket.Client;
 using Bitfinex.Client.Websocket.Communicator;
 using Bitfinex.Client.Websocket.Requests;
+using Bitfinex.Client.Websocket.Requests.Subscriptions;
 using Bitfinex.Client.Websocket.Responses;
 using Bitfinex.Client.Websocket.Responses.Books;
 using Bitfinex.Client.Websocket.Responses.Trades;

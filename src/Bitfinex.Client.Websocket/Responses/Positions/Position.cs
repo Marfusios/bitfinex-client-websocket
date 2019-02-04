@@ -1,10 +1,10 @@
 ﻿using System.Diagnostics;
 using System.Reactive.Subjects;
+using Bitfinex.Client.Websocket.Logging;
 using Bitfinex.Client.Websocket.Responses.Configurations;
 using Bitfinex.Client.Websocket.Utils;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Serilog;
 
 namespace Bitfinex.Client.Websocket.Responses.Positions
 {
@@ -15,6 +15,8 @@ namespace Bitfinex.Client.Websocket.Responses.Positions
     [JsonConverter(typeof(PositionConverter))]
     public class Position : ResponseBase
     {
+        private static readonly ILog Log = LogProvider.GetCurrentClassLogger(); 
+
         /// <summary>
         /// Pair (tBTCUSD, etc). 
         /// </summary>
@@ -85,7 +87,7 @@ namespace Bitfinex.Client.Websocket.Responses.Positions
             var data = token[2];
             if (data.Type != JTokenType.Array)
             {
-                Log.Warning(L("Positions - Invalid message format, third param not array"));
+                Log.Warn(L("Positions - Invalid message format, third param not array"));
                 return;
             }
 
@@ -102,7 +104,7 @@ namespace Bitfinex.Client.Websocket.Responses.Positions
             var data = token[2];
             if (data.Type != JTokenType.Array)
             {
-                Log.Warning(L("Position - Invalid message format, third param not array"));
+                Log.Warn(L("Position - Invalid message format, third param not array"));
                 return;
             }
 

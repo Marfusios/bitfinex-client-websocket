@@ -1,11 +1,10 @@
 ﻿using System;
 using Bitfinex.Client.Websocket.Requests.Converters;
-using Bitfinex.Client.Websocket.Requests.Orders;
 using Bitfinex.Client.Websocket.Responses.Orders;
 using Bitfinex.Client.Websocket.Validations;
 using Newtonsoft.Json;
 
-namespace Bitfinex.Client.Websocket.Requests
+namespace Bitfinex.Client.Websocket.Requests.Orders
 {
     /// <summary>
     /// Request to create a new order.

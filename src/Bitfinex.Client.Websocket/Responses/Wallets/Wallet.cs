@@ -1,9 +1,9 @@
 ﻿using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Subjects;
+using Bitfinex.Client.Websocket.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Serilog;
 
 namespace Bitfinex.Client.Websocket.Responses.Wallets
 {
@@ -14,6 +14,8 @@ namespace Bitfinex.Client.Websocket.Responses.Wallets
     [JsonConverter(typeof(WalletConverter))]
     public class Wallet
     {
+        private static readonly ILog Log = LogProvider.GetCurrentClassLogger(); 
+
         /// <summary>
         /// Wallet name (exchange, margin, funding)
         /// </summary>
@@ -46,7 +48,7 @@ namespace Bitfinex.Client.Websocket.Responses.Wallets
             var data = token[2];
             if (data.Type != JTokenType.Array)
             {
-                Log.Warning(L("Wallets - Invalid message format, third param not array"));
+                Log.Warn(L("Wallets - Invalid message format, third param not array"));
                 return;
             }
 
@@ -60,7 +62,7 @@ namespace Bitfinex.Client.Websocket.Responses.Wallets
             var data = token[2];
             if (data.Type != JTokenType.Array)
             {
-                Log.Warning(L("Wallet update - Invalid message format, third param not array"));
+                Log.Warn(L("Wallet update - Invalid message format, third param not array"));
                 return;
             }
 

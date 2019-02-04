@@ -1,6 +1,6 @@
 ﻿using Bitfinex.Client.Websocket.Messages;
 
-namespace Bitfinex.Client.Websocket.Requests
+namespace Bitfinex.Client.Websocket.Requests.Subscriptions
 {
     /// <summary>
     /// Unsubscribe from the channel.
