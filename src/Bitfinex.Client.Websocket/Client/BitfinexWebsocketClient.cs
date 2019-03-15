@@ -10,7 +10,7 @@ using Bitfinex.Client.Websocket.Responses.Configurations;
 using Bitfinex.Client.Websocket.Validations;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-
+using Websocket.Client;
 using static Bitfinex.Client.Websocket.Client.BitfinexLogger;
 
 namespace Bitfinex.Client.Websocket.Client
@@ -121,11 +121,11 @@ namespace Bitfinex.Client.Websocket.Client
             }
         }
 
-        private void HandleMessage(string message)
+        private void HandleMessage(ResponseMessage message)
         {
             try
             {
-                var formatted = (message ?? string.Empty).Trim();
+                var formatted = (message.Text ?? string.Empty).Trim();
 
                 if (formatted.StartsWith("{"))
                 {

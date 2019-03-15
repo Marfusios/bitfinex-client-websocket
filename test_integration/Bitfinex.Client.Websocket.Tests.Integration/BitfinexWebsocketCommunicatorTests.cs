@@ -19,7 +19,7 @@ namespace Bitfinex.Client.Websocket.Tests.Integration
 
                 communicator.MessageReceived.Subscribe(msg =>
                 {
-                    received = msg;
+                    received = msg.Text;
                     receivedEvent.Set();
                 });
 
