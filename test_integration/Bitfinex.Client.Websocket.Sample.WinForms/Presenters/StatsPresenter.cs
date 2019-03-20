@@ -33,8 +33,8 @@ namespace Bitmex.Client.Websocket.Sample.WinForms.Presenters
         private IDisposable _pingSubscription;
         private Stopwatch _pingRequest = Stopwatch.StartNew();
 
-        private string _defaultPair = "BTCUSD";
-        private string _currency = "$";
+        private readonly string _defaultPair = "BTCUSD";
+        private readonly string _currency = "$";
 
         public StatsPresenter(IStatsView view)
         {
