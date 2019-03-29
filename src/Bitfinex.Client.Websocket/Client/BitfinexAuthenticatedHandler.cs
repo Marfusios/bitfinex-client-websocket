@@ -1,7 +1,9 @@
 ﻿using System.Linq;
 using Bitfinex.Client.Websocket.Logging;
+using Bitfinex.Client.Websocket.Responses.Balance;
 using Bitfinex.Client.Websocket.Responses.Configurations;
 using Bitfinex.Client.Websocket.Responses.Notifications;
+using Bitfinex.Client.Websocket.Responses.Margin;
 using Bitfinex.Client.Websocket.Responses.Orders;
 using Bitfinex.Client.Websocket.Responses.Positions;
 using Bitfinex.Client.Websocket.Responses.Trades;
@@ -100,6 +102,12 @@ namespace Bitfinex.Client.Websocket.Client
                     break;
                 case "n":
                     Notification.Handle(token, _streams.NotificationSubject);
+                    break;
+                case "bu":
+                    BalanceInfo.Handle(token, _streams.BalanceInfoSubject);
+                    break;
+                case "miu":
+                    MarginInfo.Handle(token, _streams.MarginInfoSubject);
                     break;
                 //default:
                 //    Log.Warning($"Missing private handler for '{msgType}'. Data: {token}");

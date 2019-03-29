@@ -2,11 +2,13 @@
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Bitfinex.Client.Websocket.Responses;
+using Bitfinex.Client.Websocket.Responses.Balance;
 using Bitfinex.Client.Websocket.Responses.Books;
 using Bitfinex.Client.Websocket.Responses.Candles;
 using Bitfinex.Client.Websocket.Responses.Configurations;
 using Bitfinex.Client.Websocket.Responses.Fundings;
 using Bitfinex.Client.Websocket.Responses.Notifications;
+using Bitfinex.Client.Websocket.Responses.Margin;
 using Bitfinex.Client.Websocket.Responses.Orders;
 using Bitfinex.Client.Websocket.Responses.Positions;
 using Bitfinex.Client.Websocket.Responses.Tickers;
@@ -53,6 +55,9 @@ namespace Bitfinex.Client.Websocket.Client
         internal readonly Subject<Position> PositionCreatedSubject = new Subject<Position>();
         internal readonly Subject<Position> PositionUpdatedSubject = new Subject<Position>();
         internal readonly Subject<Position> PositionCanceledSubject = new Subject<Position>();
+
+        internal readonly Subject<BalanceInfo> BalanceInfoSubject = new Subject<BalanceInfo>();
+        internal readonly Subject<MarginInfo> MarginInfoSubject = new Subject<MarginInfo>();
 
 
         /// <summary>
@@ -199,6 +204,15 @@ namespace Bitfinex.Client.Websocket.Client
         /// </summary>
         public IObservable<Position> PositionCanceledStream => PositionCanceledSubject.AsObservable();
 
+        /// <summary>
+        /// Private info about total balances
+        /// </summary>
+        public IObservable<BalanceInfo> BalanceInfoStream => BalanceInfoSubject.AsObservable();
+
+        /// <summary>
+        /// Private info about margin data
+        /// </summary>
+        public IObservable<MarginInfo> MarginInfoStream => MarginInfoSubject.AsObservable();
 
         internal BitfinexClientStreams()
         {

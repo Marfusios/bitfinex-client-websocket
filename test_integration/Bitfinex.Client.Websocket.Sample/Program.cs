@@ -134,6 +134,12 @@ namespace Bitfinex.Client.Websocket.Sample
                     //await client.Send(CancelMultiOrderRequest.CancelGroup(33));
                     //await client.Send(CancelMultiOrderRequest.CancelEverything());
 
+                    // request calculations
+                    // await client.Send(new CalcRequest(new[]
+                    // {
+                    //     "margin_base",
+                    //     "balance",
+                    // }));
                 });
             }
         }
@@ -264,6 +270,13 @@ namespace Bitfinex.Client.Websocket.Sample
             client.Streams.NotificationStream.Subscribe(notification =>
                 Log.Information(
                     $"Notification: {notification.Text} code: {notification.Code}, status: {notification.Status}, type : {notification.Type}"));
+            
+            client.Streams.BalanceInfoStream.Subscribe(info =>
+                Log.Information($"Balance, total: {info.TotalAum}, net: {info.NetAum}"));
+
+            client.Streams.MarginInfoStream.Subscribe(info =>
+                Log.Information(
+                    $"Margin, balance: {info.MarginBalance}, required: {info.MarginRequired}, net: {info.MarginNet}, p/l: {info.UserPl}, swaps: {info.UserSwaps}"));
 
 
             // Unsubscription example: 
