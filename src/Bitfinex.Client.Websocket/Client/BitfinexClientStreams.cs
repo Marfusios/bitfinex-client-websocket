@@ -6,6 +6,7 @@ using Bitfinex.Client.Websocket.Responses.Books;
 using Bitfinex.Client.Websocket.Responses.Candles;
 using Bitfinex.Client.Websocket.Responses.Configurations;
 using Bitfinex.Client.Websocket.Responses.Fundings;
+using Bitfinex.Client.Websocket.Responses.Notifications;
 using Bitfinex.Client.Websocket.Responses.Orders;
 using Bitfinex.Client.Websocket.Responses.Positions;
 using Bitfinex.Client.Websocket.Responses.Tickers;
@@ -28,6 +29,7 @@ namespace Bitfinex.Client.Websocket.Client
         internal readonly Subject<ConfigurationResponse> ConfigurationSubject = new Subject<ConfigurationResponse>();
         internal readonly Subject<SubscribedResponse> SubscriptionSubject = new Subject<SubscribedResponse>();
         internal readonly Subject<UnsubscribedResponse> UnsubscriptionSubject = new Subject<UnsubscribedResponse>();
+        internal readonly Subject<Notification> NotificationSubject = new Subject<Notification>();
 
         internal readonly Subject<Ticker> TickerSubject = new Subject<Ticker>();
         internal readonly Subject<Trade> TradesSubject = new Subject<Trade>();
@@ -87,6 +89,11 @@ namespace Bitfinex.Client.Websocket.Client
         /// Info about unsubscription
         /// </summary>
         public IObservable<UnsubscribedResponse> UnsubscriptionStream => UnsubscriptionSubject.AsObservable();
+
+        /// <summary>
+        /// Notifications
+        /// </summary>
+        public IObservable<Notification> NotificationStream => NotificationSubject.AsObservable();
 
         /// <summary>
         /// Public ticker stream for subscribed pair.
