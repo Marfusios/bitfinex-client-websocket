@@ -86,7 +86,7 @@ More usage examples:
 | Funding                |                |
 | Wallets                |  ✔            |
 | Balance                |                |
-| Notifications          |                |
+| Notifications          |  ✔            |
 
 | AUTHENTICATED - INPUT  |    Covered     |
 |------------------------|:--------------:|
