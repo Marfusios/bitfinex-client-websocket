@@ -261,6 +261,10 @@ namespace Bitfinex.Client.Websocket.Sample
                                 $"| PL: {info.ProfitLoss} {info.ProfitLossPercentage}% " +
                                 $"{ShowServerTimestamp(client, info)}"));
 
+            client.Streams.NotificationStream.Subscribe(notification =>
+                Log.Information(
+                    $"Notification: {notification.Text} code: {notification.Code}, status: {notification.Status}, type : {notification.Type}"));
+
 
             // Unsubscription example: 
 

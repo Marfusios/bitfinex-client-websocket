@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using Bitfinex.Client.Websocket.Logging;
 using Bitfinex.Client.Websocket.Responses.Configurations;
+using Bitfinex.Client.Websocket.Responses.Notifications;
 using Bitfinex.Client.Websocket.Responses.Orders;
 using Bitfinex.Client.Websocket.Responses.Positions;
 using Bitfinex.Client.Websocket.Responses.Trades;
@@ -96,6 +97,9 @@ namespace Bitfinex.Client.Websocket.Client
                     break;
                 case "pc":
                     Position.Handle(token, config, _streams.PositionCanceledSubject);
+                    break;
+                case "n":
+                    Notification.Handle(token, _streams.NotificationSubject);
                     break;
                 //default:
                 //    Log.Warning($"Missing private handler for '{msgType}'. Data: {token}");
