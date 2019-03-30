@@ -79,6 +79,15 @@ namespace Bitfinex.Client.Websocket.Responses.Orders
                 case "partially filled":
                 case var s when s.Contains("partially filled"):
                     return OrderStatus.PartiallyFilled;
+                case "postonly canceled":
+                case var s when s.Contains("postonly canceled"):
+                    return OrderStatus.PostOnlyCanceled;
+                case "rsn_pos_reduce_flip":
+                case var s when s.Contains("rsn_pos_reduce_flip"):
+                    return OrderStatus.RsnPosReduceFlip;
+                case "rsn_pos_reduce_incr":
+                case var s when s.Contains("rsn_pos_reduce_incr"):
+                    return OrderStatus.RsnPosReduceIncr;
                 case "canceled":
                 case var s when s.Contains("canceled"):
                 case var b when b.Contains("insufficient balance"):
