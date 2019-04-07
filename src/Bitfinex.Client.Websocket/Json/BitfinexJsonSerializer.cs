@@ -5,9 +5,15 @@ using Newtonsoft.Json.Serialization;
 
 namespace Bitfinex.Client.Websocket.Json
 {
+    /// <summary>
+    /// Helper class for JSON serialization
+    /// </summary>
     public static class BitfinexJsonSerializer
     {
-        public static JsonSerializerSettings Settings => new JsonSerializerSettings
+        /// <summary>
+        /// Unified JSON settings
+        /// </summary>
+        public static readonly JsonSerializerSettings Settings = new JsonSerializerSettings
         {
             ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
             Formatting = Formatting.None,
@@ -15,6 +21,9 @@ namespace Bitfinex.Client.Websocket.Json
             ContractResolver = new CamelCasePropertyNamesContractResolver()
         };
 
-        public static JsonSerializer Serializer => JsonSerializer.Create(Settings);
+        /// <summary>
+        /// Custom preconfigured serializer
+        /// </summary>
+        public static readonly JsonSerializer Serializer = JsonSerializer.Create(Settings);
     }
 }
