@@ -9,6 +9,7 @@
         Canceled,
         PostOnlyCanceled,
         RsnPosReduceFlip,
-        RsnPosReduceIncr
+        RsnPosReduceIncr,
+        InsufficientBalance
     }
 }
