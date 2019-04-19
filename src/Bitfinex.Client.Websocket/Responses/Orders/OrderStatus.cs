@@ -6,6 +6,10 @@
         Active,
         Executed,
         PartiallyFilled,
-        Canceled
+        Canceled,
+        PostOnlyCanceled,
+        RsnPosReduceFlip,
+        RsnPosReduceIncr,
+        InsufficientBalance
     }
 }

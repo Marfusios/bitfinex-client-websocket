@@ -83,6 +83,11 @@ namespace Bitfinex.Client.Websocket.Responses.Orders
         public OrderStatus OrderStatus { get; set; }
 
         /// <summary>
+        /// Raw order status value
+        /// </summary>
+        public string OrderStatusText { get; set; }
+
+        /// <summary>
         /// Target price
         /// </summary>
         public double? Price { get; set; }
@@ -132,6 +137,14 @@ namespace Bitfinex.Client.Websocket.Responses.Orders
         /// </summary>
         public string QuoteSymbol => BitfinexSymbolUtils.ExtractQuoteSymbol(Pair);
 
+        /// <summary>
+        /// Returns true if the <see cref="OrderStatus"/> represents a terminated order
+        /// </summary>
+        public bool IsCanceled => OrderStatus == OrderStatus.Canceled ||
+                                  OrderStatus == OrderStatus.InsufficientBalance ||
+                                  OrderStatus == OrderStatus.PostOnlyCanceled ||
+                                  OrderStatus == OrderStatus.RsnPosReduceFlip ||
+                                  OrderStatus == OrderStatus.RsnPosReduceIncr;
 
         internal static void Handle(JToken token, Subject<Order[]> subject)
         {

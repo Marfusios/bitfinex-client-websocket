@@ -48,6 +48,7 @@ namespace Bitfinex.Client.Websocket.Responses.Orders
                 // 11
                 Flags = (int?)array[12],
                 OrderStatus = ParseStatus((string)array[13]),
+                OrderStatusText = (string)array[13],
                 // 14
                 // 15
                 Price = (double?)array[16],
@@ -76,13 +77,25 @@ namespace Bitfinex.Client.Websocket.Responses.Orders
                 case "executed":
                 case var s when s.StartsWith("executed"):
                     return OrderStatus.Executed;
+                case "postonly canceled":
+                case var s when s.Contains("postonly canceled"):
+                    return OrderStatus.PostOnlyCanceled;
+                case "rsn_pos_reduce_flip":
+                case var s when s.Contains("rsn_pos_reduce_flip"):
+                    return OrderStatus.RsnPosReduceFlip;
+                case "rsn_pos_reduce_incr":
+                case var s when s.Contains("rsn_pos_reduce_incr"):
+                    return OrderStatus.RsnPosReduceIncr;
+                case "insufficient balance":
+                case var s when s.Contains("insufficient balance"):
+                    return OrderStatus.InsufficientBalance;
+                case "canceled":
+                case var s when s.Contains("canceled"):
+                    return OrderStatus.Canceled;
                 case "partially filled":
                 case var s when s.Contains("partially filled"):
                     return OrderStatus.PartiallyFilled;
-                case "canceled":
-                case var s when s.Contains("canceled"):
-                case var b when b.Contains("insufficient balance"):
-                    return OrderStatus.Canceled;
+
             }
             Log.Warn("Can't parse OrderStatus, input: " + safe);
             return OrderStatus.Undefined;
