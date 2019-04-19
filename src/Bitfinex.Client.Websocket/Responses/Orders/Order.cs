@@ -123,7 +123,7 @@ namespace Bitfinex.Client.Websocket.Responses.Orders
         /// <summary>
         /// If another order caused this order to be placed (OCO) this will be that other order's ID
         /// </summary>
-        public int? PlacedId { get; set; }
+        public long? PlacedId { get; set; }
 
         /// <summary>
         /// Removes trailing 'f' or 't' and returns raw pair
