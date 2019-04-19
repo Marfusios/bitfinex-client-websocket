@@ -89,9 +89,15 @@ namespace Bitfinex.Client.Websocket.Responses.Orders
                 case "insufficient balance":
                 case var s when s.Contains("insufficient balance"):
                     return OrderStatus.InsufficientBalance;
+                case "insufficient margin":
+                case var s when s.Contains("insufficient margin"):
+                    return OrderStatus.InsufficientMargin;
                 case "canceled":
                 case var s when s.Contains("canceled"):
                     return OrderStatus.Canceled;
+
+                // must be last, because of statuses like: 'CANCELED was: PARTIALLY FILLED @ PRICE(AMOUNT)',
+                // or 'INSUFFICIENT MARGIN was: PARTIALLY FILLED @ PRICE(AMOUNT)'
                 case "partially filled":
                 case var s when s.Contains("partially filled"):
                     return OrderStatus.PartiallyFilled;

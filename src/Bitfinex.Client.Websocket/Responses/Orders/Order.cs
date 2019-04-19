@@ -83,7 +83,10 @@ namespace Bitfinex.Client.Websocket.Responses.Orders
         public OrderStatus OrderStatus { get; set; }
 
         /// <summary>
-        /// Raw order status value
+        /// Raw order status value. Could contain values like:
+        /// ACTIVE, EXECUTED @ PRICE(AMOUNT) e.g. "EXECUTED @ 107.6(-0.2)",
+        /// PARTIALLY FILLED @ PRICE(AMOUNT), INSUFFICIENT MARGIN was: PARTIALLY FILLED @ PRICE(AMOUNT),
+        /// CANCELED, CANCELED was: PARTIALLY FILLED @ PRICE(AMOUNT)
         /// </summary>
         public string OrderStatusText { get; set; }
 
@@ -138,13 +141,26 @@ namespace Bitfinex.Client.Websocket.Responses.Orders
         public string QuoteSymbol => BitfinexSymbolUtils.ExtractQuoteSymbol(Pair);
 
         /// <summary>
+        /// Returns true if the <see cref="OrderStatus"/> represents an active order (placed in the order book)
+        /// </summary>
+        public bool IsActive => OrderStatus == OrderStatus.Active ||
+                                OrderStatus == OrderStatus.PartiallyFilled;
+
+        /// <summary>
+        /// Returns true if the <see cref="OrderStatus"/> represents an inactive order (canceled or executed)
+        /// </summary>
+        public bool IsInactive => !IsActive;
+
+        /// <summary>
         /// Returns true if the <see cref="OrderStatus"/> represents a terminated order
         /// </summary>
         public bool IsCanceled => OrderStatus == OrderStatus.Canceled ||
                                   OrderStatus == OrderStatus.InsufficientBalance ||
+                                  OrderStatus == OrderStatus.InsufficientMargin ||
                                   OrderStatus == OrderStatus.PostOnlyCanceled ||
                                   OrderStatus == OrderStatus.RsnPosReduceFlip ||
-                                  OrderStatus == OrderStatus.RsnPosReduceIncr;
+                                  OrderStatus == OrderStatus.RsnPosReduceIncr ||
+                                  OrderStatus == OrderStatus.Undefined;
 
         internal static void Handle(JToken token, Subject<Order[]> subject)
         {
