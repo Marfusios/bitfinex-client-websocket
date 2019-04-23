@@ -296,7 +296,7 @@ Don't worry about websocket connection, those sequential execution via `.Concat(
 It won't affect receiving thread, only buffers messages inside `TradesStream`. 
 
 But beware of [producer-consumer problem](https://en.wikipedia.org/wiki/Producer%E2%80%93consumer_problem) when the consumer will be too slow. Here is a [StackOverflow issue](https://stackoverflow.com/questions/11010602/with-rx-how-do-i-ignore-all-except-the-latest-value-when-my-subscribe-method-is/15876519#15876519) 
-with an example how to ignore/discard buffered messages and process always only last one. 
+with an example how to ignore/discard buffered messages and always process only the last one. 
 
 
 ### Desktop application (WinForms or WPF)
