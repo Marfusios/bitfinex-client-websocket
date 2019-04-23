@@ -6,6 +6,9 @@ using Newtonsoft.Json.Linq;
 
 namespace Bitfinex.Client.Websocket.Responses.Margin
 {
+    /// <summary>
+    /// Margin response
+    /// </summary>
     [DebuggerDisplay("MarginInfo: {UserPl} - {MarginBalance} - {MarginNet}")]
     [JsonConverter(typeof(MarginInfoConverter))]
     public class MarginInfo
@@ -13,7 +16,7 @@ namespace Bitfinex.Client.Websocket.Responses.Margin
         private static readonly ILog Log = LogProvider.GetCurrentClassLogger();
 
         /// <summary>
-        /// User Profit and Loss
+        /// User Profit and Loss (P/L)
         /// </summary>
         public double UserPl { get; set; }
 

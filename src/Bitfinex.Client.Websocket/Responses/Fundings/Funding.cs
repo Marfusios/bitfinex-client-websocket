@@ -14,6 +14,9 @@ namespace Bitfinex.Client.Websocket.Responses.Fundings
     [JsonConverter(typeof(FundingConverter))]
     public class Funding : ResponseBase
     {
+        /// <summary>
+        /// Offer ID
+        /// </summary>
         public long Id { get; set; }
 
         /// <summary>

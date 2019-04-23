@@ -1,12 +1,14 @@
 using System.Diagnostics;
 using System.Reactive.Subjects;
 using Bitfinex.Client.Websocket.Logging;
-using Bitfinex.Client.Websocket.Responses.Margin;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace Bitfinex.Client.Websocket.Responses.Balance
 {
+    /// <summary>
+    /// Balance response
+    /// </summary>
     [DebuggerDisplay("BalanceInfo {TotalAum} {NetAum}")]
     [JsonConverter(typeof(BalanceInfoConverter))]
     public class BalanceInfo

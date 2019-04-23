@@ -68,7 +68,9 @@ More usage examples:
 | Channel subscribing    |  ✔            |
 | Channel unsubscribing  |  ✔            |
 | Ticker                 |  ✔            |
+| Ticker - funding       |                |
 | Trades                 |  ✔            |
+| Trades - funding       |  ✔            |
 | Books                  |  ✔            |
 | Raw books              |                |
 | Candles                |  ✔            |
@@ -85,7 +87,7 @@ More usage examples:
 | Trades                 |  ✔            |
 | Funding                |                |
 | Wallets                |  ✔            |
-| Balance                |                |
+| Balance                |  ✔            |
 | Notifications          |  ✔            |
 
 | AUTHENTICATED - INPUT  |    Covered     |
@@ -97,7 +99,7 @@ More usage examples:
 | Order multi-op         |                |
 | New offer              |                |
 | Cancel offer           |                |
-| Calc                   |                |
+| Calc                   |  ✔            |
 
 **Pull Requests are welcome!**
 
