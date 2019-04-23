@@ -60,7 +60,7 @@ namespace Bitfinex.Client.Websocket.Responses.Orders
                 // 22
                 Notify = (int?)array[23],
                 Hidden = (int?)array[24],
-                PlacedId = (int?)array[25],
+                PlacedId = (long?)array[25],
             };
         }
 
