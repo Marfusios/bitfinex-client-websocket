@@ -43,6 +43,21 @@ namespace Bitfinex.Client.Websocket.Responses.Notifications
         /// <summary>
         /// On wallet transfer (between exchange --> margin --> funding)
         /// </summary>
-        WalletTransfer
+        WalletTransfer,
+
+        /// <summary>
+        /// On closing a position
+        /// </summary>
+        PosClose,
+
+        /// <summary>
+        /// When a new deposit is detected
+        /// </summary>
+        DepositNew,
+
+        /// <summary>
+        /// When a deposit has been credited
+        /// </summary>
+        DepositComplete
     }
 }
