@@ -64,6 +64,12 @@ namespace Bitfinex.Client.Websocket.Responses.Notifications
                     return NotificationType.OuReq;
                 case "wallet_transfer":
                     return NotificationType.WalletTransfer;
+                case "pos_close":
+                    return NotificationType.PosClose;
+                case "deposit_new":
+                    return NotificationType.DepositNew;
+                case "deposit_complete":
+                    return NotificationType.DepositComplete;
             }
 
             Log.Warn("Can't parse NotificationType, input: " + safe);
