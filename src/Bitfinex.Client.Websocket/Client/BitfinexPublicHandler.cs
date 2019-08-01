@@ -5,6 +5,7 @@ using Bitfinex.Client.Websocket.Responses.Books;
 using Bitfinex.Client.Websocket.Responses.Candles;
 using Bitfinex.Client.Websocket.Responses.Configurations;
 using Bitfinex.Client.Websocket.Responses.Fundings;
+using Bitfinex.Client.Websocket.Responses.Status;
 using Bitfinex.Client.Websocket.Responses.Tickers;
 using Bitfinex.Client.Websocket.Responses.Trades;
 
@@ -92,6 +93,20 @@ namespace Bitfinex.Client.Websocket.Client
                 case "book":
                     _channelIdToHandler[channelId] = (data, config) => 
                         Book.Handle(data, response, config, _streams.BookSubject, _streams.BookSnapshotSubject, _streams.BookChecksumSubject);
+                    break;
+                case "status":
+                    if (response.Key.StartsWith("deriv"))
+                    {
+                        _channelIdToHandler[channelId] = (data, config) =>
+                            DerivativePairStatus.Handle(data, response, _streams.DerivativePairSubject);
+                    }
+
+                    if (response.Key.StartsWith("liq"))
+                    {
+                        _channelIdToHandler[channelId] = (data, config) =>
+                            LiquidationFeedStatus.Handle(data, response, _streams.LiquidationFeedSubject);
+                    }
+
                     break;
                 //default:
                 //    Log.Warning($"Missing subscription handler '{response.Channel}'");

@@ -94,6 +94,9 @@ namespace Bitfinex.Client.Websocket.Sample
             //await client.Send(new BookSubscribeRequest("BTC/USD", BitfinexPrecision.P3, BitfinexFrequency.Realtime));
             //await client.Send(new BookSubscribeRequest("ETH/USD", BitfinexPrecision.P0, BitfinexFrequency.Realtime));
 
+            //await client.Send(new StatusSubscribeRequest("liq:global"));
+            //await client.Send(new StatusSubscribeRequest("deriv:tBTCF0:USTF0"));
+
             if (!string.IsNullOrWhiteSpace(API_SECRET))
             {
                 await client.Authenticate(API_KEY, API_SECRET);
@@ -279,6 +282,17 @@ namespace Bitfinex.Client.Websocket.Sample
                     $"Margin, balance: {info.MarginBalance}, required: {info.MarginRequired}, net: {info.MarginNet}, p/l: {info.UserPl}, swaps: {info.UserSwaps}"));
 
 
+            client.Streams.DerivativePairStream.Subscribe(info =>
+            {
+                Log.Information(
+                    $"Derivative status, symbol: {info.Symbol}, derivPrice: {info.DerivPrice}, spot price: {info.SpotPrice}, insurance fund balance: {info.InsuranceFundBalance}, funding: {info.FundingAccrued}, funding step: {info.FundingStep}");
+            });
+
+            client.Streams.LiquidationFeedStream.Subscribe(info =>
+            {
+                Log.Information(
+                    $"Liquidation, symbol: {info.Symbol}, position id: {info.PosId}, amount: {info.Amount}, base price: {info.BasePrice}, is match: {info.IsMatch}, market sold: {info.IsMarketSold}");
+            });
             // Unsubscription example: 
 
             //client.Streams.SubscriptionStream.ObserveOn(TaskPoolScheduler.Default).Subscribe(info =>
