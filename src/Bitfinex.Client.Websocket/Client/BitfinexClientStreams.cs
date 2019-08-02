@@ -11,6 +11,7 @@ using Bitfinex.Client.Websocket.Responses.Notifications;
 using Bitfinex.Client.Websocket.Responses.Margin;
 using Bitfinex.Client.Websocket.Responses.Orders;
 using Bitfinex.Client.Websocket.Responses.Positions;
+using Bitfinex.Client.Websocket.Responses.Status;
 using Bitfinex.Client.Websocket.Responses.Tickers;
 using Bitfinex.Client.Websocket.Responses.Trades;
 using Bitfinex.Client.Websocket.Responses.TradesPrivate;
@@ -41,6 +42,8 @@ namespace Bitfinex.Client.Websocket.Client
         internal readonly Subject<Book> BookSubject = new Subject<Book>();
         internal readonly Subject<Book[]> BookSnapshotSubject = new Subject<Book[]>();
         internal readonly Subject<ChecksumResponse> BookChecksumSubject = new Subject<ChecksumResponse>();
+        internal readonly Subject<DerivativePairStatus> DerivativePairSubject = new Subject<DerivativePairStatus>();
+        internal readonly Subject<LiquidationFeedStatus> LiquidationFeedSubject = new Subject<LiquidationFeedStatus>();
 
         internal readonly Subject<Wallet[]> WalletsSubject = new Subject<Wallet[]>();
         internal readonly Subject<Wallet> WalletSubject = new Subject<Wallet>();
@@ -148,6 +151,16 @@ namespace Bitfinex.Client.Websocket.Client
         /// Must be enabled by configuration (see `ConfigurationRequest`)
         /// </summary>
         public IObservable<ChecksumResponse> BookChecksumStream => BookChecksumSubject.AsObservable();
+
+        /// <summary>
+        /// Public info about a derivative symbol
+        /// </summary>
+        public IObservable<DerivativePairStatus> DerivativePairStream => DerivativePairSubject.AsObservable();
+
+        /// <summary>
+        /// Public liquidation feed
+        /// </summary>
+        public IObservable<LiquidationFeedStatus> LiquidationFeedStream => LiquidationFeedSubject.AsObservable();
 
         /// <summary>
         /// Private initial info about all wallets/balances (streamed only on authentication)
