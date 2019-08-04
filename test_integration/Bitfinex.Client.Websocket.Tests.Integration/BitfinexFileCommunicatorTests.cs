@@ -42,7 +42,7 @@ namespace Bitfinex.Client.Websocket.Tests.Integration
 
             await communicator.Start();
 
-            Assert.Equal(8998, trades.Count);
+            Assert.Equal(8938, trades.Count);
         }
     }
 }
