@@ -39,7 +39,7 @@ namespace Bitfinex.Client.Websocket.Responses.Notifications
                 NotifyInfo = array[4].ToString(),
                 Code = (long?) array[5],
                 Status = (string) array[6],
-                Text = (string) array[7],
+                Text = array[7].ToString(),
             };
         }
 
