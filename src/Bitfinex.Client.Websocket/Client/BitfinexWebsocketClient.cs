@@ -69,14 +69,14 @@ namespace Bitfinex.Client.Websocket.Client
         /// It logs and re-throws every exception. 
         /// </summary>
         /// <param name="request">Request/message to be sent</param>
-        public async Task Send<T>(T request)
+        public void Send<T>(T request)
         {
             try
             {
                 BfxValidations.ValidateInput(request, nameof(request));
 
                 var serialized = JsonConvert.SerializeObject(request, BitfinexJsonSerializer.Settings);
-                await _communicator.Send(serialized).ConfigureAwait(false);
+                _communicator.Send(serialized);
             }
             catch (Exception e)
             {
@@ -91,9 +91,9 @@ namespace Bitfinex.Client.Websocket.Client
         /// <param name="apiKey">Your API key</param>
         /// <param name="apiSecret">Your API secret</param>
         /// <param name="deadManSwitchEnabled">Dead-Man-Switch flag (optional), when socket is closed, cancel all account orders</param>
-        public Task Authenticate(string apiKey, string apiSecret, bool deadManSwitchEnabled = false)
+        public void Authenticate(string apiKey, string apiSecret, bool deadManSwitchEnabled = false)
         {
-            return Send(new AuthenticationRequest(apiKey, apiSecret, deadManSwitchEnabled));
+            Send(new AuthenticationRequest(apiKey, apiSecret, deadManSwitchEnabled));
         }
 
         private void HandleConfiguration(ConfigurationResponse response)

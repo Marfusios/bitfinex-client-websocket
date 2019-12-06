@@ -34,7 +34,7 @@ namespace Bitfinex.Client.Websocket.Tests.Integration
 
                     await communicator.Start();
 
-                    await client.Send(new PingRequest() {Cid = 123456});
+                    client.Send(new PingRequest() {Cid = 123456});
 
                     receivedEvent.WaitOne(TimeSpan.FromSeconds(30));
 
@@ -67,7 +67,7 @@ namespace Bitfinex.Client.Websocket.Tests.Integration
 
                     await communicator.Start();
 
-                    await client.Authenticate(API_KEY, API_SECRET);
+                    client.Authenticate(API_KEY, API_SECRET);
 
                     receivedEvent.WaitOne(TimeSpan.FromSeconds(30));
 

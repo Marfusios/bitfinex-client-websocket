@@ -48,7 +48,7 @@ namespace Bitfinex.Client.Websocket.Sample
             using (var communicator = new BitfinexWebsocketCommunicator(url))
             {
                 communicator.Name = "Bitfinex-1";
-                communicator.ReconnectTimeoutMs = (int)TimeSpan.FromSeconds(300).TotalMilliseconds;
+                communicator.ReconnectTimeout = TimeSpan.FromSeconds(30);
                 communicator.ReconnectionHappened.Subscribe(type =>
                     Log.Information($"Reconnection happened, type: {type}"));
 
@@ -76,30 +76,30 @@ namespace Bitfinex.Client.Websocket.Sample
 
         private static async Task SendSubscriptionRequests(BitfinexWebsocketClient client)
         {
-            //await client.Send(new ConfigurationRequest(ConfigurationFlag.Timestamp | ConfigurationFlag.Sequencing));
-            await client.Send(new PingRequest() {Cid = 123456});
+            //client.Send(new ConfigurationRequest(ConfigurationFlag.Timestamp | ConfigurationFlag.Sequencing));
+            client.Send(new PingRequest() {Cid = 123456});
 
-            //await client.Send(new TickerSubscribeRequest("BTC/USD"));
-            //await client.Send(new TickerSubscribeRequest("ETH/USD"));
+            //client.Send(new TickerSubscribeRequest("BTC/USD"));
+            //client.Send(new TickerSubscribeRequest("ETH/USD"));
 
-            await client.Send(new TradesSubscribeRequest("BTC/USD"));
-            //await client.Send(new TradesSubscribeRequest("NEC/ETH")); // Nectar coin from ETHFINEX
-            //await client.Send(new FundingsSubscribeRequest("BTC"));
-            //await client.Send(new FundingsSubscribeRequest("USD"));
+            client.Send(new TradesSubscribeRequest("BTC/USD"));
+            //client.Send(new TradesSubscribeRequest("NEC/ETH")); // Nectar coin from ETHFINEX
+            //client.Send(new FundingsSubscribeRequest("BTC"));
+            //client.Send(new FundingsSubscribeRequest("USD"));
 
-            //await client.Send(new CandlesSubscribeRequest("BTC/USD", BitfinexTimeFrame.OneMinute));
-            //await client.Send(new CandlesSubscribeRequest("ETH/USD", BitfinexTimeFrame.OneMinute));
+            //client.Send(new CandlesSubscribeRequest("BTC/USD", BitfinexTimeFrame.OneMinute));
+            //client.Send(new CandlesSubscribeRequest("ETH/USD", BitfinexTimeFrame.OneMinute));
 
-            //await client.Send(new BookSubscribeRequest("BTC/USD", BitfinexPrecision.P0, BitfinexFrequency.Realtime));
-            //await client.Send(new BookSubscribeRequest("BTC/USD", BitfinexPrecision.P3, BitfinexFrequency.Realtime));
-            //await client.Send(new BookSubscribeRequest("ETH/USD", BitfinexPrecision.P0, BitfinexFrequency.Realtime));
+            client.Send(new BookSubscribeRequest("BTC/USD", BitfinexPrecision.P0, BitfinexFrequency.Realtime));
+            //client.Send(new BookSubscribeRequest("BTC/USD", BitfinexPrecision.P3, BitfinexFrequency.Realtime));
+            //client.Send(new BookSubscribeRequest("ETH/USD", BitfinexPrecision.P0, BitfinexFrequency.Realtime));
 
-            //await client.Send(new StatusSubscribeRequest("liq:global"));
-            //await client.Send(new StatusSubscribeRequest("deriv:tBTCF0:USTF0"));
+            //client.Send(new StatusSubscribeRequest("liq:global"));
+            //client.Send(new StatusSubscribeRequest("deriv:tBTCF0:USTF0"));
 
             if (!string.IsNullOrWhiteSpace(API_SECRET))
             {
-                await client.Authenticate(API_KEY, API_SECRET);
+                client.Authenticate(API_KEY, API_SECRET);
 
 #pragma warning disable 4014
                 Task.Run(async () =>
@@ -326,7 +326,7 @@ namespace Bitfinex.Client.Websocket.Sample
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Verbose()
                 .WriteTo.File(logPath, rollingInterval: RollingInterval.Day)
-                .WriteTo.ColoredConsole(LogEventLevel.Information, outputTemplate: 
+                .WriteTo.ColoredConsole(LogEventLevel.Debug, outputTemplate: 
                     "[{Timestamp:HH:mm:ss.fff} {Level:u3}] {Message:lj}{NewLine}{Exception}")
                 .CreateLogger();
         }
