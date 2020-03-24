@@ -49,8 +49,8 @@ namespace Bitfinex.Client.Websocket.Sample
             {
                 communicator.Name = "Bitfinex-1";
                 communicator.ReconnectTimeout = TimeSpan.FromSeconds(30);
-                communicator.ReconnectionHappened.Subscribe(type =>
-                    Log.Information($"Reconnection happened, type: {type}"));
+                communicator.ReconnectionHappened.Subscribe(info =>
+                    Log.Information($"Reconnection happened, type: {info.Type}"));
 
                 using (var client = new BitfinexWebsocketClient(communicator))
                 {
