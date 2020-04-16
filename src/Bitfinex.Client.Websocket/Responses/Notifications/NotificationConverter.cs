@@ -54,6 +54,10 @@ namespace Bitfinex.Client.Websocket.Responses.Notifications
                     return NotificationType.OnReq;
                 case "oc-req":
                     return NotificationType.OcReq;
+                case "on_multi-req":
+                    return NotificationType.OnMultiReq;
+                case "oc_multi-req":
+                    return NotificationType.OcMultiReq;
                 case "uca":
                     return NotificationType.Uca;
                 case "fon-req":

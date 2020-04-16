@@ -138,6 +138,35 @@ More usage examples:
 </tr>
 </table>
 
+### Placing orders
+
+Bitfinex supports input authenticated API via websockets. 
+You are able to place, update, cancel orders. Also via multi batch. 
+Usage: 
+
+```csharp
+// placing buy
+client.Send(new NewOrderRequest(gid: 33, cid: 100, "ETH/USD", OrderType.Limit, 0.2, 163) {Flags = OrderFlag.PostOnly});
+
+// palcing sell
+client.Send(new NewOrderRequest(gid: 33, cid: 200, "ETH/USD", OrderType.Limit, -0.2, 188) { Flags = OrderFlag.PostOnly });
+
+// updating by client id
+client.Send(new UpdateOrderRequest(new CidPair(100, DateTime.UtcNow)) { Amount = 0.3, Price = 161});
+
+// canceling by client id
+client.Send(new CancelOrderRequest(new CidPair(100, DateTime.UtcNow)));
+
+// other canceling options
+client.Send(CancelMultiOrderRequest.CancelEverything());
+client.Send(CancelMultiOrderRequest.CancelGroup(33));
+client.Send(new CancelMultiOrderRequest(new[]
+{
+    new CidPair(100, DateTime.UtcNow),
+    new CidPair(200, DateTime.UtcNow)
+}));
+```
+
 ### Reconnecting
 
 There is a built-in reconnection which invokes after 1 minute (default) of not receiving any messages from the server. It is possible to configure that timeout via `communicator.ReconnectTimeoutMs`. Also, there is a stream `ReconnectionHappened` which sends information about a type of reconnection. However, if you are subscribed to low rate channels, it is very likely that you will encounter that timeout - higher the timeout to a few minutes or call `PingRequest` by your own every few seconds. 

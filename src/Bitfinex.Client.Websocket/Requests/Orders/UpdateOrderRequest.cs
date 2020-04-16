@@ -23,9 +23,25 @@ namespace Bitfinex.Client.Websocket.Requests.Orders
         }
 
         /// <summary>
+        /// Create update request for unique pair client id + datetime (when client id was generated)
+        /// </summary>
+        public UpdateOrderRequest(CidPair cidPair)
+        {
+            BfxValidations.ValidateInput(cidPair, nameof(cidPair));
+
+            CidPair = cidPair;
+        }
+
+
+        /// <summary>
         /// Unique Bitfinex id (must be set)
         /// </summary>
-        public long Id { get; }
+        public long? Id { get; }
+
+        /// <summary>
+        /// Unique client order identification
+        /// </summary>
+        public CidPair CidPair { get; }
 
         /// <summary>
         /// Group id for the order

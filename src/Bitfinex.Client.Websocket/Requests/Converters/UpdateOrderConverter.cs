@@ -21,8 +21,20 @@ namespace Bitfinex.Client.Websocket.Requests.Converters
 
             writer.WriteStartObject();
 
-            writer.WritePropertyName("id");
-            writer.WriteValue(request.Id);
+            if (request.Id.HasValue)
+            {
+                writer.WritePropertyName("id");
+                writer.WriteValue(request.Id);
+            }
+
+            if (request.CidPair != null)
+            {
+                writer.WritePropertyName("cid");
+                writer.WriteValue(request.CidPair.Cid);
+
+                writer.WritePropertyName("cid_date");
+                writer.WriteValue(request.CidPair.CidDate.ToString("yyyy-MM-dd"));
+            }
 
             if (request.Gid.HasValue)
             {

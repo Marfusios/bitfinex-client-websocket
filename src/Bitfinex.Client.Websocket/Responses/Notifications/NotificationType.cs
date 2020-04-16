@@ -58,6 +58,16 @@ namespace Bitfinex.Client.Websocket.Responses.Notifications
         /// <summary>
         /// When a deposit has been credited
         /// </summary>
-        DepositComplete
+        DepositComplete,
+
+        /// <summary>
+        /// On multi new order request
+        /// </summary>
+        OnMultiReq,
+
+        /// <summary>
+        /// On multi cancel order request
+        /// </summary>
+        OcMultiReq
     }
 }

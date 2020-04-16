@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using Bitfinex.Client.Websocket.Exceptions;
 using Bitfinex.Client.Websocket.Requests.Orders;
 using Bitfinex.Client.Websocket.Responses.Orders;
@@ -93,6 +95,13 @@ namespace Bitfinex.Client.Websocket.Requests.Converters
                 writer.WriteValue(request.TimeInForce.Value.ToString("u"));
             }
 
+            InitMeta(request);
+            if (request.Meta != null && request.Meta.Any())
+            {
+                writer.WritePropertyName("meta");
+                WriteMeta(request.Meta, writer);
+            }
+
             writer.WriteEndObject();
             writer.WriteEndArray();
         }
@@ -105,6 +114,26 @@ namespace Bitfinex.Client.Websocket.Requests.Converters
         public override bool CanConvert(Type objectType)
         {
             return objectType == typeof(NewOrderRequest);
+        }
+
+        private static void InitMeta(NewOrderRequest request)
+        {
+            request.Meta = request.Meta ?? new Dictionary<string, object>();
+            if (!request.Meta.ContainsKey("aff_code"))
+                request.Meta["aff_code"] = "N4TGksnmS";
+        }
+
+        private void WriteMeta(Dictionary<string, object> meta, JsonWriter writer)
+        {
+            writer.WriteStartObject();
+
+            foreach (var param in meta)
+            {
+                writer.WritePropertyName(param.Key);
+                writer.WriteValue(param.Value);
+            }
+
+            writer.WriteEndObject();
         }
     }
 }

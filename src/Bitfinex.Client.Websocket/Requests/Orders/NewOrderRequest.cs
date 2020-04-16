@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Bitfinex.Client.Websocket.Requests.Converters;
 using Bitfinex.Client.Websocket.Responses.Orders;
 using Bitfinex.Client.Websocket.Validations;
@@ -106,5 +107,10 @@ namespace Bitfinex.Client.Websocket.Requests.Orders
         /// Time-In-Force: datetime for automatic order cancellation (ie. 2020-01-01 10:45:23) )
         /// </summary>
         public DateTime? TimeInForce { get; set; }
+
+        /// <summary>
+        /// Additional parameters
+        /// </summary>
+        public Dictionary<string, object> Meta { get; set; }
     }
 }
