@@ -8,7 +8,7 @@
     <Description>Client for Bitfinex and Ethfinex websocket API version 2.0</Description>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageReleaseNotes></PackageReleaseNotes>
-    <Copyright>Copyright 2019 Mariusz Kotas. All rights reserved.</Copyright>
+    <Copyright>Copyright 2020 Mariusz Kotas. All rights reserved.</Copyright>
     <PackageTags>Bitfinex Ethfinex websockets websocket client cryptocurrency exchange bitcoin</PackageTags>
     <PackageLicenseUrl>https://github.com/Marfusios/bitfinex-client-websocket/blob/master/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/Marfusios/bitfinex-client-websocket</PackageProjectUrl>
@@ -31,7 +31,7 @@
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="System.Reactive" Version="4.4.1" />
-    <PackageReference Include="Websocket.Client" Version="4.3.12" />
+    <PackageReference Include="Websocket.Client" Version="4.3.15" />
   </ItemGroup>
 
 </Project>
