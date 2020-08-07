@@ -82,7 +82,7 @@ namespace Bitfinex.Client.Websocket.Sample
             //client.Send(new TickerSubscribeRequest("BTC/USD"));
             //client.Send(new TickerSubscribeRequest("ETH/USD"));
 
-            client.Send(new TradesSubscribeRequest("BTC/USD"));
+            //client.Send(new TradesSubscribeRequest("BTC/USD"));
             //client.Send(new TradesSubscribeRequest("NEC/ETH")); // Nectar coin from ETHFINEX
             //client.Send(new FundingsSubscribeRequest("BTC"));
             //client.Send(new FundingsSubscribeRequest("USD"));
@@ -90,9 +90,15 @@ namespace Bitfinex.Client.Websocket.Sample
             //client.Send(new CandlesSubscribeRequest("BTC/USD", BitfinexTimeFrame.OneMinute));
             //client.Send(new CandlesSubscribeRequest("ETH/USD", BitfinexTimeFrame.OneMinute));
 
-            client.Send(new BookSubscribeRequest("BTC/USD", BitfinexPrecision.P0, BitfinexFrequency.Realtime));
+            //client.Send(new BookSubscribeRequest("BTC/USD", BitfinexPrecision.P0, BitfinexFrequency.Realtime));
             //client.Send(new BookSubscribeRequest("BTC/USD", BitfinexPrecision.P3, BitfinexFrequency.Realtime));
             //client.Send(new BookSubscribeRequest("ETH/USD", BitfinexPrecision.P0, BitfinexFrequency.Realtime));
+
+            //client.Send(new BookSubscribeRequest("fUSD", BitfinexPrecision.P0, BitfinexFrequency.Realtime));
+
+            client.Send(new RawBookSubscribeRequest("BTCUSD", "100"));
+            //client.Send(new RawBookSubscribeRequest("fUSD", "25"));
+            //client.Send(new RawBookSubscribeRequest("fBTC", "25"));
 
             //client.Send(new StatusSubscribeRequest("liq:global"));
             //client.Send(new StatusSubscribeRequest("deriv:tBTCF0:USTF0"));
@@ -185,7 +191,18 @@ namespace Bitfinex.Client.Websocket.Sample
 
             client.Streams.BookStream.Subscribe(book =>
                 Log.Information(
-                    $"{book.ServerSequence} Book | channel: {book.ChanId} pair: {book.Pair}, price: {book.Price}, amount {book.Amount}, count: {book.Count}, {ShowServerTimestamp(client, book)}"));
+                    book.Period <= 0 ?
+                    $"{book.ServerSequence} Book | channel: {book.ChanId} pair: {book.Pair}, price: {book.Price}, amount {book.Amount}, count: {book.Count}, {ShowServerTimestamp(client, book)}" :
+                    $"{book.ServerSequence} Book | channel: {book.ChanId} sym: {book.Symbol}, rate: {book.Rate*100}% (p.a. {(book.Rate*100*365):F}%), period: {book.Period} amount {book.Amount}, count: {book.Count}, {ShowServerTimestamp(client, book)}"));
+
+            client.Streams.RawBookStream.Subscribe(book =>
+            {
+                Log.Information(
+                    book.OrderId > 0
+                        ? $"{book.ServerSequence} RawBook | channel: {book.ChanId} pair: {book.Pair}, order: {book.OrderId}, price: {book.Price}, amount {book.Amount} {ShowServerTimestamp(client, book)}"
+                        : $"{book.ServerSequence} RawBook | channel: {book.ChanId} sym: {book.Symbol}, offer: {book.OfferId}, period: {book.Period} days, rate {book.Rate*100}% (p.a. {(book.Rate*100*365):F}%) {ShowServerTimestamp(client, book)}");
+            });
+
 
             client.Streams.CandlesStream.Subscribe(candles =>
             {

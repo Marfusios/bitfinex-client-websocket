@@ -41,6 +41,8 @@ namespace Bitfinex.Client.Websocket.Client
         internal readonly Subject<Candles> CandlesSubject = new Subject<Candles>();
         internal readonly Subject<Book> BookSubject = new Subject<Book>();
         internal readonly Subject<Book[]> BookSnapshotSubject = new Subject<Book[]>();
+        internal readonly Subject<RawBook> RawBookSubject = new Subject<RawBook>();
+        internal readonly Subject<RawBook[]> RawBookSnapshotSubject = new Subject<RawBook[]>();
         internal readonly Subject<ChecksumResponse> BookChecksumSubject = new Subject<ChecksumResponse>();
         internal readonly Subject<DerivativePairStatus> DerivativePairSubject = new Subject<DerivativePairStatus>();
         internal readonly Subject<LiquidationFeedStatus> LiquidationFeedSubject = new Subject<LiquidationFeedStatus>();
@@ -133,6 +135,11 @@ namespace Bitfinex.Client.Websocket.Client
         public IObservable<Candles> CandlesStream => CandlesSubject.AsObservable();
 
         /// <summary>
+        /// Public initial snapshot of the order book 
+        /// </summary>
+        public IObservable<Book[]> BookSnapshotStream => BookSnapshotSubject.AsObservable();
+
+        /// <summary>
         /// Public order book stream, contains also values from initial snapshot.
         /// The Order Books channel allow you to keep track of the state of the Bitfinex order book.
         /// It is provided on a price aggregated basis, with customizable precision.
@@ -142,9 +149,18 @@ namespace Bitfinex.Client.Websocket.Client
         public IObservable<Book> BookStream => BookSubject.AsObservable();
 
         /// <summary>
-        /// Public initial snapshot of the order book 
+        /// Public initial snapshot of the order book (raw - every single order)
         /// </summary>
-        public IObservable<Book[]> BookSnapshotStream => BookSnapshotSubject.AsObservable();
+        public IObservable<RawBook[]> RawBookSnapshotStream => RawBookSnapshotSubject.AsObservable();
+
+        /// <summary>
+        /// Public order book stream (raw - every single order), contains also values from initial snapshot.
+        /// The Order Books channel allow you to keep track of the state of the Bitfinex order book.
+        /// It provides the most granular books, every single order with order id.
+        /// After receiving the response, you will receive a snapshot of the book orders,
+        /// followed by updates upon any changes to the book orders.
+        /// </summary>
+        public IObservable<RawBook> RawBookStream => RawBookSubject.AsObservable();
 
         /// <summary>
         /// Checksum stream for every book iteration. Checks the top 25 entries for each side of book. Checksum is a signed int.

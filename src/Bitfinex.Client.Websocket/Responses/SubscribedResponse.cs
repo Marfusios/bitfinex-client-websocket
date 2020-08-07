@@ -31,5 +31,15 @@ namespace Bitfinex.Client.Websocket.Responses
         /// Target key
         /// </summary>
         public string Key { get; set; }
+
+        /// <summary>
+        /// Level of price aggregation one of: P0, P1, P2, P3, R0 (raw)
+        /// </summary>
+        public string Prec { get; set; }
+
+        /// <summary>
+        /// Number of orders/levels returned by API ("1", "25", "100")
+        /// </summary>
+        public string Len { get; set; }
     }
 }

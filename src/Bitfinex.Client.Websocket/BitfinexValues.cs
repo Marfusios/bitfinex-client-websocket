@@ -18,6 +18,11 @@ namespace Bitfinex.Client.Websocket
         public static readonly Uri BitfinexWebsocketUrl = ApiWebsocketUrl;
 
         /// <summary>
+        /// Url to Bitfinex websocket API - only public channels without authentication
+        /// </summary>
+        public static readonly Uri BitfinexPublicWebsocketUrl = new Uri("wss://api-pub.bitfinex.com/ws/2");
+
+        /// <summary>
         /// Url to Ethfinex websocket API
         /// </summary>
         public static readonly Uri EthfinexWebsocketUrl = new Uri("wss://api.ethfinex.com/ws/2");

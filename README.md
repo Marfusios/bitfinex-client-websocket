@@ -2,7 +2,7 @@
 # Bitfinex & Ethfinex websocket API client 
 [![Build Status](https://travis-ci.org/Marfusios/bitfinex-client-websocket.svg?branch=master)](https://travis-ci.org/Marfusios/bitfinex-client-websocket) [![NuGet version](https://badge.fury.io/nu/Bitfinex.Client.Websocket.svg)](https://badge.fury.io/nu/Bitfinex.Client.Websocket) [![NuGet downloads](https://img.shields.io/nuget/dt/Bitfinex.Client.Websocket)](https://www.nuget.org/packages/Bitfinex.Client.Websocket)
 
-This is a C# implementation of the Bitfinex & Ethfinex websocket API version 2.0 (BETA) found here:
+This is a C# implementation of the Bitfinex & Ethfinex websocket API version 2.0 found here:
 
 https://bitfinex.readme.io/v2/docs ([Ethfinex](https://www.ethfinex.com/api_docs))
 
@@ -73,7 +73,9 @@ More usage examples:
 | Trades                 |  ✔            |
 | Trades - funding       |  ✔            |
 | Books                  |  ✔            |
-| Raw books              |                |
+| Books - funding        |  ✔            |
+| Raw books              |  ✔            |
+| Raw books - funding    |  ✔            |
 | Candles                |  ✔            |
 | Funding                |  ✔            |
 | Sequencing             |  ✔            |

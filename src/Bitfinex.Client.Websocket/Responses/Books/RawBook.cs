@@ -6,37 +6,42 @@ using Newtonsoft.Json.Linq;
 namespace Bitfinex.Client.Websocket.Responses.Books
 {
     /// <summary>
-    /// The state of the Bitfinex order book
+    /// The state of the Bitfinex order book (raw - every single order)
     /// </summary>
-    [JsonConverter(typeof(BookConverter))]
-    public class Book : ResponseBase
+    [JsonConverter(typeof(RawBookConverter))]
+    public class RawBook : ResponseBase
     {
         /// <summary>
-        /// Price level
+        /// Identification number of the order
+        /// </summary>
+        public long OrderId { get; set; }
+
+        /// <summary>
+        /// Identification number of the funding offer
+        /// </summary>
+        public long OfferId { get; set; }
+
+        /// <summary>
+        /// Order price; if 0 you have to remove the order from your book
         /// </summary>
         public double Price { get; set; }
 
         /// <summary>
-        /// Number of orders at that price level (delete price level if count = 0)
-        /// </summary>
-        public int Count { get; set; }
-
-        /// <summary>
-        /// Total amount available at that price level. 
+        /// Amount of order
         /// Trading: if AMOUNT greater than 0 then bid else ask; 
         /// Funding: if AMOUNT lower than 0 then bid else ask;
         /// </summary>
         public double Amount { get; set; }
 
         /// <summary>
-        /// Rate level
+        /// Funding rate for the offer; if 0 you have to remove the offer from your book
         /// </summary>
         public double Rate { get; set; }
 
         /// <summary>
-        /// Period level
+        /// Funding period in days
         /// </summary>
-        public double Period { get; set; }
+        public int Period { get; set; }
 
         /// <summary>
         /// Target pair
@@ -44,6 +49,7 @@ namespace Bitfinex.Client.Websocket.Responses.Books
         [JsonIgnore]
         public string Pair { get; set; }
 
+        
         /// <summary>
         /// Target symbol
         /// </summary>
@@ -52,7 +58,7 @@ namespace Bitfinex.Client.Websocket.Responses.Books
 
 
         internal static void Handle(JToken token, SubscribedResponse subscription, ConfigurationState config, 
-            Subject<Book> subject, Subject<Book[]> subjectSnapshot, Subject<ChecksumResponse> subjectChecksum)
+            Subject<RawBook> subject, Subject<RawBook[]> subjectSnapshot, Subject<ChecksumResponse> subjectChecksum)
         {
             var data = token[1];
 
@@ -73,11 +79,11 @@ namespace Bitfinex.Client.Websocket.Responses.Books
             if(data.First?.Type == JTokenType.Array)
             {
                 // initial snapshot
-                Handle(token, data.ToObject<Book[]>(), subscription, config, subject, subjectSnapshot);
+                Handle(token, data.ToObject<RawBook[]>(), subscription, config, subject, subjectSnapshot);
                 return;
             }
 
-            var book = data.ToObject<Book>();
+            var book = data.ToObject<RawBook>();
             book.Pair = subscription.Pair;
             book.Symbol = subscription.Symbol;
             book.ChanId = subscription.ChanId;
@@ -85,8 +91,8 @@ namespace Bitfinex.Client.Websocket.Responses.Books
             subject.OnNext(book);
         }
 
-        internal static void Handle(JToken token, Book[] books, SubscribedResponse subscription, ConfigurationState config, 
-            Subject<Book> subject, Subject<Book[]> subjectSnapshot)
+        internal static void Handle(JToken token, RawBook[] books, SubscribedResponse subscription, ConfigurationState config, 
+            Subject<RawBook> subject, Subject<RawBook[]> subjectSnapshot)
         {
             foreach (var book in books)
             {

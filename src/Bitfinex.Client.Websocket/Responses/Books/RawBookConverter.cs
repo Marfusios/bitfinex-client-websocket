@@ -4,11 +4,11 @@ using Newtonsoft.Json.Linq;
 
 namespace Bitfinex.Client.Websocket.Responses.Books
 {
-    class BookConverter : JsonConverter
+    class RawBookConverter : JsonConverter
     {
         public override bool CanConvert(Type objectType)
         {
-            return objectType == typeof(Book);
+            return objectType == typeof(RawBook);
         }
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue,
@@ -25,25 +25,25 @@ namespace Bitfinex.Client.Websocket.Responses.Books
             throw new NotImplementedException();
         }
 
-        private Book JArrayToTradingTicker(JArray array)
+        private RawBook JArrayToTradingTicker(JArray array)
         {
             if (array.Count == 3)
             {
-                return new Book
+                return new RawBook
                 {
-                    Price = (double)array[0],
-                    Count = (int)array[1],
+                    OrderId = (long)array[0],
+                    Price = (double)array[1],
                     Amount = (double)array[2],
                 };
             }
 
             if (array.Count > 3)
             {
-                return new Book
+                return new RawBook
                 {
-                    Rate = (double)array[0],
-                    Period = (double)array[1],
-                    Count = (int)array[2],
+                    OfferId = (long)array[0],
+                    Period = (int)array[1],
+                    Rate = (double)array[2],
                     Amount = (double)array[3],
                 };
             }

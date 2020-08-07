@@ -1,4 +1,5 @@
-﻿using Bitfinex.Client.Websocket.Logging;
+﻿using System;
+using Bitfinex.Client.Websocket.Logging;
 using Bitfinex.Client.Websocket.Messages;
 using Bitfinex.Client.Websocket.Responses;
 using Bitfinex.Client.Websocket.Responses.Books;
@@ -91,8 +92,12 @@ namespace Bitfinex.Client.Websocket.Client
                         Candles.Handle(data, response, _streams.CandlesSubject);
                     break;
                 case "book":
-                    _channelIdToHandler[channelId] = (data, config) => 
-                        Book.Handle(data, response, config, _streams.BookSubject, _streams.BookSnapshotSubject, _streams.BookChecksumSubject);
+                    if("R0".Equals(response.Prec, StringComparison.OrdinalIgnoreCase))
+                        _channelIdToHandler[channelId] = (data, config) => 
+                            RawBook.Handle(data, response, config, _streams.RawBookSubject, _streams.RawBookSnapshotSubject, _streams.BookChecksumSubject);
+                    else
+                        _channelIdToHandler[channelId] = (data, config) => 
+                            Book.Handle(data, response, config, _streams.BookSubject, _streams.BookSnapshotSubject, _streams.BookChecksumSubject);
                     break;
                 case "status":
                     if (response.Key.StartsWith("deriv"))

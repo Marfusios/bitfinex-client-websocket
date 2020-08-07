@@ -6,23 +6,39 @@
     public static class BitfinexSymbolUtils
     {
         /// <summary>
+        /// Format pair into Bitfinex symbol (BTC/USD --> tBTCUSD or fBTC)
+        /// </summary>
+        /// <param name="pair">fUSD, tBTCUSD, etc</param>
+        public static string FormatPairToSymbol(string pair)
+        {
+            var pairSafe = (pair ?? string.Empty);
+            return pairSafe.StartsWith("f") ? 
+                FormatSymbolToFunding(pairSafe) : 
+                FormatPairToTradingSymbol(pairSafe);
+        }
+
+        /// <summary>
         /// Format pair into Bitfinex trading symbol (BTC/USD --> tBTCUSD)
         /// </summary>
         /// <param name="pair">BTC/USD, BTCUSD, etc</param>
         public static string FormatPairToTradingSymbol(string pair)
         {
-            var formatted = FormatPair(pair);
-            return $"t{formatted}";
+            var pairSafe = (pair ?? string.Empty);
+            return pairSafe.StartsWith("t") ? 
+                pairSafe : 
+                $"t{FormatPair(pairSafe)}";
         }
 
         /// <summary>
         /// Format symbol into Bitfinex funding symbol (BTC --> fBTC)
         /// </summary>
-        /// <param name="symbol">BTC, USD, etc</param>
+        /// <param name="symbol">BTC, USD, fUSD, etc</param>
         public static string FormatSymbolToFunding(string symbol)
         {
-            var formatted = FormatPair(symbol);
-            return $"f{formatted}";
+            var symbolSafe = (symbol ?? string.Empty);
+            return symbolSafe.StartsWith("f") ? 
+                symbolSafe : 
+                $"f{FormatPair(symbolSafe)}";
         }
 
         /// <summary>
