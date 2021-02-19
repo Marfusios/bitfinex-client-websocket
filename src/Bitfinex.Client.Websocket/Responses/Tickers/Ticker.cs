@@ -67,6 +67,11 @@ namespace Bitfinex.Client.Websocket.Responses.Tickers
         [JsonIgnore]
         public string Pair { get; set; }
 
+        /// <summary>
+        /// Target symbol
+        /// </summary>
+        [JsonIgnore]
+        public string Symbol { get; set; }
 
         internal static void Handle(JToken token, SubscribedResponse subscription, ConfigurationState config, Subject<Ticker> subject)
         {
@@ -80,6 +85,7 @@ namespace Bitfinex.Client.Websocket.Responses.Tickers
 
             var ticker = data.ToObject<Ticker>();
             ticker.Pair = subscription.Pair;
+            ticker.Symbol = subscription.Symbol;
             ticker.ChanId = subscription.ChanId;
             SetGlobalData(ticker, config, token);
             subject.OnNext(ticker);
