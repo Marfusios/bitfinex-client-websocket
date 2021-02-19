@@ -57,6 +57,11 @@ namespace Bitfinex.Client.Websocket.Responses.Trades
         [JsonIgnore]
         public string Pair { get; set; }
 
+        /// <summary>
+        /// Target symbol
+        /// </summary>
+        [JsonIgnore]
+        public string Symbol { get; set; }
 
         internal static void Handle(JToken token, SubscribedResponse subscription, ConfigurationState config, 
             Subject<Trade> subject, Subject<Trade[]> subjectSnapshot)
@@ -88,6 +93,7 @@ namespace Bitfinex.Client.Websocket.Responses.Trades
             var trade = data.ToObject<Trade>();
             trade.Type = tradeType;
             trade.Pair = subscription.Pair;
+            trade.Symbol = subscription.Symbol;
             trade.ChanId = subscription.ChanId;
             SetGlobalData(trade, config, token, 2);
             subject.OnNext(trade);
@@ -100,6 +106,7 @@ namespace Bitfinex.Client.Websocket.Responses.Trades
             {
                 trade.Type = TradeType.Executed;
                 trade.Pair = subscription.Pair;
+                trade.Symbol = subscription.Symbol;
                 trade.ChanId = subscription.ChanId;
                 SetGlobalData(trade, config, token);
             }
