@@ -20,6 +20,9 @@
         [StringValue("3h")]
         ThreeHours = 60,
 
+        [StringValue("4h")]
+        FourHours = 61,
+
         [StringValue("6h")]
         SixHours = 70,
 
