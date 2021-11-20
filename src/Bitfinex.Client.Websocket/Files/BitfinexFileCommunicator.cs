@@ -72,6 +72,10 @@ namespace Bitfinex.Client.Websocket.Files
         {
         }
 
+        public void Send(ArraySegment<byte> message)
+        {
+        }
+
         public virtual Task SendInstant(string message)
         {
             return Task.CompletedTask;
