@@ -1,23 +1,23 @@
-﻿using Bitfinex.Client.Websocket.Utils;
+﻿using System;
+using Bitfinex.Client.Websocket.Utils;
 using Bitfinex.Client.Websocket.Validations;
 
-namespace Bitfinex.Client.Websocket.Requests.Subscriptions
+namespace Bitfinex.Client.Websocket.Requests.Subscriptions;
+
+public class CandlesSubscribeRequest : SubscribeRequestBase
 {
-    public class CandlesSubscribeRequest : SubscribeRequestBase
+    public CandlesSubscribeRequest(string pair, BitfinexTimeFrame bitfinexTimeFrame)
     {
-        public CandlesSubscribeRequest(string pair, BitfinexTimeFrame bitfinexTimeFrame)
-        {
-            BfxValidations.ValidateInput(pair, nameof(pair));
+        if (string.IsNullOrWhiteSpace(pair)) throw new ArgumentException(BfxValidations.NullOrWhitespace, nameof(pair));
 
-            Key = $"trade:{TimeFrameToKeyCommand(bitfinexTimeFrame)}:{BitfinexSymbolUtils.FormatPairToTradingSymbol(pair)}";
-        }
+        Key = $"trade:{TimeFrameToKeyCommand(bitfinexTimeFrame)}:{BitfinexSymbolUtils.FormatPairToTradingSymbol(pair)}";
+    }
 
-        public override string Channel => "candles";
-        public string Key { get; set; }
+    public override string Channel => "candles";
+    public string Key { get; set; }
 
-        private string TimeFrameToKeyCommand(BitfinexTimeFrame bitfinexTimeFrame)
-        {
-            return bitfinexTimeFrame.GetStringValue();
-        }
+    string TimeFrameToKeyCommand(BitfinexTimeFrame bitfinexTimeFrame)
+    {
+        return bitfinexTimeFrame.GetStringValue();
     }
 }

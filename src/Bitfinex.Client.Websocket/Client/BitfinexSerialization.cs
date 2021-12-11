@@ -1,13 +1,12 @@
 ﻿using Bitfinex.Client.Websocket.Json;
 using Newtonsoft.Json;
 
-namespace Bitfinex.Client.Websocket.Client
+namespace Bitfinex.Client.Websocket.Client;
+
+static class BitfinexSerialization
 {
-    internal static class BitfinexSerialization
+    public static T Deserialize<T>(string msg)
     {
-        public static T Deserialize<T>(string msg)
-        {
-            return JsonConvert.DeserializeObject<T>(msg, BitfinexJsonSerializer.Settings);
-        }
+        return JsonConvert.DeserializeObject<T>(msg, BitfinexJsonSerializer.Settings);
     }
 }

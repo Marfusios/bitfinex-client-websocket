@@ -1,250 +1,31 @@
-﻿using System;
-using System.Reactive.Linq;
-using System.Reactive.Subjects;
+﻿using System.Reactive.Subjects;
 using Bitfinex.Client.Websocket.Responses;
-using Bitfinex.Client.Websocket.Responses.Balance;
-using Bitfinex.Client.Websocket.Responses.Books;
-using Bitfinex.Client.Websocket.Responses.Candles;
 using Bitfinex.Client.Websocket.Responses.Configurations;
-using Bitfinex.Client.Websocket.Responses.Fundings;
-using Bitfinex.Client.Websocket.Responses.Notifications;
-using Bitfinex.Client.Websocket.Responses.Margin;
-using Bitfinex.Client.Websocket.Responses.Orders;
-using Bitfinex.Client.Websocket.Responses.Positions;
-using Bitfinex.Client.Websocket.Responses.Status;
-using Bitfinex.Client.Websocket.Responses.Tickers;
-using Bitfinex.Client.Websocket.Responses.Trades;
-using Bitfinex.Client.Websocket.Responses.TradesPrivate;
-using Bitfinex.Client.Websocket.Responses.Wallets;
 
-namespace Bitfinex.Client.Websocket.Client
+namespace Bitfinex.Client.Websocket.Client;
+
+/// <summary>
+/// Base class for streams from Bitfinex websocket API.
+/// </summary>
+public abstract class BitfinexClientStreams
 {
     /// <summary>
-    /// All provided streams from Bitfinex websocket API.
-    /// You need to subscribe first, send subscription request (for example: `await client.Send(new TradesSubscribeRequest(pair))`)
+    /// Info about every occurred error
     /// </summary>
-    public class BitfinexClientStreams
-    {
-        internal readonly Subject<ErrorResponse> ErrorSubject = new Subject<ErrorResponse>();
-        internal readonly Subject<InfoResponse> InfoSubject = new Subject<InfoResponse>();
-        internal readonly Subject<PongResponse> PongSubject = new Subject<PongResponse>();
-        internal readonly Subject<AuthenticationResponse> AuthenticationSubject = new Subject<AuthenticationResponse>();
-        internal readonly Subject<ConfigurationResponse> ConfigurationSubject = new Subject<ConfigurationResponse>();
-        internal readonly Subject<SubscribedResponse> SubscriptionSubject = new Subject<SubscribedResponse>();
-        internal readonly Subject<UnsubscribedResponse> UnsubscriptionSubject = new Subject<UnsubscribedResponse>();
-        internal readonly Subject<Notification> NotificationSubject = new Subject<Notification>();
+    public readonly Subject<ErrorResponse> ErrorStream = new();
 
-        internal readonly Subject<Ticker> TickerSubject = new Subject<Ticker>();
-        internal readonly Subject<Trade> TradesSubject = new Subject<Trade>();
-        internal readonly Subject<Trade[]> TradesSnapshotSubject = new Subject<Trade[]>();
-        internal readonly Subject<Funding> FundingsSubject = new Subject<Funding>();
-        internal readonly Subject<Candles> CandlesSubject = new Subject<Candles>();
-        internal readonly Subject<Book> BookSubject = new Subject<Book>();
-        internal readonly Subject<Book[]> BookSnapshotSubject = new Subject<Book[]>();
-        internal readonly Subject<RawBook> RawBookSubject = new Subject<RawBook>();
-        internal readonly Subject<RawBook[]> RawBookSnapshotSubject = new Subject<RawBook[]>();
-        internal readonly Subject<ChecksumResponse> BookChecksumSubject = new Subject<ChecksumResponse>();
-        internal readonly Subject<DerivativePairStatus> DerivativePairSubject = new Subject<DerivativePairStatus>();
-        internal readonly Subject<LiquidationFeedStatus> LiquidationFeedSubject = new Subject<LiquidationFeedStatus>();
+    /// <summary>
+    /// Initial info stream, publishes always on a new connection
+    /// </summary>
+    public readonly Subject<InfoResponse> InfoStream = new();
 
-        internal readonly Subject<Wallet[]> WalletsSubject = new Subject<Wallet[]>();
-        internal readonly Subject<Wallet> WalletSubject = new Subject<Wallet>();
-        internal readonly Subject<PrivateTrade> PrivateTradeSubject = new Subject<PrivateTrade>();
+    /// <summary>
+    /// Pong stream to match every ping request
+    /// </summary>
+    public readonly Subject<PongResponse> PongStream = new();
 
-        internal readonly Subject<Order[]> OrdersSubject = new Subject<Order[]>();
-        internal readonly Subject<Order> OrderCreatedSubject = new Subject<Order>();
-        internal readonly Subject<Order> OrderUpdatedSubject = new Subject<Order>();
-        internal readonly Subject<Order> OrderCanceledSubject = new Subject<Order>();
-
-        internal readonly Subject<Position[]> PositionsSubject = new Subject<Position[]>();
-        internal readonly Subject<Position> PositionCreatedSubject = new Subject<Position>();
-        internal readonly Subject<Position> PositionUpdatedSubject = new Subject<Position>();
-        internal readonly Subject<Position> PositionCanceledSubject = new Subject<Position>();
-
-        internal readonly Subject<BalanceInfo> BalanceInfoSubject = new Subject<BalanceInfo>();
-        internal readonly Subject<MarginInfo> MarginInfoSubject = new Subject<MarginInfo>();
-
-
-        /// <summary>
-        /// Info about every occurred error
-        /// </summary>
-        public IObservable<ErrorResponse> ErrorStream => ErrorSubject.AsObservable();
-
-        /// <summary>
-        /// Initial info stream, publishes always on a new connection
-        /// </summary>
-        public IObservable<InfoResponse> InfoStream => InfoSubject.AsObservable();
-
-        /// <summary>
-        /// Pong stream to match every ping request
-        /// </summary>
-        public IObservable<PongResponse> PongStream => PongSubject.AsObservable();
-
-        /// <summary>
-        /// Info about processed authentication
-        /// </summary>
-        public IObservable<AuthenticationResponse> AuthenticationStream => AuthenticationSubject.AsObservable();
-
-        /// <summary>
-        /// Info about processed configuration
-        /// </summary>
-        public IObservable<ConfigurationResponse> ConfigurationStream => ConfigurationSubject.AsObservable();
-
-        /// <summary>
-        /// Info about subscribed channel, you need to store channel id in order to future unsubscription
-        /// </summary>
-        public IObservable<SubscribedResponse> SubscriptionStream => SubscriptionSubject.AsObservable();
-
-        /// <summary>
-        /// Info about unsubscription
-        /// </summary>
-        public IObservable<UnsubscribedResponse> UnsubscriptionStream => UnsubscriptionSubject.AsObservable();
-
-        /// <summary>
-        /// Notifications
-        /// </summary>
-        public IObservable<Notification> NotificationStream => NotificationSubject.AsObservable();
-
-        /// <summary>
-        /// Public ticker stream for subscribed pair.
-        /// The ticker is a high level overview of the state of the market. It shows you the current best bid and ask, as well as the last trade price.
-        /// It also includes information such as daily volume and how much the price has moved over the last day.
-        /// </summary>
-        public IObservable<Ticker> TickerStream => TickerSubject.AsObservable();
-
-        /// <summary>
-        /// Public trades stream for subscribed pair.
-        /// This channel sends a trade message whenever a trade occurs at Bitfinex. It includes all the pertinent details of the trade, such as price, size and time.
-        /// </summary>
-        public IObservable<Trade> TradesStream => TradesSubject.AsObservable();
-
-        /// <summary>
-        /// Public trades snapshot stream for subscribed pair. It streams only initial snapshot after a reconnection. 
-        /// </summary>
-        public IObservable<Trade[]> TradesSnapshotStream => TradesSnapshotSubject.AsObservable();
-
-        /// <summary>
-        /// Public funding stream for subscribed pair
-        /// </summary>
-        public IObservable<Funding> FundingStream => FundingsSubject.AsObservable();
-
-        /// <summary>
-        /// Public candles stream for subscribed pair.
-        /// Provides a way to access charting candle info
-        /// </summary>
-        public IObservable<Candles> CandlesStream => CandlesSubject.AsObservable();
-
-        /// <summary>
-        /// Public initial snapshot of the order book 
-        /// </summary>
-        public IObservable<Book[]> BookSnapshotStream => BookSnapshotSubject.AsObservable();
-
-        /// <summary>
-        /// Public order book stream, contains also values from initial snapshot.
-        /// The Order Books channel allow you to keep track of the state of the Bitfinex order book.
-        /// It is provided on a price aggregated basis, with customizable precision.
-        /// After receiving the response, you will receive a snapshot of the book,
-        /// followed by updates upon any changes to the book.
-        /// </summary>
-        public IObservable<Book> BookStream => BookSubject.AsObservable();
-
-        /// <summary>
-        /// Public initial snapshot of the order book (raw - every single order)
-        /// </summary>
-        public IObservable<RawBook[]> RawBookSnapshotStream => RawBookSnapshotSubject.AsObservable();
-
-        /// <summary>
-        /// Public order book stream (raw - every single order), contains also values from initial snapshot.
-        /// The Order Books channel allow you to keep track of the state of the Bitfinex order book.
-        /// It provides the most granular books, every single order with order id.
-        /// After receiving the response, you will receive a snapshot of the book orders,
-        /// followed by updates upon any changes to the book orders.
-        /// </summary>
-        public IObservable<RawBook> RawBookStream => RawBookSubject.AsObservable();
-
-        /// <summary>
-        /// Checksum stream for every book iteration. Checks the top 25 entries for each side of book. Checksum is a signed int.
-        /// Must be enabled by configuration (see `ConfigurationRequest`)
-        /// </summary>
-        public IObservable<ChecksumResponse> BookChecksumStream => BookChecksumSubject.AsObservable();
-
-        /// <summary>
-        /// Public info about a derivative symbol
-        /// </summary>
-        public IObservable<DerivativePairStatus> DerivativePairStream => DerivativePairSubject.AsObservable();
-
-        /// <summary>
-        /// Public liquidation feed
-        /// </summary>
-        public IObservable<LiquidationFeedStatus> LiquidationFeedStream => LiquidationFeedSubject.AsObservable();
-
-        /// <summary>
-        /// Private initial info about all wallets/balances (streamed only on authentication)
-        /// </summary>
-        public IObservable<Wallet[]> WalletsStream => WalletsSubject.AsObservable();
-
-        /// <summary>
-        /// Private stream for every wallet balance update (initial wallets info is also streamed, same as 'WalletsStream')
-        /// </summary>
-        public IObservable<Wallet> WalletStream => WalletSubject.AsObservable();
-
-        /// <summary>
-        /// Private info about executed trades
-        /// </summary>
-        public IObservable<PrivateTrade> PrivateTradeStream => PrivateTradeSubject.AsObservable();
-
-        /// <summary>
-        /// Private initial info about all opened orders (streamed only on authentication)
-        /// </summary>
-        public IObservable<Order[]> OrdersStream => OrdersSubject.AsObservable();
-
-        /// <summary>
-        /// Private info about created/placed order
-        /// </summary>
-        public IObservable<Order> OrderCreatedStream => OrderCreatedSubject.AsObservable();
-
-        /// <summary>
-        /// Private info about updated order
-        /// </summary>
-        public IObservable<Order> OrderUpdatedStream => OrderUpdatedSubject.AsObservable();
-
-        /// <summary>
-        /// Private info about canceled or executed order
-        /// </summary>
-        public IObservable<Order> OrderCanceledStream => OrderCanceledSubject.AsObservable();
-
-        /// <summary>
-        /// Private initial info about all opened positions (streamed only on authentication)
-        /// </summary>
-        public IObservable<Position[]> PositionsStream => PositionsSubject.AsObservable();
-
-        /// <summary>
-        /// Private info about created/opened position
-        /// </summary>
-        public IObservable<Position> PositionCreatedStream => PositionCreatedSubject.AsObservable();
-
-        /// <summary>
-        /// Private info about updated position
-        /// </summary>
-        public IObservable<Position> PositionUpdatedStream => PositionUpdatedSubject.AsObservable();
-
-        /// <summary>
-        /// Private info about canceled or closed position
-        /// </summary>
-        public IObservable<Position> PositionCanceledStream => PositionCanceledSubject.AsObservable();
-
-        /// <summary>
-        /// Private info about total balances
-        /// </summary>
-        public IObservable<BalanceInfo> BalanceInfoStream => BalanceInfoSubject.AsObservable();
-
-        /// <summary>
-        /// Private info about margin data
-        /// </summary>
-        public IObservable<MarginInfo> MarginInfoStream => MarginInfoSubject.AsObservable();
-
-        internal BitfinexClientStreams()
-        {
-        }
-    }
+    /// <summary>
+    /// Info about processed configuration
+    /// </summary>
+    public readonly Subject<ConfigurationResponse> ConfigurationStream = new();
 }

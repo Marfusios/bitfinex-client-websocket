@@ -1,23 +1,22 @@
-﻿namespace Bitfinex.Client.Websocket.Responses.Positions
+﻿namespace Bitfinex.Client.Websocket.Responses.Positions;
+
+/// <summary>
+/// Status  of the position
+/// </summary>
+public enum PositionStatus
 {
     /// <summary>
-    /// Status  of the position
+    /// Not known status (failed to parse or received null)
     /// </summary>
-    public enum PositionStatus
-    {
-        /// <summary>
-        /// Not known status (failed to parse or received null)
-        /// </summary>
-        Undefined,
+    Undefined,
 
-        /// <summary>
-        /// Position is active
-        /// </summary>
-        Active,
+    /// <summary>
+    /// Position is active
+    /// </summary>
+    Active,
 
-        /// <summary>
-        /// Position is closed
-        /// </summary>
-        Closed
-    }
+    /// <summary>
+    /// Position is closed
+    /// </summary>
+    Closed
 }
