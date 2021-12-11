@@ -1,18 +1,18 @@
-﻿using Bitfinex.Client.Websocket.Utils;
+﻿using System;
+using Bitfinex.Client.Websocket.Utils;
 using Bitfinex.Client.Websocket.Validations;
 
-namespace Bitfinex.Client.Websocket.Requests.Subscriptions
+namespace Bitfinex.Client.Websocket.Requests.Subscriptions;
+
+public class FundingsSubscribeRequest : SubscribeRequestBase
 {
-    public class FundingsSubscribeRequest : SubscribeRequestBase
+    public FundingsSubscribeRequest(string symbol)
     {
-        public FundingsSubscribeRequest(string symbol)
-        {
-            BfxValidations.ValidateInput(symbol, nameof(symbol));
+        if (string.IsNullOrWhiteSpace(symbol)) throw new ArgumentException(BfxValidations.NullOrWhitespace, nameof(symbol));
 
-            Symbol = BitfinexSymbolUtils.FormatSymbolToFunding(symbol);
-        }
-
-        public override string Channel => "trades";
-        public string Symbol { get; }
+        Symbol = BitfinexSymbolUtils.FormatSymbolToFunding(symbol);
     }
+
+    public override string Channel => "trades";
+    public string Symbol { get; }
 }

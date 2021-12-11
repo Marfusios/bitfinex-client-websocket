@@ -1,10 +1,9 @@
-﻿namespace Bitfinex.Client.Websocket.Responses.Wallets
+﻿namespace Bitfinex.Client.Websocket.Responses.Wallets;
+
+public enum WalletType
 {
-    public enum WalletType
-    {
-        Undefined,
-        Exchange,
-        Margin,
-        Funding
-    }
+    Undefined,
+    Exchange,
+    Margin,
+    Funding
 }

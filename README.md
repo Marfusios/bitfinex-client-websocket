@@ -26,11 +26,11 @@ As a benefit, you will get real-time data and fast execution of your commands.
 
 ```csharp
 var exitEvent = new ManualResetEvent(false);
-var url = BitfinexValues.ApiWebsocketUrl;
+var url = BitfinexValues.BitfinexPublicWebsocketUrl;
 
-using (var communicator = new BitfinexWebsocketCommunicator(url))
+using (var communicator = new WebsocketClient(url))
 {
-    using (var client = new BitfinexWebsocketClient(communicator))
+    using (var client = new BitfinexPublicWebsocketClient(communicator))
     {
         client.Streams.InfoStream.Subscribe(info =>
         {
@@ -179,23 +179,23 @@ Beware that you **need to resubscribe to channels** after reconnection happens. 
 
 ### Backtesting
 
-The library is prepared for backtesting. The dependency between `Client` and `Communicator` is via abstraction `IBitfinexCommunicator`. There are two communicator implementations: 
-* `BitfinexWebsocketCommunicator` - a realtime communication with Bitfinex via websocket API.
-* `BitfinexFileCommunicator` - a simulated communication, raw data are loaded from files and streamed. If you are **interested in buying historical raw data** (trades, order book events), contact me.
+The library is prepared for backtesting. The dependency between `Client` and `Communicator` is via abstraction `IWebsocketClient`. There are two communicator implementations: 
+* `WebsocketClient` - a realtime communication with Bitfinex via websocket API.
+* `BitfinexFileClient` - a simulated communication, raw data are loaded from files and streamed. If you are **interested in buying historical raw data** (trades, order book events), contact me.
 
-Feel free to implement `IBitfinexCommunicator` on your own, for example, load raw data from database, cache, etc. 
+Feel free to implement `IWebsocketClient` on your own, for example, load raw data from database, cache, etc. 
 
 Usage: 
 
 ```csharp
-var communicator = new BitfinexFileCommunicator();
+var communicator = new BitfinexFileClient();
 communicator.FileNames = new[]
 {
     "data/bitfinex_raw_2018-11-12.txt"
 };
 communicator.Delimiter = ";;";
 
-var client = new BitfinexWebsocketClient(communicator);
+var client = new BitfinexPublicWebsocketClient(communicator);
 client.Streams.TradesStream.Subscribe(trade =>
 {
     // do something with trade

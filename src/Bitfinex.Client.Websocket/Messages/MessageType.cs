@@ -1,17 +1,16 @@
-﻿namespace Bitfinex.Client.Websocket.Messages
+﻿namespace Bitfinex.Client.Websocket.Messages;
+
+public enum MessageType
 {
-    public enum MessageType
-    {
-        Undefined,
-        Info,
-        Auth,
-        Error,
-        Ping,
-        Pong,
-        Conf,
-        Subscribe,
-        Subscribed,
-        Unsubscribe,
-        Unsubscribed
-    }
+    Undefined,
+    Info,
+    Auth,
+    Error,
+    Ping,
+    Pong,
+    Conf,
+    Subscribe,
+    Subscribed,
+    Unsubscribe,
+    Unsubscribed
 }

@@ -1,33 +1,32 @@
 ﻿using System;
 using Bitfinex.Client.Websocket.Validations;
 
-namespace Bitfinex.Client.Websocket.Requests.Orders
+namespace Bitfinex.Client.Websocket.Requests.Orders;
+
+/// <summary>
+/// Unique client order identification - id + date
+/// </summary>
+public class CidPair
 {
     /// <summary>
-    /// Unique client order identification - id + date
+    /// Create a new unique order identification
     /// </summary>
-    public class CidPair
+    public CidPair(long cid, DateTime cidDate)
     {
-        /// <summary>
-        /// Create a new unique order identification
-        /// </summary>
-        public CidPair(long cid, DateTime cidDate)
-        {
-            BfxValidations.ValidateInput(cid, nameof(cid), 0);
-            BfxValidations.ValidateInput(cidDate, nameof(cidDate));
+        if (cid < 0) throw new ArgumentException(BfxValidations.LessThanZero, nameof(cid));
+        if (cidDate == default) throw new ArgumentException(BfxValidations.Default, nameof(cidDate));
 
-            Cid = cid;
-            CidDate = cidDate;
-        }
-
-        /// <summary>
-        /// Client id, unique per day
-        /// </summary>
-        public long Cid { get; }
-
-        /// <summary>
-        /// Order creation date to make Cid unique
-        /// </summary>
-        public DateTime CidDate { get; }
+        Cid = cid;
+        CidDate = cidDate;
     }
+
+    /// <summary>
+    /// Client id, unique per day
+    /// </summary>
+    public long Cid { get; }
+
+    /// <summary>
+    /// Order creation date to make Cid unique
+    /// </summary>
+    public DateTime CidDate { get; }
 }

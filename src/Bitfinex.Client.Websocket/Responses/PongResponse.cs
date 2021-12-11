@@ -5,20 +5,19 @@ using Bitfinex.Client.Websocket.Json;
 using Bitfinex.Client.Websocket.Messages;
 using Newtonsoft.Json;
 
-namespace Bitfinex.Client.Websocket.Responses
+namespace Bitfinex.Client.Websocket.Responses;
+
+public class PongResponse : MessageBase
 {
-    public class PongResponse : MessageBase
+    public int Cid { get; set; }
+
+    [JsonConverter(typeof(UnixDateTimeConverter))]
+    public DateTime Ts { get; set; }
+
+
+    internal static void Handle(string msg, Subject<PongResponse> subject)
     {
-        public int Cid { get; set; }
-
-        [JsonConverter(typeof(UnixDateTimeConverter))]
-        public DateTime Ts { get; set; }
-
-
-        internal static void Handle(string msg, Subject<PongResponse> subject)
-        {
-            var pong = BitfinexSerialization.Deserialize<PongResponse>(msg);
-            subject.OnNext(pong);
-        }
+        var pong = BitfinexSerialization.Deserialize<PongResponse>(msg);
+        subject.OnNext(pong);
     }
 }
