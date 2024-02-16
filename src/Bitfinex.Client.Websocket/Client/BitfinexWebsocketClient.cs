@@ -51,9 +51,14 @@ namespace Bitfinex.Client.Websocket.Client
         public BitfinexClientStreams Streams { get; } = new BitfinexClientStreams();
 
         /// <summary>
-        /// Currently enabled features
+        /// Current enabled features
         /// </summary>
         public ConfigurationState Configuration { get; private set; } = new ConfigurationState();
+
+        /// <summary>
+        /// Expose logger for this client
+        /// </summary>
+        public ILogger<BitfinexWebsocketClient> Logger => _logger;
 
         /// <summary>
         /// Cleanup everything
