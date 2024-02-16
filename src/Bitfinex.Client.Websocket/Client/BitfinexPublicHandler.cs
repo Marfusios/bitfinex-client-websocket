@@ -1,5 +1,4 @@
 ﻿using System;
-using Bitfinex.Client.Websocket.Logging;
 using Bitfinex.Client.Websocket.Messages;
 using Bitfinex.Client.Websocket.Responses;
 using Bitfinex.Client.Websocket.Responses.Books;
@@ -14,8 +13,6 @@ namespace Bitfinex.Client.Websocket.Client
 {
     internal class BitfinexPublicHandler
     {
-        private static readonly ILog Log = LogProvider.GetCurrentClassLogger(); 
-
         private readonly BitfinexClientStreams _streams;
         private readonly BitfinexChannelList _channelIdToHandler;
 
@@ -52,14 +49,17 @@ namespace Bitfinex.Client.Websocket.Client
                 case MessageType.Unsubscribed:
                     UnsubscribedResponse.Handle(msg, _streams.UnsubscriptionSubject);
                     break;
-                //default:
-                //    Log.Warning($"Missing handler for public stream, data: '{msg}'");
-                //    break;
+                    //default:
+                    //    Log.Warning($"Missing handler for public stream, data: '{msg}'");
+                    //    break;
             }
         }
 
-        private void OnSubscription(SubscribedResponse response)
+        private void OnSubscription(SubscribedResponse? response)
         {
+            if (response == null)
+                return;
+
             _streams.SubscriptionSubject.OnNext(response);
 
             var channelId = response.ChanId;
@@ -71,32 +71,32 @@ namespace Bitfinex.Client.Websocket.Client
             switch (response.Channel)
             {
                 case "ticker":
-                    _channelIdToHandler[channelId] = (data, config) => 
+                    _channelIdToHandler[channelId] = (data, config) =>
                         Ticker.Handle(data, response, config, _streams.TickerSubject);
                     break;
                 case "trades":
                     //if pair is null means that is funding
                     if (response.Pair == null)
                     {
-                        _channelIdToHandler[channelId] = (data, config) => 
+                        _channelIdToHandler[channelId] = (data, config) =>
                             Funding.Handle(data, response, config, _streams.FundingsSubject);
                     }
                     else
                     {
-                        _channelIdToHandler[channelId] = (data, config) => 
+                        _channelIdToHandler[channelId] = (data, config) =>
                             Trade.Handle(data, response, config, _streams.TradesSubject, _streams.TradesSnapshotSubject);
                     }
                     break;
                 case "candles":
-                    _channelIdToHandler[channelId] = (data, config) => 
+                    _channelIdToHandler[channelId] = (data, config) =>
                         Candles.Handle(data, response, _streams.CandlesSubject);
                     break;
                 case "book":
-                    if("R0".Equals(response.Prec, StringComparison.OrdinalIgnoreCase))
-                        _channelIdToHandler[channelId] = (data, config) => 
+                    if ("R0".Equals(response.Prec, StringComparison.OrdinalIgnoreCase))
+                        _channelIdToHandler[channelId] = (data, config) =>
                             RawBook.Handle(data, response, config, _streams.RawBookSubject, _streams.RawBookSnapshotSubject, _streams.BookChecksumSubject);
                     else
-                        _channelIdToHandler[channelId] = (data, config) => 
+                        _channelIdToHandler[channelId] = (data, config) =>
                             Book.Handle(data, response, config, _streams.BookSubject, _streams.BookSnapshotSubject, _streams.BookChecksumSubject);
                     break;
                 case "status":
@@ -113,9 +113,9 @@ namespace Bitfinex.Client.Websocket.Client
                     }
 
                     break;
-                //default:
-                //    Log.Warning($"Missing subscription handler '{response.Channel}'");
-                //    break;
+                    //default:
+                    //    Log.Warning($"Missing subscription handler '{response.Channel}'");
+                    //    break;
             }
         }
 

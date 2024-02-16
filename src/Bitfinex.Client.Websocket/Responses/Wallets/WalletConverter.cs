@@ -1,5 +1,4 @@
 ﻿using System;
-using Bitfinex.Client.Websocket.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -7,8 +6,6 @@ namespace Bitfinex.Client.Websocket.Responses.Wallets
 {
     class WalletConverter : JsonConverter
     {
-        private static readonly ILog Log = LogProvider.GetCurrentClassLogger(); 
-
         public override bool CanConvert(Type objectType)
         {
             return objectType == typeof(Wallet);
@@ -57,7 +54,6 @@ namespace Bitfinex.Client.Websocket.Responses.Wallets
                 case var s when s.StartsWith("funding"):
                     return WalletType.Funding;
             }
-            Log.Warn("Can't parse WalletType, input: " + safe);
             return WalletType.Undefined;
         }
     }

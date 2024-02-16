@@ -14,21 +14,23 @@ using Bitfinex.Client.Websocket.Responses.Fundings;
 using Bitfinex.Client.Websocket.Responses.Trades;
 using Bitfinex.Client.Websocket.Utils;
 using Bitfinex.Client.Websocket.Websockets;
+using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Events;
+using Serilog.Extensions.Logging;
 
 namespace Bitfinex.Client.Websocket.Sample
 {
     class Program
     {
-        private static readonly ManualResetEvent ExitEvent = new ManualResetEvent(false);
+        private static readonly ManualResetEvent ExitEvent = new(false);
 
-        private static readonly string API_KEY = "your_api_key";
-        private static readonly string API_SECRET = "";
+        private const string ApiKey = "your_api_key";
+        private const string ApiSecret = "";
 
         static void Main(string[] args)
         {
-            InitLogging();
+            var logger = InitLogging();
 
             AppDomain.CurrentDomain.ProcessExit += CurrentDomainOnProcessExit;
             AssemblyLoadContext.Default.Unloading += DefaultOnUnloading;
@@ -45,18 +47,18 @@ namespace Bitfinex.Client.Websocket.Sample
 
 
             var url = BitfinexValues.ApiWebsocketUrl;
-            using (var communicator = new BitfinexWebsocketCommunicator(url))
+            using (var communicator = new BitfinexWebsocketCommunicator(url, logger.CreateLogger<BitfinexWebsocketCommunicator>()))
             {
                 communicator.Name = "Bitfinex-1";
                 communicator.ReconnectTimeout = TimeSpan.FromSeconds(30);
                 communicator.ReconnectionHappened.Subscribe(info =>
-                    Log.Information($"Reconnection happened, type: {info.Type}"));
+                    Log.Information("Reconnection happened, type: {type}", info.Type));
 
-                using (var client = new BitfinexWebsocketClient(communicator))
+                using (var client = new BitfinexWebsocketClient(communicator, logger.CreateLogger<BitfinexWebsocketClient>()))
                 {
                     client.Streams.InfoStream.Subscribe(info =>
                     {
-                        Log.Information($"Info received version: {info.Version}, reconnection happened, resubscribing to streams");
+                        Log.Information("Info received version: {version}, reconnection happened, resubscribing to streams", info.Version);
                         SendSubscriptionRequests(client).Wait();
                     });
 
@@ -77,12 +79,12 @@ namespace Bitfinex.Client.Websocket.Sample
         private static async Task SendSubscriptionRequests(BitfinexWebsocketClient client)
         {
             //client.Send(new ConfigurationRequest(ConfigurationFlag.Timestamp | ConfigurationFlag.Sequencing));
-            client.Send(new PingRequest() {Cid = 123456});
+            client.Send(new PingRequest() { Cid = 123456 });
 
             //client.Send(new TickerSubscribeRequest("BTC/USD"));
             //client.Send(new TickerSubscribeRequest("ETH/USD"));
 
-            //client.Send(new TradesSubscribeRequest("BTC/USD"));
+            client.Send(new TradesSubscribeRequest("BTC/USD"));
             //client.Send(new TradesSubscribeRequest("NEC/ETH")); // Nectar coin from ETHFINEX
             //client.Send(new FundingsSubscribeRequest("BTC"));
             //client.Send(new FundingsSubscribeRequest("USD"));
@@ -96,16 +98,16 @@ namespace Bitfinex.Client.Websocket.Sample
 
             //client.Send(new BookSubscribeRequest("fUSD", BitfinexPrecision.P0, BitfinexFrequency.Realtime));
 
-            client.Send(new RawBookSubscribeRequest("BTCUSD", "100"));
+            //client.Send(new RawBookSubscribeRequest("BTCUSD", "100"));
             //client.Send(new RawBookSubscribeRequest("fUSD", "25"));
             //client.Send(new RawBookSubscribeRequest("fBTC", "25"));
 
             //client.Send(new StatusSubscribeRequest("liq:global"));
             //client.Send(new StatusSubscribeRequest("deriv:tBTCF0:USTF0"));
 
-            if (!string.IsNullOrWhiteSpace(API_SECRET))
+            if (!string.IsNullOrWhiteSpace(ApiSecret))
             {
-                client.Authenticate(API_KEY, API_SECRET);
+                client.Authenticate(ApiKey, ApiSecret);
 
 #pragma warning disable 4014
                 Task.Run(async () =>
@@ -161,10 +163,10 @@ namespace Bitfinex.Client.Websocket.Sample
                 Log.Information($"Configuration happened {x.Status}, flags: {x.Flags}, server timestamp enabled: {client.Configuration.IsTimestampEnabled}"));
 
             client.Streams.PongStream.Subscribe(pong => Log.Information($"Pong received! Id: {pong.Cid}"));
-            
+
             client.Streams.TickerStream.Subscribe(ticker =>
                 Log.Information($"{ticker.ServerSequence} {ticker.Pair} - last price: {ticker.LastPrice}, bid: {ticker.Bid}, ask: {ticker.Ask}, {ShowServerTimestamp(client, ticker)}"));
-            
+
             client.Streams.TradesSnapshotStream.Subscribe(trades =>
             {
                 foreach (var x in trades)
@@ -176,7 +178,7 @@ namespace Bitfinex.Client.Websocket.Sample
 
             client.Streams.TradesStream.Where(x => x.Type == TradeType.Executed).Subscribe(x =>
                 Log.Information($"{x.ServerSequence} Trade {x.Pair} executed. Time: {x.Mts:mm:ss.fff}, Amount: {x.Amount}, Price: {x.Price}, {ShowServerTimestamp(client, x)}"));
-            
+
             client.Streams.FundingStream.Where(x => x.Type == FundingType.Executed).Subscribe(x =>
                 Log.Information($"Funding,  Symbol {x.Symbol} executed. Time: {x.Mts:mm:ss.fff}, Amount: {x.Amount}, Rate: {x.Rate}, Period: {x.Period}"));
 
@@ -193,14 +195,14 @@ namespace Bitfinex.Client.Websocket.Sample
                 Log.Information(
                     book.Period <= 0 ?
                     $"{book.ServerSequence} Book | channel: {book.ChanId} pair: {book.Pair}, price: {book.Price}, amount {book.Amount}, count: {book.Count}, {ShowServerTimestamp(client, book)}" :
-                    $"{book.ServerSequence} Book | channel: {book.ChanId} sym: {book.Symbol}, rate: {book.Rate*100}% (p.a. {(book.Rate*100*365):F}%), period: {book.Period} amount {book.Amount}, count: {book.Count}, {ShowServerTimestamp(client, book)}"));
+                    $"{book.ServerSequence} Book | channel: {book.ChanId} sym: {book.Symbol}, rate: {book.Rate * 100}% (p.a. {(book.Rate * 100 * 365):F}%), period: {book.Period} amount {book.Amount}, count: {book.Count}, {ShowServerTimestamp(client, book)}"));
 
             client.Streams.RawBookStream.Subscribe(book =>
             {
                 Log.Information(
                     book.OrderId > 0
                         ? $"{book.ServerSequence} RawBook | channel: {book.ChanId} pair: {book.Pair}, order: {book.OrderId}, price: {book.Price}, amount {book.Amount} {ShowServerTimestamp(client, book)}"
-                        : $"{book.ServerSequence} RawBook | channel: {book.ChanId} sym: {book.Symbol}, offer: {book.OfferId}, period: {book.Period} days, rate {book.Rate*100}% (p.a. {(book.Rate*100*365):F}%) {ShowServerTimestamp(client, book)}");
+                        : $"{book.ServerSequence} RawBook | channel: {book.ChanId} sym: {book.Symbol}, offer: {book.OfferId}, period: {book.Period} days, rate {book.Rate * 100}% (p.a. {(book.Rate * 100 * 365):F}%) {ShowServerTimestamp(client, book)}");
             });
 
 
@@ -248,7 +250,7 @@ namespace Bitfinex.Client.Websocket.Sample
                     //    Flags = OrderFlag.PostOnly
                     //});
                 });
-                
+
 
             client.Streams.OrderUpdatedStream.Subscribe(info =>
                 Log.Information($"Order #{info.Cid} group: {info.Gid} updated: {info.Pair} - {info.Type} - {info.Amount} @ {info.Price} | {info.OrderStatus}"));
@@ -256,7 +258,7 @@ namespace Bitfinex.Client.Websocket.Sample
             client.Streams.OrderCanceledStream.Subscribe(info =>
                 Log.Information($"Order #{info.Cid} group: {info.Gid} {info.OrderStatus}: {info.Pair} - {info.Type} - {info.Amount} @ {info.Price}"));
 
-            client.Streams.PrivateTradeStream.Subscribe(trade => 
+            client.Streams.PrivateTradeStream.Subscribe(trade =>
                 Log.Information($"Private trade {trade.Pair} executed. Time: {trade.MtsCreate:mm:ss.fff}, Amount: {trade.ExecAmount}, Price: {trade.ExecPrice}, " +
                                 $"Fee: {trade.Fee} {trade.FeeCurrency}, type: {trade.OrderType}, " +
                                 $"{ShowServerSequence(client, trade)}, {ShowServerTimestamp(client, trade)}"));
@@ -290,7 +292,7 @@ namespace Bitfinex.Client.Websocket.Sample
             client.Streams.NotificationStream.Subscribe(notification =>
                 Log.Information(
                     $"Notification: {notification.Text} code: {notification.Code}, status: {notification.Status}, type : {notification.Type}"));
-            
+
             client.Streams.BalanceInfoStream.Subscribe(info =>
                 Log.Information($"Balance, total: {info.TotalAum}, net: {info.NetAum}"));
 
@@ -324,28 +326,30 @@ namespace Bitfinex.Client.Websocket.Sample
 
         private static string ShowServerTimestamp(BitfinexWebsocketClient client, ResponseBase response)
         {
-            if(!client.Configuration.IsTimestampEnabled)
+            if (!client.Configuration.IsTimestampEnabled)
                 return string.Empty;
             return $"server timestamp: {response.ServerTimestamp:mm:ss.fff}";
         }
 
         private static string ShowServerSequence(BitfinexWebsocketClient client, ResponseBase response)
         {
-            if(!client.Configuration.IsSequencingEnabled)
+            if (!client.Configuration.IsSequencingEnabled)
                 return string.Empty;
             return $"sequence: {response.ServerSequence} / {response.ServerPrivateSequence}";
         }
 
-        private static void InitLogging()
+        private static SerilogLoggerFactory InitLogging()
         {
             var executingDir = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
             var logPath = Path.Combine(executingDir, "logs", "verbose.log");
-            Log.Logger = new LoggerConfiguration()
+            var logger = new LoggerConfiguration()
                 .MinimumLevel.Verbose()
                 .WriteTo.File(logPath, rollingInterval: RollingInterval.Day)
-                .WriteTo.ColoredConsole(LogEventLevel.Debug, outputTemplate: 
+                .WriteTo.Console(LogEventLevel.Debug, outputTemplate:
                     "[{Timestamp:HH:mm:ss.fff} {Level:u3}] {Message:lj}{NewLine}{Exception}")
                 .CreateLogger();
+            Log.Logger = logger;
+            return new SerilogLoggerFactory(logger);
         }
 
         private static void CurrentDomainOnProcessExit(object sender, EventArgs eventArgs)

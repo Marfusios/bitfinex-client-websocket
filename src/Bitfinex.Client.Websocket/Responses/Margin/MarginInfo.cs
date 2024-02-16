@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using System.Reactive.Subjects;
-using Bitfinex.Client.Websocket.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -13,8 +12,6 @@ namespace Bitfinex.Client.Websocket.Responses.Margin
     [JsonConverter(typeof(MarginInfoConverter))]
     public class MarginInfo
     {
-        private static readonly ILog Log = LogProvider.GetCurrentClassLogger();
-
         /// <summary>
         /// User Profit and Loss (P/L)
         /// </summary>
@@ -43,9 +40,8 @@ namespace Bitfinex.Client.Websocket.Responses.Margin
         internal static void Handle(JToken token, Subject<MarginInfo> subject)
         {
             var data = token[2];
-            if (data.Type != JTokenType.Array)
+            if (data?.Type != JTokenType.Array)
             {
-                Log.Warn(L("MarginInfo - Invalid message format, third param not array"));
                 return;
             }
 

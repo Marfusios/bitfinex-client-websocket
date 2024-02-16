@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using Bitfinex.Client.Websocket.Logging;
 using Bitfinex.Client.Websocket.Responses.Balance;
 using Bitfinex.Client.Websocket.Responses.Configurations;
 using Bitfinex.Client.Websocket.Responses.Notifications;
@@ -9,18 +8,20 @@ using Bitfinex.Client.Websocket.Responses.Positions;
 using Bitfinex.Client.Websocket.Responses.Trades;
 using Bitfinex.Client.Websocket.Responses.TradesPrivate;
 using Bitfinex.Client.Websocket.Responses.Wallets;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 
 namespace Bitfinex.Client.Websocket.Client
 {
     internal class BitfinexAuthenticatedHandler
     {
-        private static readonly ILog Log = LogProvider.GetCurrentClassLogger(); 
+        private readonly ILogger _logger;
         private readonly BitfinexClientStreams _streams;
 
-        public BitfinexAuthenticatedHandler(BitfinexClientStreams streams, BitfinexChannelList channelIdToHandler)
+        public BitfinexAuthenticatedHandler(BitfinexClientStreams streams, BitfinexChannelList channelIdToHandler, ILogger logger)
         {
             _streams = streams;
+            _logger = logger;
 
             channelIdToHandler[0] = HandleAccountInfo;
         }
@@ -35,17 +36,17 @@ namespace Bitfinex.Client.Websocket.Client
             var itemsCount = token?.Count();
             if (token == null || itemsCount < 2)
             {
-                Log.Warn($"Invalid message format, too low items");
+                _logger.LogWarning(L("Invalid message format, too low items"));
                 return;
             }
 
             var secondItem = token[1];
-            if (secondItem.Type != JTokenType.String)
+            if (secondItem?.Type != JTokenType.String)
             {
-                Log.Warn(L("Invalid message format, second param is not string"));
+                _logger.LogWarning(L("Invalid message format, second param is not string"));
                 return;
             }
-            var msgType = (string)secondItem;
+            var msgType = (string?)secondItem;
             if (msgType == "hb")
             {
                 // heartbeat, ignore
@@ -54,7 +55,7 @@ namespace Bitfinex.Client.Websocket.Client
 
             if (itemsCount < 3)
             {
-                Log.Warn(L("Invalid message format, too low items"));
+                _logger.LogWarning(L("Invalid message format, too low items"));
                 return;
             }
 
@@ -109,9 +110,9 @@ namespace Bitfinex.Client.Websocket.Client
                 case "miu":
                     MarginInfo.Handle(token, _streams.MarginInfoSubject);
                     break;
-                //default:
-                //    Log.Warning($"Missing private handler for '{msgType}'. Data: {token}");
-                //    break;
+                    //default:
+                    //    Log.Warning($"Missing private handler for '{msgType}'. Data: {token}");
+                    //    break;
             }
         }
     }

@@ -1,6 +1,6 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Reactive.Subjects;
-using Bitfinex.Client.Websocket.Logging;
 using Bitfinex.Client.Websocket.Responses.Configurations;
 using Bitfinex.Client.Websocket.Utils;
 using Newtonsoft.Json;
@@ -15,8 +15,6 @@ namespace Bitfinex.Client.Websocket.Responses.Positions
     [JsonConverter(typeof(PositionConverter))]
     public class Position : ResponseBase
     {
-        private static readonly ILog Log = LogProvider.GetCurrentClassLogger(); 
-
         /// <summary>
         /// Pair (tBTCUSD, etc). 
         /// </summary>
@@ -85,13 +83,12 @@ namespace Bitfinex.Client.Websocket.Responses.Positions
         internal static void Handle(JToken token, ConfigurationState config, Subject<Position[]> subject)
         {
             var data = token[2];
-            if (data.Type != JTokenType.Array)
+            if (data?.Type != JTokenType.Array)
             {
-                Log.Warn(L("Positions - Invalid message format, third param not array"));
                 return;
             }
 
-            var parsed = data.ToObject<Position[]>();
+            var parsed = data.ToObject<Position[]>() ?? Array.Empty<Position>();
             foreach (var position in parsed)
             {
                 SetGlobalData(position, config, token, 2, true);
@@ -102,20 +99,17 @@ namespace Bitfinex.Client.Websocket.Responses.Positions
         internal static void Handle(JToken token, ConfigurationState config, Subject<Position> subject)
         {
             var data = token[2];
-            if (data.Type != JTokenType.Array)
+            if (data?.Type != JTokenType.Array)
             {
-                Log.Warn(L("Position - Invalid message format, third param not array"));
                 return;
             }
 
             var position = data.ToObject<Position>();
-            SetGlobalData(position, config, token, 2, true);
-            subject.OnNext(position);
-        }
-
-        private static string L(string msg)
-        {
-            return $"[BFX POSITION HANDLER] {msg}";
+            if (position != null)
+            {
+                SetGlobalData(position, config, token, 2, true);
+                subject.OnNext(position);
+            }
         }
     }
 }

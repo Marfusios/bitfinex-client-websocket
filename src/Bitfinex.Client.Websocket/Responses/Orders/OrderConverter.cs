@@ -1,6 +1,5 @@
 ﻿using System;
 using Bitfinex.Client.Websocket.Exceptions;
-using Bitfinex.Client.Websocket.Logging;
 using Bitfinex.Client.Websocket.Utils;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -9,8 +8,6 @@ namespace Bitfinex.Client.Websocket.Responses.Orders
 {
     internal class OrderConverter : JsonConverter
     {
-        private static readonly ILog Log = LogProvider.GetCurrentClassLogger(); 
-
         public override bool CanConvert(Type objectType)
         {
             return objectType == typeof(Order);
@@ -103,7 +100,6 @@ namespace Bitfinex.Client.Websocket.Responses.Orders
                     return OrderStatus.PartiallyFilled;
 
             }
-            Log.Warn("Can't parse OrderStatus, input: " + safe);
             return OrderStatus.Undefined;
         }
 
@@ -151,7 +147,6 @@ namespace Bitfinex.Client.Websocket.Responses.Orders
                 case var s when s.StartsWith("exchange fok"):
                     return OrderType.ExchangeFok;
             }
-            Log.Warn("Can't parse OrderType, input: " + safe);
             return OrderType.Undefined;
         }
 

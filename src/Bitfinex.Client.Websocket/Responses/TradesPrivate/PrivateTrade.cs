@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Reactive.Subjects;
-using Bitfinex.Client.Websocket.Logging;
 using Bitfinex.Client.Websocket.Responses.Configurations;
 using Bitfinex.Client.Websocket.Responses.Orders;
 using Bitfinex.Client.Websocket.Responses.Trades;
@@ -16,8 +15,6 @@ namespace Bitfinex.Client.Websocket.Responses.TradesPrivate
     [JsonConverter(typeof(PrivateTradeConverter))]
     public class PrivateTrade : ResponseBase
     {
-        private static readonly ILog Log = LogProvider.GetCurrentClassLogger(); 
-
         /// <summary>
         /// Trade id
         /// </summary>
@@ -89,22 +86,18 @@ namespace Bitfinex.Client.Websocket.Responses.TradesPrivate
         internal static void Handle(JToken token, ConfigurationState config, Subject<PrivateTrade> subject, TradeType type)
         {
             var data = token[2];
-            if (data.Type != JTokenType.Array)
+            if (data?.Type != JTokenType.Array)
             {
-                Log.Warn(L("Private trade info - Invalid message format, third param not array"));
                 return;
             }
 
             var trade = data.ToObject<PrivateTrade>();
-            trade.Type = type;
-            SetGlobalData(trade, config, token, 2, true);
-
-            subject.OnNext(trade);
-        }
-
-        private static string L(string msg)
-        {
-            return $"[BFX PRIVATE TRADE HANDLER] {msg}";
+            if (trade != null)
+            {
+                trade.Type = type;
+                SetGlobalData(trade, config, token, 2, true);
+                subject.OnNext(trade);
+            }
         }
     }
 }

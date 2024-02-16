@@ -5,7 +5,7 @@ namespace Bitfinex.Client.Websocket.Client
 {
     internal static class BitfinexSerialization
     {
-        public static T Deserialize<T>(string msg)
+        public static T? Deserialize<T>(string msg) where T : class
         {
             return JsonConvert.DeserializeObject<T>(msg, BitfinexJsonSerializer.Settings);
         }

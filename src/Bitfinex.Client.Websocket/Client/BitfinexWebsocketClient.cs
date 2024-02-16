@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Linq;
-using System.Threading.Tasks;
 using Bitfinex.Client.Websocket.Communicator;
 using Bitfinex.Client.Websocket.Json;
-using Bitfinex.Client.Websocket.Logging;
 using Bitfinex.Client.Websocket.Requests;
 using Bitfinex.Client.Websocket.Requests.Configurations;
 using Bitfinex.Client.Websocket.Responses.Configurations;
 using Bitfinex.Client.Websocket.Validations;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Websocket.Client;
@@ -21,8 +21,7 @@ namespace Bitfinex.Client.Websocket.Client
     /// </summary>
     public class BitfinexWebsocketClient : IDisposable
     {
-        private static readonly ILog Log = LogProvider.GetCurrentClassLogger(); 
-
+        private readonly ILogger<BitfinexWebsocketClient> _logger;
         private readonly IBitfinexCommunicator _communicator;
         private readonly IDisposable _messageReceivedSubscription;
         private readonly IDisposable _configurationSubscription;
@@ -33,15 +32,16 @@ namespace Bitfinex.Client.Websocket.Client
         private readonly BitfinexPublicHandler _publicHandler;
 
         /// <inheritdoc />
-        public BitfinexWebsocketClient(IBitfinexCommunicator communicator)
+        public BitfinexWebsocketClient(IBitfinexCommunicator communicator, ILogger<BitfinexWebsocketClient>? logger = null)
         {
             BfxValidations.ValidateInput(communicator, nameof(communicator));
 
             _communicator = communicator;
+            _logger = logger ?? NullLogger<BitfinexWebsocketClient>.Instance;
             _messageReceivedSubscription = _communicator.MessageReceived.Subscribe(HandleMessage);
             _configurationSubscription = Streams.ConfigurationSubject.Subscribe(HandleConfiguration);
 
-            _authenticatedHandler = new BitfinexAuthenticatedHandler(Streams, _channelIdToHandler);
+            _authenticatedHandler = new BitfinexAuthenticatedHandler(Streams, _channelIdToHandler, _logger);
             _publicHandler = new BitfinexPublicHandler(Streams, _channelIdToHandler);
         }
 
@@ -80,7 +80,7 @@ namespace Bitfinex.Client.Websocket.Client
             }
             catch (Exception e)
             {
-                Log.Error(e, L($"Exception while sending message '{request}'. Error: {e.Message}"));
+                _logger.LogError(e, L("Exception while sending message '{request}'. Error: {error}"), request, e.Message);
                 throw;
             }
         }
@@ -117,7 +117,7 @@ namespace Bitfinex.Client.Websocket.Client
             }
             catch (Exception e)
             {
-                Log.Error(e, L("Exception while received configuration"));
+                _logger.LogError(e, L("Exception while received configuration, error: {error}"), e.Message);
             }
         }
 
@@ -141,7 +141,7 @@ namespace Bitfinex.Client.Websocket.Client
             }
             catch (Exception e)
             {
-                Log.Error(e, L("Exception while receiving message"));
+                _logger.LogError(e, L("Exception while receiving message, error: {error}"), e.Message);
             }
         }
 
@@ -150,7 +150,7 @@ namespace Bitfinex.Client.Websocket.Client
             var parsed = BitfinexSerialization.Deserialize<JArray>(msg);
             if (parsed.Count() < 2)
             {
-                Log.Warn(L("Invalid message format, too low items"));
+                _logger.LogWarning(L("Invalid message format, too low items"));
                 return;
             }
 
@@ -158,7 +158,7 @@ namespace Bitfinex.Client.Websocket.Client
 
             if (!_channelIdToHandler.ContainsKey(channelId))
             {
-                Log.Debug($"Unrecognized channel id '{channelId}', ignoring..");
+                _logger.LogDebug("Unrecognized channel id '{channelId}', ignoring..", channelId);
                 return;
             }
 

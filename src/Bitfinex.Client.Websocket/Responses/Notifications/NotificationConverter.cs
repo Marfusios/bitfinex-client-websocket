@@ -1,5 +1,4 @@
 using System;
-using Bitfinex.Client.Websocket.Logging;
 using Bitfinex.Client.Websocket.Utils;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -8,8 +7,6 @@ namespace Bitfinex.Client.Websocket.Responses.Notifications
 {
     class NotificationConverter : JsonConverter
     {
-        private static readonly ILog Log = LogProvider.GetCurrentClassLogger();
-
         public override bool CanConvert(Type objectType)
         {
             return objectType == typeof(Notification);
@@ -33,12 +30,12 @@ namespace Bitfinex.Client.Websocket.Responses.Notifications
         {
             return new Notification
             {
-                Mts = BitfinexTime.ConvertToTime((long) array[0]),
-                Type = ParseNotificationType((string) array[1]),
-                MessageId = (long?) array[2],
+                Mts = BitfinexTime.ConvertToTime((long)array[0]),
+                Type = ParseNotificationType((string)array[1]),
+                MessageId = (long?)array[2],
                 NotifyInfo = array[4].ToString(),
-                Code = (long?) array[5],
-                Status = (string) array[6],
+                Code = (long?)array[5],
+                Status = (string)array[6],
                 Text = array[7].ToString(),
             };
         }
@@ -76,7 +73,6 @@ namespace Bitfinex.Client.Websocket.Responses.Notifications
                     return NotificationType.DepositComplete;
             }
 
-            Log.Warn("Can't parse NotificationType, input: " + safe);
             return NotificationType.Undefined;
         }
     }

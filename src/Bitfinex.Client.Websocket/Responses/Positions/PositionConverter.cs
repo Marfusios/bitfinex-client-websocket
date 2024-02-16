@@ -1,5 +1,4 @@
 ﻿using System;
-using Bitfinex.Client.Websocket.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -7,8 +6,6 @@ namespace Bitfinex.Client.Websocket.Responses.Positions
 {
     internal class PositionConverter : JsonConverter
     {
-        private static readonly ILog Log = LogProvider.GetCurrentClassLogger(); 
-
         public override bool CanConvert(Type objectType)
         {
             return objectType == typeof(Position);
@@ -58,7 +55,6 @@ namespace Bitfinex.Client.Websocket.Responses.Positions
                 case var s when s.Contains("closed"):
                     return PositionStatus.Closed;
             }
-            Log.Warn("Can't parse PositionStatus, input: " + safe);
             return PositionStatus.Undefined;
         }
 
@@ -73,7 +69,6 @@ namespace Bitfinex.Client.Websocket.Responses.Positions
                 case 1:
                     return MarginFundingType.Term;
             }
-            Log.Warn("Can't parse MarginFundingType, input: " + type);
             return MarginFundingType.Undefined;
         }
     }

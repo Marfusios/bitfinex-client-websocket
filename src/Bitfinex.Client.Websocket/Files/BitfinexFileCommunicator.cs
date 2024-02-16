@@ -7,7 +7,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Bitfinex.Client.Websocket.Communicator;
 using Websocket.Client;
-using Websocket.Client.Models;
 
 namespace Bitfinex.Client.Websocket.Files
 {
@@ -24,6 +23,7 @@ namespace Bitfinex.Client.Websocket.Files
 
         public TimeSpan? ReconnectTimeout { get; set; } = TimeSpan.FromSeconds(60);
         public TimeSpan? ErrorReconnectTimeout { get; set; } = TimeSpan.FromSeconds(60);
+        public TimeSpan? LostReconnectTimeout { get; set; } = TimeSpan.FromSeconds(60);
         public string Name { get; set; }
         public bool IsStarted { get; private set; }
         public bool IsRunning { get; private set; }
@@ -39,7 +39,7 @@ namespace Bitfinex.Client.Websocket.Files
 
         public virtual void Dispose()
         {
-            
+
         }
 
         public virtual Task Start()
@@ -64,16 +64,19 @@ namespace Bitfinex.Client.Websocket.Files
             return Task.FromResult(true);
         }
 
-        public virtual void Send(string message)
+        public virtual bool Send(string message)
         {
+            return true;
         }
 
-        public void Send(byte[] message)
+        public bool Send(byte[] message)
         {
+            return true;
         }
 
-        public void Send(ArraySegment<byte> message)
+        public bool Send(ArraySegment<byte> message)
         {
+            return true;
         }
 
         public virtual Task SendInstant(string message)
@@ -84,6 +87,16 @@ namespace Bitfinex.Client.Websocket.Files
         public Task SendInstant(byte[] message)
         {
             return Task.CompletedTask;
+        }
+
+        public bool SendAsText(byte[] message)
+        {
+            return true;
+        }
+
+        public bool SendAsText(ArraySegment<byte> message)
+        {
+            return true;
         }
 
         public Task Reconnect()
@@ -107,7 +120,7 @@ namespace Bitfinex.Client.Websocket.Files
         {
             if (FileNames == null)
                 throw new InvalidOperationException("FileNames are not set, provide at least one path to historical data");
-            if(string.IsNullOrEmpty(Delimiter))
+            if (string.IsNullOrEmpty(Delimiter))
                 throw new InvalidOperationException("Delimiter is not set (separator between messages in the file)");
 
             foreach (var fileName in FileNames)
@@ -126,19 +139,19 @@ namespace Bitfinex.Client.Websocket.Files
             }
         }
 
- 
+
         private static string ReadByDelimeter(StreamReader sr, string delimiter)
         {
             var line = new StringBuilder();
             int matchIndex = 0;
 
             while (sr.Peek() > 0)
-            {               
+            {
                 var nextChar = (char)sr.Read();
                 line.Append(nextChar);
                 if (nextChar == delimiter[matchIndex])
                 {
-                    if(matchIndex == delimiter.Length - 1)
+                    if (matchIndex == delimiter.Length - 1)
                     {
                         return line.ToString().Substring(0, line.Length - delimiter.Length);
                     }

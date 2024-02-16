@@ -1,5 +1,4 @@
 ﻿using System;
-using Bitfinex.Client.Websocket.Logging;
 using Bitfinex.Client.Websocket.Responses.Configurations;
 using Bitfinex.Client.Websocket.Utils;
 using Newtonsoft.Json.Linq;
@@ -11,8 +10,6 @@ namespace Bitfinex.Client.Websocket.Responses
     /// </summary>
     public class ResponseBase
     {
-        private static readonly ILog Log = LogProvider.GetCurrentClassLogger(); 
-
         /// <summary>
         /// Unique channel id for this type of response.
         /// </summary>
@@ -69,7 +66,7 @@ namespace Bitfinex.Client.Websocket.Responses
             }
             catch (Exception e)
             {
-                Log.Warn($"[BFX response] Failed to parse global data (timestamp, sequence). Error: {e.Message}");
+                Console.WriteLine($"[BFX response] Failed to parse global data (timestamp, sequence). Error: {e.Message}");
             }
         }
     }
