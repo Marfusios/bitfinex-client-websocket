@@ -21,7 +21,7 @@ namespace Bitfinex.Client.Websocket.Client
     /// </summary>
     public class BitfinexWebsocketClient : IDisposable
     {
-        private readonly ILogger<BitfinexWebsocketClient> _logger;
+        private readonly ILogger _logger;
         private readonly IBitfinexCommunicator _communicator;
         private readonly IDisposable _messageReceivedSubscription;
         private readonly IDisposable _configurationSubscription;
@@ -32,7 +32,7 @@ namespace Bitfinex.Client.Websocket.Client
         private readonly BitfinexPublicHandler _publicHandler;
 
         /// <inheritdoc />
-        public BitfinexWebsocketClient(IBitfinexCommunicator communicator, ILogger<BitfinexWebsocketClient>? logger = null)
+        public BitfinexWebsocketClient(IBitfinexCommunicator communicator, ILogger? logger = null)
         {
             BfxValidations.ValidateInput(communicator, nameof(communicator));
 
@@ -58,7 +58,7 @@ namespace Bitfinex.Client.Websocket.Client
         /// <summary>
         /// Expose logger for this client
         /// </summary>
-        public ILogger<BitfinexWebsocketClient> Logger => _logger;
+        public ILogger Logger => _logger;
 
         /// <summary>
         /// Cleanup everything
