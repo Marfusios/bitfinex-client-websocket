@@ -20,6 +20,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{6D0FCFA1-4C4C-4BBD-83CC-22C8E464E338}"
 	ProjectSection(SolutionItems) = preProject
 		bitfinex_logo.png = bitfinex_logo.png
+		Directory.Build.props = Directory.Build.props
 		.github\workflows\dotnet-core-branches.yml = .github\workflows\dotnet-core-branches.yml
 		.github\workflows\dotnet-core.yml = .github\workflows\dotnet-core.yml
 		LICENSE = LICENSE
