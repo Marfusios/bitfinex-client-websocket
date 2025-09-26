@@ -172,7 +172,7 @@ namespace Bitfinex.Client.Websocket.Sample
                 foreach (var x in trades)
                 {
                     Log.Information(
-                        $"{x.ServerSequence} Trade {x.Pair} from snapshot. Time: {x.Mts:mm:ss.fff}, Amount: {x.Amount}, Price: {x.Price}, {ShowServerTimestamp(client, x)}");
+                        $"{x.ServerSequence} Trade {x.Pair} from snapshot. Time: {x.Mts:mm:ss.fff}, Amount: {x.Amount:#.0000####}, Price: {x.Price}, {ShowServerTimestamp(client, x)}");
                 }
             });
 
