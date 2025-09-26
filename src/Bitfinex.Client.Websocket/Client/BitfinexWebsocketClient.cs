@@ -85,7 +85,7 @@ namespace Bitfinex.Client.Websocket.Client
             }
             catch (Exception e)
             {
-                _logger.LogError(e, L("Exception while sending message '{request}'. Error: {error}"), request, e.Message);
+                _logger.LogError(e, L("Exception while sending message '{request}'. Error: {error}", _communicator), request, e.Message);
                 throw;
             }
         }
@@ -122,7 +122,7 @@ namespace Bitfinex.Client.Websocket.Client
             }
             catch (Exception e)
             {
-                _logger.LogError(e, L("Exception while received configuration, error: {error}"), e.Message);
+                _logger.LogError(e, L("Exception while received configuration, error: {error}", _communicator), e.Message);
             }
         }
 
@@ -146,7 +146,7 @@ namespace Bitfinex.Client.Websocket.Client
             }
             catch (Exception e)
             {
-                _logger.LogError(e, L("Exception while receiving message, error: {error}"), e.Message);
+                _logger.LogError(e, L("Exception while receiving message, error: {error}", _communicator), e.Message);
             }
         }
 
@@ -155,7 +155,7 @@ namespace Bitfinex.Client.Websocket.Client
             var parsed = BitfinexSerialization.Deserialize<JArray>(msg);
             if (parsed.Count() < 2)
             {
-                _logger.LogWarning(L("Invalid message format, too low items"));
+                _logger.LogWarning(L("Invalid message format, too low items", _communicator));
                 return;
             }
 

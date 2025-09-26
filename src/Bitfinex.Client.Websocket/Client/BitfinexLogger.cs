@@ -1,10 +1,12 @@
-﻿namespace Bitfinex.Client.Websocket.Client
+﻿using Bitfinex.Client.Websocket.Communicator;
+
+namespace Bitfinex.Client.Websocket.Client
 {
     internal static class BitfinexLogger
     {
-        public static string L(string msg)
+        public static string L(string msg, IBitfinexCommunicator communicator)
         {
-            return $"[BFX WEBSOCKET CLIENT] {msg}";
+            return $"[{communicator.Name ?? "BFX"} WEBSOCKET CLIENT] {msg}";
         }
     }
 }
