@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Bitfinex.Client.Websocket.Utils;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -28,21 +27,22 @@ namespace Bitfinex.Client.Websocket.Responses.Candles
         private Candles JArrayToCandles(JArray jArray)
         {
             var candles = new Candles();
-            var candleList = new List<Candle>();
 
             if (jArray.Count==6)
             {
-                candleList.Add(JArrayToCandle(jArray));
+                candles.CandleList = new[] { JArrayToCandle(jArray) };
             }
             else
             {
-                foreach (var candle in jArray)
+                var candleList = new Candle[jArray.Count];
+                for (var i = 0; i < jArray.Count; i++)
                 {
-                    candleList.Add(JArrayToCandle(candle));
+                    candleList[i] = JArrayToCandle(jArray[i]);
                 }
+
+                candles.CandleList = candleList;
             }
 
-            candles.CandleList = candleList.ToArray();
             return candles;
         }
 

@@ -65,41 +65,29 @@ namespace Bitfinex.Client.Websocket.Responses.Orders
         {
             if (string.IsNullOrWhiteSpace(status))
                 return OrderStatus.Undefined;
-            var safe = status.ToLower().Trim();
-            switch (safe)
-            {
-                case "active":
-                case var s when s.StartsWith("active"):
-                    return OrderStatus.Active;
-                case "executed":
-                case var s when s.StartsWith("executed"):
-                    return OrderStatus.Executed;
-                case "postonly canceled":
-                case var s when s.Contains("postonly canceled"):
-                    return OrderStatus.PostOnlyCanceled;
-                case "rsn_pos_reduce_flip":
-                case var s when s.Contains("rsn_pos_reduce_flip"):
-                    return OrderStatus.RsnPosReduceFlip;
-                case "rsn_pos_reduce_incr":
-                case var s when s.Contains("rsn_pos_reduce_incr"):
-                    return OrderStatus.RsnPosReduceIncr;
-                case "insufficient balance":
-                case var s when s.Contains("insufficient balance"):
-                    return OrderStatus.InsufficientBalance;
-                case "insufficient margin":
-                case var s when s.Contains("insufficient margin"):
-                    return OrderStatus.InsufficientMargin;
-                case "canceled":
-                case var s when s.Contains("canceled"):
-                    return OrderStatus.Canceled;
+            var safe = status.Trim();
+            if (safe.StartsWith("active", StringComparison.OrdinalIgnoreCase))
+                return OrderStatus.Active;
+            if (safe.StartsWith("executed", StringComparison.OrdinalIgnoreCase))
+                return OrderStatus.Executed;
+            if (safe.IndexOf("postonly canceled", StringComparison.OrdinalIgnoreCase) >= 0)
+                return OrderStatus.PostOnlyCanceled;
+            if (safe.IndexOf("rsn_pos_reduce_flip", StringComparison.OrdinalIgnoreCase) >= 0)
+                return OrderStatus.RsnPosReduceFlip;
+            if (safe.IndexOf("rsn_pos_reduce_incr", StringComparison.OrdinalIgnoreCase) >= 0)
+                return OrderStatus.RsnPosReduceIncr;
+            if (safe.IndexOf("insufficient balance", StringComparison.OrdinalIgnoreCase) >= 0)
+                return OrderStatus.InsufficientBalance;
+            if (safe.IndexOf("insufficient margin", StringComparison.OrdinalIgnoreCase) >= 0)
+                return OrderStatus.InsufficientMargin;
+            if (safe.IndexOf("canceled", StringComparison.OrdinalIgnoreCase) >= 0)
+                return OrderStatus.Canceled;
 
-                // must be last, because of statuses like: 'CANCELED was: PARTIALLY FILLED @ PRICE(AMOUNT)',
-                // or 'INSUFFICIENT MARGIN was: PARTIALLY FILLED @ PRICE(AMOUNT)'
-                case "partially filled":
-                case var s when s.Contains("partially filled"):
-                    return OrderStatus.PartiallyFilled;
+            // must be last, because of statuses like: 'CANCELED was: PARTIALLY FILLED @ PRICE(AMOUNT)',
+            // or 'INSUFFICIENT MARGIN was: PARTIALLY FILLED @ PRICE(AMOUNT)'
+            if (safe.IndexOf("partially filled", StringComparison.OrdinalIgnoreCase) >= 0)
+                return OrderStatus.PartiallyFilled;
 
-            }
             return OrderStatus.Undefined;
         }
 
@@ -107,46 +95,32 @@ namespace Bitfinex.Client.Websocket.Responses.Orders
         {
             if (string.IsNullOrWhiteSpace(type))
                 return OrderType.Undefined;
-            var safe = type.ToLower().Trim();
-            switch (safe)
-            {
-                case "market":
-                case var s when s.StartsWith("market"):
-                    return OrderType.Market;
-                case "exchange market":
-                case var s when s.StartsWith("exchange market"):
-                    return OrderType.ExchangeMarket;
-                case "limit":
-                case var s when s.StartsWith("limit"):
-                    return OrderType.Limit;
-                case "exchange limit":
-                case var s when s.StartsWith("exchange limit"):
-                    return OrderType.ExchangeLimit;
-                case "trailing stop":
-                case var s when s.StartsWith("trailing stop"):
-                    return OrderType.TrailingStop;
-                case "exchange trailing stop":
-                case var s when s.StartsWith("exchange trailing stop"):
-                    return OrderType.ExchangeTrailingStop;
-                case "stop":
-                case var s when s.StartsWith("stop"):
-                    return OrderType.Stop;
-                case "exchange stop":
-                case var s when s.StartsWith("exchange stop"):
-                    return OrderType.ExchangeStop;
-                case "stop limit":
-                case var s when s.StartsWith("stop limit"):
-                    return OrderType.StopLimit;
-                case "exchange stop limit":
-                case var s when s.StartsWith("exchange stop limit"):
-                    return OrderType.ExchangeStopLimit;
-                case "fok":
-                case var s when s.StartsWith("fok"):
-                    return OrderType.Fok;
-                case "exchange fok":
-                case var s when s.StartsWith("exchange fok"):
-                    return OrderType.ExchangeFok;
-            }
+            var safe = type.Trim();
+            if (safe.StartsWith("market", StringComparison.OrdinalIgnoreCase))
+                return OrderType.Market;
+            if (safe.StartsWith("exchange market", StringComparison.OrdinalIgnoreCase))
+                return OrderType.ExchangeMarket;
+            if (safe.StartsWith("limit", StringComparison.OrdinalIgnoreCase))
+                return OrderType.Limit;
+            if (safe.StartsWith("exchange limit", StringComparison.OrdinalIgnoreCase))
+                return OrderType.ExchangeLimit;
+            if (safe.StartsWith("trailing stop", StringComparison.OrdinalIgnoreCase))
+                return OrderType.TrailingStop;
+            if (safe.StartsWith("exchange trailing stop", StringComparison.OrdinalIgnoreCase))
+                return OrderType.ExchangeTrailingStop;
+            if (safe.StartsWith("stop", StringComparison.OrdinalIgnoreCase))
+                return OrderType.Stop;
+            if (safe.StartsWith("exchange stop", StringComparison.OrdinalIgnoreCase))
+                return OrderType.ExchangeStop;
+            if (safe.StartsWith("stop limit", StringComparison.OrdinalIgnoreCase))
+                return OrderType.StopLimit;
+            if (safe.StartsWith("exchange stop limit", StringComparison.OrdinalIgnoreCase))
+                return OrderType.ExchangeStopLimit;
+            if (safe.StartsWith("fok", StringComparison.OrdinalIgnoreCase))
+                return OrderType.Fok;
+            if (safe.StartsWith("exchange fok", StringComparison.OrdinalIgnoreCase))
+                return OrderType.ExchangeFok;
+
             return OrderType.Undefined;
         }
 

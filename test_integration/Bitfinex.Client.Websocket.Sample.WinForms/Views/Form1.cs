@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace Bitmex.Client.Websocket.Sample.WinForms.Views
+namespace Bitfinex.Client.Websocket.Sample.WinForms.Views
 {
     public partial class Form1 : Form, IStatsView
     {

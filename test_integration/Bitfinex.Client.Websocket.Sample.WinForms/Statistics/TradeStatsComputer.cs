@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Bitfinex.Client.Websocket.Responses.Trades;
 
-namespace Bitmex.Client.Websocket.Sample.WinForms.Statistics
+namespace Bitfinex.Client.Websocket.Sample.WinForms.Statistics
 {
     class TradeStatsComputer
     {

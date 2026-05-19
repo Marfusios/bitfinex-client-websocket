@@ -41,19 +41,14 @@ namespace Bitfinex.Client.Websocket.Responses.Wallets
         {
             if (string.IsNullOrWhiteSpace(type))
                 return WalletType.Undefined;
-            var safe = type.ToLower().Trim();
-            switch (safe)
-            {
-                case "exchange":
-                case var s when s.StartsWith("exchange"):
-                    return WalletType.Exchange;
-                case "margin":
-                case var s when s.StartsWith("margin"):
-                    return WalletType.Margin;
-                case "funding":
-                case var s when s.StartsWith("funding"):
-                    return WalletType.Funding;
-            }
+            var safe = type.Trim();
+            if (safe.StartsWith("exchange", StringComparison.OrdinalIgnoreCase))
+                return WalletType.Exchange;
+            if (safe.StartsWith("margin", StringComparison.OrdinalIgnoreCase))
+                return WalletType.Margin;
+            if (safe.StartsWith("funding", StringComparison.OrdinalIgnoreCase))
+                return WalletType.Funding;
+
             return WalletType.Undefined;
         }
     }

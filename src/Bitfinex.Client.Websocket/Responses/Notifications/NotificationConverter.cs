@@ -44,34 +44,31 @@ namespace Bitfinex.Client.Websocket.Responses.Notifications
         {
             if (string.IsNullOrWhiteSpace(type))
                 return NotificationType.Undefined;
-            var safe = type.ToLower().Trim();
-            switch (safe)
-            {
-                case "on-req":
-                    return NotificationType.OnReq;
-                case "oc-req":
-                    return NotificationType.OcReq;
-                case "on_multi-req":
-                    return NotificationType.OnMultiReq;
-                case "oc_multi-req":
-                    return NotificationType.OcMultiReq;
-                case "uca":
-                    return NotificationType.Uca;
-                case "fon-req":
-                    return NotificationType.FonReq;
-                case "foc-req":
-                    return NotificationType.FocReq;
-                case "ou-req":
-                    return NotificationType.OuReq;
-                case "wallet_transfer":
-                    return NotificationType.WalletTransfer;
-                case "pos_close":
-                    return NotificationType.PosClose;
-                case "deposit_new":
-                    return NotificationType.DepositNew;
-                case "deposit_complete":
-                    return NotificationType.DepositComplete;
-            }
+            var safe = type.Trim();
+            if (safe.Equals("on-req", StringComparison.OrdinalIgnoreCase))
+                return NotificationType.OnReq;
+            if (safe.Equals("oc-req", StringComparison.OrdinalIgnoreCase))
+                return NotificationType.OcReq;
+            if (safe.Equals("on_multi-req", StringComparison.OrdinalIgnoreCase))
+                return NotificationType.OnMultiReq;
+            if (safe.Equals("oc_multi-req", StringComparison.OrdinalIgnoreCase))
+                return NotificationType.OcMultiReq;
+            if (safe.Equals("uca", StringComparison.OrdinalIgnoreCase))
+                return NotificationType.Uca;
+            if (safe.Equals("fon-req", StringComparison.OrdinalIgnoreCase))
+                return NotificationType.FonReq;
+            if (safe.Equals("foc-req", StringComparison.OrdinalIgnoreCase))
+                return NotificationType.FocReq;
+            if (safe.Equals("ou-req", StringComparison.OrdinalIgnoreCase))
+                return NotificationType.OuReq;
+            if (safe.Equals("wallet_transfer", StringComparison.OrdinalIgnoreCase))
+                return NotificationType.WalletTransfer;
+            if (safe.Equals("pos_close", StringComparison.OrdinalIgnoreCase))
+                return NotificationType.PosClose;
+            if (safe.Equals("deposit_new", StringComparison.OrdinalIgnoreCase))
+                return NotificationType.DepositNew;
+            if (safe.Equals("deposit_complete", StringComparison.OrdinalIgnoreCase))
+                return NotificationType.DepositComplete;
 
             return NotificationType.Undefined;
         }

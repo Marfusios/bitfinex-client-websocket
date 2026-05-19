@@ -17,7 +17,7 @@ namespace Bitfinex.Client.Websocket.Json
         {
             ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
             Formatting = Formatting.None,
-            Converters = new List<JsonConverter>() { new StringEnumConverter() { CamelCaseText = true} },
+            Converters = new List<JsonConverter> { new StringEnumConverter { NamingStrategy = new CamelCaseNamingStrategy() } },
             ContractResolver = new CamelCasePropertyNamesContractResolver()
         };
 

@@ -45,16 +45,12 @@ namespace Bitfinex.Client.Websocket.Responses.Positions
         {
             if (string.IsNullOrWhiteSpace(status))
                 return PositionStatus.Undefined;
-            var safe = status.ToLower().Trim();
-            switch (safe)
-            {
-                case "active":
-                case var s when s.Contains("active"):
-                    return PositionStatus.Active;
-                case "closed":
-                case var s when s.Contains("closed"):
-                    return PositionStatus.Closed;
-            }
+            var safe = status.Trim();
+            if (safe.IndexOf("active", StringComparison.OrdinalIgnoreCase) >= 0)
+                return PositionStatus.Active;
+            if (safe.IndexOf("closed", StringComparison.OrdinalIgnoreCase) >= 0)
+                return PositionStatus.Closed;
+
             return PositionStatus.Undefined;
         }
 

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Reactive.Subjects;
 using Bitfinex.Client.Websocket.Json;
 using Bitfinex.Client.Websocket.Responses.Configurations;
@@ -101,8 +100,8 @@ namespace Bitfinex.Client.Websocket.Responses.Trades
 
         internal static void Handle(JToken token, Trade[] trades, SubscribedResponse subscription, ConfigurationState config, Subject<Trade[]> subject)
         {
-            var reversed = trades.Reverse().ToArray(); // newest last
-            foreach (var trade in reversed)
+            Array.Reverse(trades); // newest last
+            foreach (var trade in trades)
             {
                 trade.Type = TradeType.Executed;
                 trade.Pair = subscription.Pair;
@@ -110,7 +109,7 @@ namespace Bitfinex.Client.Websocket.Responses.Trades
                 trade.ChanId = subscription.ChanId;
                 SetGlobalData(trade, config, token);
             }
-            subject.OnNext(reversed);
+            subject.OnNext(trades);
         }
     }
 }

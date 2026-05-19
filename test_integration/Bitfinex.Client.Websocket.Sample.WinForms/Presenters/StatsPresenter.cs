@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
@@ -11,13 +11,13 @@ using Bitfinex.Client.Websocket.Requests.Subscriptions;
 using Bitfinex.Client.Websocket.Responses;
 using Bitfinex.Client.Websocket.Responses.Books;
 using Bitfinex.Client.Websocket.Responses.Trades;
-using Bitmex.Client.Websocket.Sample.WinForms.Statistics;
-using Bitmex.Client.Websocket.Sample.WinForms.Views;
+using Bitfinex.Client.Websocket.Sample.WinForms.Statistics;
+using Bitfinex.Client.Websocket.Sample.WinForms.Views;
 using Bitfinex.Client.Websocket.Websockets;
 using Serilog;
 using Websocket.Client;
 
-namespace Bitmex.Client.Websocket.Sample.WinForms.Presenters
+namespace Bitfinex.Client.Websocket.Sample.WinForms.Presenters
 {
     class StatsPresenter
     {

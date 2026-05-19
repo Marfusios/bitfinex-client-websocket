@@ -46,12 +46,12 @@ namespace Bitfinex.Client.Websocket.Responses.Positions
         public MarginFundingType MarginFundingType { get; set; }
 
         /// <summary>
-        /// Profit & Loss
+        /// Profit &amp; Loss
         /// </summary>
         public double? ProfitLoss { get; set; }
 
         /// <summary>
-        /// Profit & Loss percentage
+        /// Profit &amp; Loss percentage
         /// </summary>
         public double? ProfitLossPercentage { get; set; }
 

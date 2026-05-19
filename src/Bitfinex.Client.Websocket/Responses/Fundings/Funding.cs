@@ -1,7 +1,6 @@
 ﻿using Bitfinex.Client.Websocket.Json;
 using Newtonsoft.Json;
 using System;
-using System.Linq;
 using System.Reactive.Subjects;
 using Bitfinex.Client.Websocket.Responses.Configurations;
 using Newtonsoft.Json.Linq;
@@ -92,8 +91,8 @@ namespace Bitfinex.Client.Websocket.Responses.Fundings
         internal static void Handle(JToken token, Funding[] fundings, SubscribedResponse subscription, 
             ConfigurationState config, Subject<Funding> subject)
         {
-            var reversed = fundings.Reverse().ToArray(); // newest last
-            foreach (var funding in reversed)
+            Array.Reverse(fundings); // newest last
+            foreach (var funding in fundings)
             {
                 funding.Type = FundingType.Executed;
                 funding.Symbol = subscription.Symbol;
